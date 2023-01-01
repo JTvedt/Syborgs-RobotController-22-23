@@ -11,10 +11,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cRangeSensor;
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.Camera;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.vuforia.CameraDevice;
@@ -30,16 +28,15 @@ public class TeleOpIMU extends LinearOpMode {
     private DcMotor backLeft;
 
 
-    BNO055IMU imu;
-    Orientation lastAngles = new Orientation();
-    double globalAngle, power = .30, correction;
+    private BNO055IMU imu;
+    private Orientation lastAngles = new Orientation();
+    private double globalAngle, power = .30, correction;
 
-    double cntPower;
-    double current = 0;
+    private double cntPower;
+    private double current = 0;
 
     @Override
     public void runOpMode() {
-
         frontRight  = hardwareMap.get(DcMotor.class, "FR");
         frontLeft = hardwareMap.get(DcMotor.class, "FL");
         backRight  = hardwareMap.get(DcMotor.class, "BR");
@@ -67,8 +64,7 @@ public class TeleOpIMU extends LinearOpMode {
         telemetry.addData("Mode", "calibrating...");
         telemetry.update();
 
-        while (!isStopRequested() && !imu.isGyroCalibrated())
-        {
+        while (!isStopRequested() && !imu.isGyroCalibrated()) {
             sleep(200);
             idle();
         }
@@ -79,94 +75,85 @@ public class TeleOpIMU extends LinearOpMode {
 
         waitForStart();
 
-        while(opModeIsActive())
-        {
-            //first pad controls
-            double drive = gamepad1.left_stick_y * 0.65;
-            double strafe = -gamepad1.left_stick_x;
-            double spin = gamepad1.right_stick_x;
-
-            //giving power to the motors
-            frontLeft.setPower(drive + strafe - spin );
-            frontRight.setPower(drive - strafe + spin);
-            backLeft.setPower(drive - strafe - spin );
-            backRight.setPower(drive + strafe + spin );
-
-            if(gamepad1.left_bumper)
-            {
-                current = getAngle();
-            }
-
-            if(gamepad1.right_bumper)
-            {
-                telemetry.update();
-
-                double x = 0;
-                double power = 0.3;
-
-                while( getAngle()  > current)
-                {
-                    frontLeft.setPower(-power);
-                    frontRight.setPower(power);
-                    backLeft.setPower(-power);
-                    backRight.setPower(power);
-                    x = x - 1;
-                }
-                frontLeft.setPower(0);
-                frontRight.setPower(0);
-                backLeft.setPower(0);
-                backRight.setPower(0);
-
-
-            }
-            if(gamepad1.left_bumper)
-            {
-                telemetry.update();
-
-                double x = 0;
-                double power = 0.3;
-
-                while( getAngle()  < current)
-                {
-                    frontLeft.setPower(power);
-                    frontRight.setPower(-power);
-                    backLeft.setPower(power);
-                    backRight.setPower(-power);
-                    x = x + 1;
-                }
-                frontLeft.setPower(0);
-                frontRight.setPower(0);
-                backLeft.setPower(0);
-                backRight.setPower(0);
-
-            }
-
-
-            if(gamepad1.dpad_down)
-            {
-                current = getAngle();
-            }
-
-
-            telemetry.addData("Angle:", getAngle());
-            telemetry.update();
+        while(opModeIsActive()) {
+            whileActive();
         }
     }
+
+    private void whileActive() {
+        //first pad controls
+        double drive = gamepad1.left_stick_y * 0.65;
+        double strafe = -gamepad1.left_stick_x;
+        double spin = gamepad1.right_stick_x;
+
+        //giving power to the motors
+        frontLeft.setPower(drive + strafe - spin );
+        frontRight.setPower(drive - strafe + spin);
+        backLeft.setPower(drive - strafe - spin );
+        backRight.setPower(drive + strafe + spin );
+
+        if(gamepad1.left_bumper) {
+            current = getAngle();
+        }
+
+        if(gamepad1.right_bumper) {
+            telemetry.update();
+
+            double x = 0;
+            double power = 0.3;
+
+            while( getAngle()  > current) {
+                frontLeft.setPower(-power);
+                frontRight.setPower(power);
+                backLeft.setPower(-power);
+                backRight.setPower(power);
+                x = x - 1;
+            }
+            frontLeft.setPower(0);
+            frontRight.setPower(0);
+            backLeft.setPower(0);
+            backRight.setPower(0);
+        }
+
+        if(gamepad1.left_bumper) {
+            telemetry.update();
+
+            double x = 0;
+            double power = 0.3;
+
+            while(getAngle()  < current) {
+                frontLeft.setPower(power);
+                frontRight.setPower(-power);
+                backLeft.setPower(power);
+                backRight.setPower(-power);
+                x = x + 1;
+            }
+            frontLeft.setPower(0);
+            frontRight.setPower(0);
+            backLeft.setPower(0);
+            backRight.setPower(0);
+        }
+
+        if(gamepad1.dpad_down) {
+            current = getAngle();
+        }
+
+        telemetry.addData("Angle:", getAngle());
+        telemetry.update();
+    }
+
     private void resetAngle() {
         lastAngles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
         globalAngle = 0;
     }
 
     private double getAngle() {
-
         Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
 
         double deltaAngle = angles.firstAngle - lastAngles.firstAngle;
 
-        if (deltaAngle < -180)
-            deltaAngle += 360;
-        else if (deltaAngle > 180)
-            deltaAngle -= 360;
+        if (deltaAngle < -180) deltaAngle += 360;
+        else if (deltaAngle > 180) deltaAngle -= 360;
 
         globalAngle += deltaAngle;
 
@@ -174,6 +161,7 @@ public class TeleOpIMU extends LinearOpMode {
 
         return globalAngle;
     }
+
     public void rotate(double power, int degrees) {
         resetAngle();
 
@@ -218,7 +206,7 @@ public class TeleOpIMU extends LinearOpMode {
                 telemetry.addData("3 correction", correction);
                 telemetry.update();
             }
-        } else    // left turn.
+        } else {   // left turn.
             while (opModeIsActive() && getAngle() < degrees) {
                 correction = checkDirection();
 
@@ -227,6 +215,7 @@ public class TeleOpIMU extends LinearOpMode {
                 telemetry.addData("3 correction", correction);
                 telemetry.update();
             }
+        }
 
         frontLeft.setPower(0);
         frontRight.setPower(0);
