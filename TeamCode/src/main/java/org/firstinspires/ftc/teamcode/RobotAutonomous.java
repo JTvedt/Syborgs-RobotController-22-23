@@ -5,11 +5,10 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
-@Autonomous(name="Autonomous Green", group="Linear Opmode")
+@Autonomous(name="Functional Autonomous", group="Linear Opmode")
 public class RobotAutonomous extends LinearOpMode {
     private final ElapsedTime runtime = new ElapsedTime();
     private DriveTrain motors = null;
-    private String none;
 
     @Override
     public void runOpMode() {
@@ -21,9 +20,7 @@ public class RobotAutonomous extends LinearOpMode {
         waitForStart();
 
         runtime.reset();
-        motors.strafe(60);
-        motors.drive(60);
-        motors.linearMove(60 * Math.sqrt(2), 135);
-        motors.drive(-120);
+
+        // Autonomous processes go here
     }
 }

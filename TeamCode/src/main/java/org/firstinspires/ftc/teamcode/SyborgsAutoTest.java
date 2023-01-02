@@ -1,13 +1,15 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 // This is the autonomous we programmed together
-@Autonomous(name="Autonomous Red", group="Linear Opmode")
+@Disabled
+@Autonomous(name="Yash Autonomous", group="Linear Opmode")
 public class SyborgsAutoTest extends LinearOpMode
 {
 
@@ -41,12 +43,7 @@ public class SyborgsAutoTest extends LinearOpMode
         telemetry.update();
 
         // run until the end of the match (driver presses STOP)
-        frontLeft.setPower(0.6);
-        frontRight.setPower(0.6);
-        backLeft.setPower(0.6);
-        backRight.setPower(-0.6);
-
-        sleep(1000);
+        driveForward(0.6, 1000);
     }
 
     public void driveForward(double power, int ticks)

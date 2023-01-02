@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-@Autonomous(name="Autonomous Yellow", group="Linear Opmode")
+@Autonomous(name="Test Autonomous", group="Linear Opmode")
 public class RobotTest extends LinearOpMode {
     private DriveTrain motors;
 

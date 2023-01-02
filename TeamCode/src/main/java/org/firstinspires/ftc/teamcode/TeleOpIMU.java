@@ -32,14 +32,13 @@ public class TeleOpIMU extends LinearOpMode {
     private Orientation lastAngles = new Orientation();
     private double globalAngle, power = .30, correction;
 
-    private double cntPower;
     private double current = 0;
 
     @Override
     public void runOpMode() {
-        frontRight  = hardwareMap.get(DcMotor.class, "FR");
+        frontRight = hardwareMap.get(DcMotor.class, "FR");
         frontLeft = hardwareMap.get(DcMotor.class, "FL");
-        backRight  = hardwareMap.get(DcMotor.class, "BR");
+        backRight = hardwareMap.get(DcMotor.class, "BR");
         backLeft = hardwareMap.get(DcMotor.class, "BL");
 
         frontLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -128,6 +127,7 @@ public class TeleOpIMU extends LinearOpMode {
                 backRight.setPower(-power);
                 x = x + 1;
             }
+
             frontLeft.setPower(0);
             frontRight.setPower(0);
             backLeft.setPower(0);
@@ -244,7 +244,4 @@ public class TeleOpIMU extends LinearOpMode {
 
         return correction;
     }
-
-
-
 }
