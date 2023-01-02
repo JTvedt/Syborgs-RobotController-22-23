@@ -12,12 +12,15 @@ public class DriveTrain {
     private static final int WAIT_TIME = 300;
 
     private static final double PULSES_PER_REVOLUTION = 537.7;
-    private static final double CM_PER_REVOLUTION = 40.02;
-    private static final double TICKS_PER_CM = PULSES_PER_REVOLUTION / CM_PER_REVOLUTION;
+    private static final double WHEEL_CIRCUMFERENCE = 40.02;
+    private static final double TICKS_PER_CM = PULSES_PER_REVOLUTION / WHEEL_CIRCUMFERENCE;
 
     private final ArrayList<DcMotor> motorList;
-    private final HashMap<String, Integer> motorMap;
-    private final HashMap<DcMotor, Double> powerMap;
+
+    private DcMotor frontLeft;
+    private DcMotor frontRight;
+    private DcMotor backLeft;
+    private DcMotor backRight;
 
     public DriveTrain(HardwareMap hardwareMap) {
         // Store motors in list for iteration purposes
@@ -27,23 +30,14 @@ public class DriveTrain {
         motorList.add(hardwareMap.get(DcMotor.class, "BL"));
         motorList.add(hardwareMap.get(DcMotor.class, "BR"));
 
-        // String references mapped to ArrayList
-        motorMap = new HashMap<String, Integer>();
-        motorMap.put("FL", 0);
-        motorMap.put("FR", 1);
-        motorMap.put("BL", 2);
-        motorMap.put("BR", 3);
-
-        // Power coefficient applied to each motor
-        powerMap = new HashMap<DcMotor, Double>();
-        powerMap.put(getMotor("FL"), 1.0);
-        powerMap.put(getMotor("FR"), 1.0);
-        powerMap.put(getMotor("BL"), 1.0);
-        powerMap.put(getMotor("BR"), 1.0);
+        frontLeft = hardwareMap.get(DcMotor.class, "FL");
+        frontRight = hardwareMap.get(DcMotor.class, "FR");
+        backLeft = hardwareMap.get(DcMotor.class, "BL");
+        backRight = hardwareMap.get(DcMotor.class, "BR");
 
         // Reverse left side motors
-        getMotor("FL").setDirection(DcMotor.Direction.REVERSE);
-        getMotor("BL").setDirection(DcMotor.Direction.REVERSE);
+        frontLeft.setDirection(DcMotor.Direction.REVERSE);
+        backLeft.setDirection(DcMotor.Direction.REVERSE);
     }
 
     /**
@@ -57,18 +51,18 @@ public class DriveTrain {
         double vertical = Math.sin(radianDirection) * 0.87;
         int tickCount = (int)(distance * TICKS_PER_CM);
 
-        resetEncoders();
+        setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        getMotor("FL").setTargetPosition((int)((horizontal + vertical) * tickCount));
-        getMotor("FR").setTargetPosition((int)((-horizontal + vertical) * tickCount));
-        getMotor("BL").setTargetPosition((int)((-horizontal + vertical) * tickCount));
-        getMotor("BR").setTargetPosition((int)((horizontal + vertical) * tickCount));
+        frontLeft.setTargetPosition((int)((horizontal + vertical) * tickCount));
+        frontRight.setTargetPosition((int)((-horizontal + vertical) * tickCount));
+        backLeft.setTargetPosition((int)((-horizontal + vertical) * tickCount));
+        backRight.setTargetPosition((int)((horizontal + vertical) * tickCount));
 
-        startMovement();
+        setMode(DcMotor.RunMode.RUN_TO_POSITION);
         setPower(1.0);
 
         while (isMoving()) {
-
+            // Wait for robot to stop
         }
 
         try {
@@ -86,18 +80,18 @@ public class DriveTrain {
         double radianAngle = angle * (Math.PI/180);
         int tickCount = (int)(radianAngle * 425);
 
-        resetEncoders();
+        setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        getMotor("FL").setTargetPosition(-tickCount);
-        getMotor("FR").setTargetPosition(tickCount);
-        getMotor("BL").setTargetPosition(-tickCount);
-        getMotor("BR").setTargetPosition(tickCount);
+        frontLeft.setTargetPosition(-tickCount);
+        frontRight.setTargetPosition(tickCount);
+        backLeft.setTargetPosition(-tickCount);
+        backRight.setTargetPosition(tickCount);
 
-        startMovement();
+        setMode(DcMotor.RunMode.RUN_TO_POSITION);
         setPower(1.0);
 
         while (isMoving()) {
-
+            // Wait for movement to finish
         }
     }
 
@@ -117,48 +111,21 @@ public class DriveTrain {
         linearMove(distance, 0);
     }
 
-    // Returns the motor referenced by the tag
-    private DcMotor getMotor(String tag) {
-        return motorList.get(motorMap.get(tag));
-    }
-
-    // Resets the encoders
-    private void resetEncoders() {
-        for (DcMotor motor : motorList) {
-            motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        }
-    }
-
-    // Tells the motors to start moving to designated spot
-    private void startMovement() {
-        for (DcMotor motor : motorList) {
-            motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        }
-    }
-
-    // Sets motor power to 0 to stop the robot
-    private void stopMovement() {
-        for (DcMotor motor : motorList) {
-            motor.setPower(0);
-        }
-    }
-
-    // Set the power on the power mapping
-    private void setMotorPower(String motorName, double powerCoefficient) {
-        double power = Math.min(Math.max(powerCoefficient, -MAX_POWER/BASE_POWER), MAX_POWER/BASE_POWER) * BASE_POWER;
-        powerMap.put(getMotor(motorName), power);
-    }
-
-    private void setPower() {
-        for (DcMotor motor : motorList) {
-            motor.setPower(BASE_POWER * powerMap.get(motor));
+    private void setMode(DcMotor.RunMode runMode) {
+        for (DcMotor motor: motorList) {
+            motor.setMode(runMode);
         }
     }
 
     private void setPower(double power) {
         for (DcMotor motor : motorList) {
-            motor.setPower(BASE_POWER * power);
+            motor.setPower(power * BASE_POWER);
         }
+    }
+
+    // Sets motor power to 0 to stop the robot
+    private void stopMovement() {
+        setPower(0);
     }
 
     /**
