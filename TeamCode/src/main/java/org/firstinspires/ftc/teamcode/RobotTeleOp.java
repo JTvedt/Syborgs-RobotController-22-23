@@ -57,19 +57,26 @@ public class RobotTeleOp extends OpMode {
     @Override
     public void loop() {
         // Stick Controls
-        double horizontal = gamepad1.left_stick_x * 0.4;
-        double vertical = -gamepad1.left_stick_y * 0.4;
-
-        double angle = Math.atan2(vertical, horizontal);
-        double magnitude = Math.hypot(vertical, horizontal);
+        double stickAngle = Math.atan2(-gamepad1.left_stick_y, gamepad1.left_stick_x);
+        double magnitude = Math.hypot(gamepad1.left_stick_y, gamepad1.left_stick_x) * 0.3;
 
         magnitude *= gamepad1.x ? 2 : 1;
         magnitude /= gamepad1.y ? 2 : 1;
 
-        frontLeft.setPower(vertical + horizontal);
-        frontRight.setPower(vertical - horizontal);
-        backLeft.setPower(vertical - horizontal);
-        backRight.setPower(vertical + horizontal);
+        frontLeft.setPower(Math.sin(stickAngle) + Math.cos(stickAngle) * magnitude);
+        frontRight.setPower(Math.sin(stickAngle) - Math.cos(stickAngle) * magnitude);
+        backLeft.setPower(Math.sin(stickAngle) - Math.cos(stickAngle) * magnitude);
+        backRight.setPower(Math.sin(stickAngle) + Math.cos(stickAngle) * magnitude);
+
+        telemetry.addData("LStick y: ", "%f", gamepad1.left_stick_y);
+        telemetry.addData("LStick X: ", "%f", gamepad1.left_stick_x);
+        telemetry.addData("Stick Angle: ", "%f", stickAngle);
+        telemetry.update();
+    }
+
+    // Stops the robot in its place, prevents drifting
+    private void brake() {
+
     }
 
     private double getAngle() {
