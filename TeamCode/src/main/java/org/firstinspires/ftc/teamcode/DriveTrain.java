@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode;
 
 import java.util.HashMap;
 import java.util.ArrayList;
+
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -22,6 +24,8 @@ public class DriveTrain {
     private DcMotor backLeft;
     private DcMotor backRight;
 
+    private BNO055IMU imu;
+
     public DriveTrain(HardwareMap hardwareMap) {
         // Store motors in list for iteration purposes
         motorList = new ArrayList<DcMotor>();
@@ -38,6 +42,15 @@ public class DriveTrain {
         // Reverse left side motors
         frontLeft.setDirection(DcMotor.Direction.REVERSE);
         backLeft.setDirection(DcMotor.Direction.REVERSE);
+
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.mode = BNO055IMU.SensorMode.IMU;
+        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.loggingEnabled = false;
+
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        imu.initialize(parameters);
     }
 
     /**
@@ -46,9 +59,9 @@ public class DriveTrain {
      * @param direction Direction of movement, in degrees
      */
     public void linearMove(double distance, double direction) {
-        double radianDirection = direction * (Math.PI / 180);
-        double horizontal = Math.cos(radianDirection);
-        double vertical = Math.sin(radianDirection) * 0.87;
+        double radianAngle = direction * (Math.PI / 180);
+        double horizontal = Math.cos(radianAngle);
+        double vertical = Math.sin(radianAngle) * 0.87;
         int tickCount = (int)(distance * TICKS_PER_CM);
 
         setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
