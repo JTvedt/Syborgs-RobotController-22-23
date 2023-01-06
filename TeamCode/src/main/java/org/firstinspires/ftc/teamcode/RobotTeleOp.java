@@ -69,9 +69,12 @@ public class RobotTeleOp extends OpMode {
         backLeft.setPower((Math.sin(stickAngle) - Math.cos(stickAngle)) * magnitude);
         backRight.setPower((Math.sin(stickAngle) + Math.cos(stickAngle)) * magnitude);
 
+        // ok for some reason the left_stick likes to sort of "snap" to values of 1.0 and -1.0
         telemetry.addData("LStick y: ", "%f", gamepad1.left_stick_y);
         telemetry.addData("LStick X: ", "%f", gamepad1.left_stick_x);
+        // Also I don't know why but the stick angle is always in one of 8 cardinal directions
         telemetry.addData("Stick Angle: ", "%f", stickAngle);
+        telemetry.addData("Robot Direction: ", "%f", getAngle());
         telemetry.update();
     }
 
@@ -81,7 +84,9 @@ public class RobotTeleOp extends OpMode {
     }
 
     private double getAngle() {
-        double imuAngle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
+        double imuAngle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle - initialAngle;
+        if (imuAngle < -180) imuAngle += 360;
+        if (imuAngle > 180) imuAngle -= 360;
         return imuAngle;
     }
 

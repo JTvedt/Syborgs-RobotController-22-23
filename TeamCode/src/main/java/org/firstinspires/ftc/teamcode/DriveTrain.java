@@ -7,6 +7,10 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+
 public class DriveTrain {
     private static final double BASE_POWER = 0.35;
     private static final double MAX_POWER = 0.8;
@@ -25,6 +29,7 @@ public class DriveTrain {
     private DcMotor backRight;
 
     private BNO055IMU imu;
+    private double initialAngle = 0;
 
     public DriveTrain(HardwareMap hardwareMap) {
         // Store motors in list for iteration purposes
@@ -151,5 +156,16 @@ public class DriveTrain {
         }
 
         return false;
+    }
+
+    private double getAngle() {
+        double imuAngle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle - initialAngle;
+        if (imuAngle < -180) imuAngle += 360;
+        if (imuAngle > 180) imuAngle -= 360;
+        return imuAngle;
+    }
+
+    private void resetAngle() {
+        initialAngle = getAngle();
     }
 }
