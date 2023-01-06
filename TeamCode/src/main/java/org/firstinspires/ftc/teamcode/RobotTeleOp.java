@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
@@ -58,15 +59,15 @@ public class RobotTeleOp extends OpMode {
     public void loop() {
         // Stick Controls
         double stickAngle = Math.atan2(-gamepad1.left_stick_y, gamepad1.left_stick_x);
-        double magnitude = Math.hypot(gamepad1.left_stick_y, gamepad1.left_stick_x) * 0.3;
+        double magnitude = Range.clip(Math.hypot(gamepad1.left_stick_y, gamepad1.left_stick_x) * 0.5, -1, 1);
 
         magnitude *= gamepad1.x ? 2 : 1;
         magnitude /= gamepad1.y ? 2 : 1;
 
-        frontLeft.setPower(Math.sin(stickAngle) + Math.cos(stickAngle) * magnitude);
-        frontRight.setPower(Math.sin(stickAngle) - Math.cos(stickAngle) * magnitude);
-        backLeft.setPower(Math.sin(stickAngle) - Math.cos(stickAngle) * magnitude);
-        backRight.setPower(Math.sin(stickAngle) + Math.cos(stickAngle) * magnitude);
+        frontLeft.setPower((Math.sin(stickAngle) + Math.cos(stickAngle)) * magnitude);
+        frontRight.setPower((Math.sin(stickAngle) - Math.cos(stickAngle)) * magnitude);
+        backLeft.setPower((Math.sin(stickAngle) - Math.cos(stickAngle)) * magnitude);
+        backRight.setPower((Math.sin(stickAngle) + Math.cos(stickAngle)) * magnitude);
 
         telemetry.addData("LStick y: ", "%f", gamepad1.left_stick_y);
         telemetry.addData("LStick X: ", "%f", gamepad1.left_stick_x);
