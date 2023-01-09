@@ -7,18 +7,35 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 // This TeleOp is for testing purposes only (motors, etc)
 @TeleOp(name="Test TeleOp")
 public class TestTeleOp extends OpMode {
-    private DcMotor crane;
+    private DcMotor leftSlide;
+    private DcMotor rightSlide;
 
     @Override
     public void init() {
-        crane = hardwareMap.get(DcMotor.class, "Crane");
+        leftSlide = hardwareMap.get(DcMotor.class, "LS");
+        rightSlide = hardwareMap.get(DcMotor.class, "RS");
     }
 
     @Override
     public void loop() {
-        if (gamepad1.a) crane.setPower(0.4);
-        if (gamepad1.b) crane.setPower(-0.4);
-        if (gamepad1.x) crane.setPower(0.85);
-        if (gamepad1.y) crane.setPower(-0.85);
+        leftSlide.setPower(0.0);
+        rightSlide.setPower(0.0);
+
+        if (gamepad1.a) {
+            leftSlide.setPower(0.4);
+            rightSlide.setPower(0.4);
+        }
+        if (gamepad1.b) {
+            leftSlide.setPower(-0.4);
+            rightSlide.setPower(-0.4);
+        }
+        if (gamepad1.x) {
+            leftSlide.setPower(0.85);
+            rightSlide.setPower(0.85);
+        }
+        if (gamepad1.y) {
+            leftSlide.setPower(-0.85);
+            rightSlide.setPower(-0.85);
+        }
     }
 }
