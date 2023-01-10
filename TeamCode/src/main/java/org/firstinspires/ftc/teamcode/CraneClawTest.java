@@ -6,8 +6,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
 // This TeleOp is for testing purposes only (motors, etc)
-@TeleOp(name="Test TeleOp")
-public class SlideTest extends OpMode {
+@TeleOp(name="Crane & Claw Subsystm Testing")
+public class CraneClawTest extends OpMode {
     private DcMotor leftSlide;
     private DcMotor rightSlide;
 
@@ -32,20 +32,20 @@ public class SlideTest extends OpMode {
         leftSlide.setPower(0.0);
         rightSlide.setPower(0.0);
 
-        if (gamepad1.a) {
+        if (gamepad2.a) {
             leftSlide.setPower(0.5);
             rightSlide.setPower(0.5);
         }
-        if (gamepad1.b) {
+        if (gamepad2.b) {
             leftSlide.setPower(-0.5);
             rightSlide.setPower(-0.5);
         }
 
-        if (gamepad1.x) {
+        if (gamepad2.x) {
             leftClaw.setPosition(0.1);
             rightClaw.setPosition(0.9);
         }
-        if (gamepad1.y) {
+        if (gamepad2.y) {
             leftClaw.setPosition(0.9);
             rightClaw.setPosition(0.1);
         }

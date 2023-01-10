@@ -5,9 +5,12 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 @Disabled
 @Autonomous(name="Right Hand Autonomous")
-public class AutonomousB extends RobotAutonomous {
+public class AutonomousB extends AutonomousBase {
     @Override
     public void runOpMode() {
-        initialize();
+        waitForStart();
+        telemetry.addData("Run B", "successful");
+        telemetry.update();
+        sleep(1000);
     }
 }
