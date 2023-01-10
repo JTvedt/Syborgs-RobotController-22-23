@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -12,7 +13,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 
 import java.util.ArrayList;
 
-@Autonomous(name="Functional Autonomous", group="Linear Opmode")
+@Disabled
+@Autonomous(name="Autonomous Base")
 public class RobotAutonomous extends LinearOpMode {
     private final ElapsedTime runtime = new ElapsedTime();
 
@@ -43,6 +45,10 @@ public class RobotAutonomous extends LinearOpMode {
     public void runOpMode() {
         initialize();
         // Autonomous processes go here
+
+        telemetry.addData("Angle: ", getAngle());
+        spin(90);
+        telemetry.addData("Angle: ", getAngle());
     }
 
     public void initialize() {

@@ -12,7 +12,6 @@ import com.qualcomm.robotcore.util.Range;
 @Autonomous(name="Yash Autonomous", group="Linear Opmode")
 public class SyborgsAutoTest extends LinearOpMode
 {
-
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
 

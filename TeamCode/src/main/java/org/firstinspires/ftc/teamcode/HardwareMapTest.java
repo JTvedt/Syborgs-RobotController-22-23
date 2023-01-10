@@ -10,7 +10,7 @@ import java.util.ArrayList;
  * Test the motors to see if they are mapped correctly in the Configuration
  * Before pressing play, hold the robot upside down to see each wheel
  */
-@Autonomous(name="Test Hardware Map", group="Linear Opmode")
+@Autonomous(name="Test Hardware Map")
 public class HardwareMapTest extends LinearOpMode {
     public void runOpMode() {
         ArrayList<DcMotor> motorList = new ArrayList<DcMotor>();
