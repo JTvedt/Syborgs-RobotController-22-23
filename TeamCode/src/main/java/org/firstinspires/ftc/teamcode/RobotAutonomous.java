@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -21,11 +22,12 @@ public class RobotAutonomous extends LinearOpMode {
     private static final double BASE_POWER = 0.35;
     private static final double MAX_POWER = 0.8;
     private static final double TILE_CM = 60;
-    private static final int WAIT_TIME = 300;
 
     private static final double PULSES_PER_REVOLUTION = 537.7;
     private static final double WHEEL_CIRCUMFERENCE = 40.02;
     private static final double TICKS_PER_CM = PULSES_PER_REVOLUTION / WHEEL_CIRCUMFERENCE;
+
+    private static final int WAIT_TIME = 300;
 
     private ArrayList<DcMotor> wheelList;
     private ArrayList<DcMotor> slideList;
@@ -37,6 +39,9 @@ public class RobotAutonomous extends LinearOpMode {
 
     private DcMotor leftSlide;
     private DcMotor rightSlide;
+
+    private Servo leftClaw;
+    private Servo rightClaw;
 
     private BNO055IMU imu;
     private double initialAngle = 0;
@@ -64,6 +69,9 @@ public class RobotAutonomous extends LinearOpMode {
         backLeft = hardwareMap.get(DcMotor.class, "BL");
         backRight = hardwareMap.get(DcMotor.class, "BR");
 
+        frontLeft.setDirection(DcMotor.Direction.REVERSE);
+        backLeft.setDirection(DcMotor.Direction.REVERSE);
+
         // Slide motors
         slideList = new ArrayList<DcMotor>();
         slideList.add(hardwareMap.get(DcMotor.class, "LS"));
@@ -72,13 +80,17 @@ public class RobotAutonomous extends LinearOpMode {
         leftSlide = hardwareMap.get(DcMotor.class, "LS");
         rightSlide = hardwareMap.get(DcMotor.class, "RS");
 
-        // Reverse left side motors
-        frontLeft.setDirection(DcMotor.Direction.REVERSE);
-        backLeft.setDirection(DcMotor.Direction.REVERSE);
+        leftSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightSlide.setDirection(DcMotor.Direction.REVERSE);
+
+        // Servo
+        leftClaw = hardwareMap.get(Servo.class, "LC");
+        rightClaw = hardwareMap.get(Servo.class, "RC");
 
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.mode = BNO055IMU.SensorMode.IMU;
-        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+        parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
         parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
         parameters.loggingEnabled = false;
 
@@ -192,14 +204,32 @@ public class RobotAutonomous extends LinearOpMode {
         return false;
     }
 
+    // Gets the degree value as a radian value
     private double getAngle() {
         double imuAngle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle - initialAngle;
-        if (imuAngle < -180) imuAngle += 360;
-        if (imuAngle > 180) imuAngle -= 360;
+        if (imuAngle < -Math.PI) imuAngle += 2 * Math.PI;
+        if (imuAngle > Math.PI) imuAngle -= 2 * Math.PI;
         return imuAngle;
     }
 
+    // Sets the initialAngle of the robot to where it is currently facing
     private void resetAngle() {
         initialAngle = getAngle();
     }
+
+    /**
+     * Sets the claw to a position
+     * @param state state to put the claw in
+     */
+    private void setClaw(ClawState state) {
+        if (state == ClawState.OPEN) {
+            leftClaw.setPosition(0.1);
+            rightClaw.setPosition(0.9);
+        } else if (state == ClawState.CLOSE) {
+            leftClaw.setPosition(0.1);
+            rightClaw.setPosition(0.9);
+        }
+    }
+
+    private enum ClawState { OPEN, CLOSE }
 }

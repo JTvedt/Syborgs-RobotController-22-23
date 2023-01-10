@@ -13,8 +13,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
-@TeleOp(name = "Yash's TeleOp")
-public class BasicTeleOp extends LinearOpMode {
+@TeleOp(name = "Yash TeleOp")
+public class SyborgsTeleOp extends LinearOpMode {
 
     private DcMotor frontRight;
     private DcMotor frontLeft;
@@ -46,8 +46,6 @@ public class BasicTeleOp extends LinearOpMode {
         frontRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         backRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         backLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        // leftArm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        // rightArm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         frontRight.setDirection(DcMotor.Direction.REVERSE);
         backRight.setDirection(DcMotor.Direction.REVERSE);
@@ -57,6 +55,7 @@ public class BasicTeleOp extends LinearOpMode {
 
         leftArm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightArm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightArm.setDirection(DcMotor.Direction.REVERSE);
 
         leftClaw = hardwareMap.get(Servo.class, "LC");
         rightClaw = hardwareMap.get(Servo.class, "RC");
@@ -74,9 +73,6 @@ public class BasicTeleOp extends LinearOpMode {
         telemetry.addData("Mode", "calibrating...");
         telemetry.update();
 
-
-
-
         while (!isStopRequested() && !imu.isGyroCalibrated())
         {
             sleep(200);
@@ -87,14 +83,7 @@ public class BasicTeleOp extends LinearOpMode {
         telemetry.addData("imu calib status", imu.getCalibrationStatus().toString());
         telemetry.update();
 
-
-
-
-
-
-
         waitForStart();
-
 
         while(opModeIsActive())
         {
@@ -110,7 +99,7 @@ public class BasicTeleOp extends LinearOpMode {
             backLeft.setPower(drive - strafe - spin );
             backRight.setPower(drive + strafe + spin );
             leftArm.setPower(up);
-            rightArm.setPower(-up);
+            rightArm.setPower(up);
 
             if(gamepad1.left_bumper)
             {
@@ -161,7 +150,6 @@ public class BasicTeleOp extends LinearOpMode {
 
             }
 
-
             if(gamepad1.dpad_down)
             {
                 current = getAngle();
@@ -182,6 +170,7 @@ public class BasicTeleOp extends LinearOpMode {
 
         }
     }
+
     private void resetAngle()
     {
         lastAngles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
@@ -206,6 +195,7 @@ public class BasicTeleOp extends LinearOpMode {
 
         return globalAngle;
     }
+
     public void rotate(double power, int degrees)
     {
         resetAngle();
@@ -269,9 +259,8 @@ public class BasicTeleOp extends LinearOpMode {
         sleep(100);
 
         resetAngle();
-
-
     }
+
     private double checkDirection() {
         // The gain value determines how sensitive the correction is to direction changes.
         // You will have to experiment with your robot to get small smooth direction changes
