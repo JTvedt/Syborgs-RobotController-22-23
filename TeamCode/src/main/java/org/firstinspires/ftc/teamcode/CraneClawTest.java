@@ -1,11 +1,13 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
 // This TeleOp is for testing purposes only (motors, etc)
+@Disabled
 @TeleOp(name="Crane & Claw Subsystm Testing")
 public class CraneClawTest extends OpMode {
     private DcMotor leftSlide;
