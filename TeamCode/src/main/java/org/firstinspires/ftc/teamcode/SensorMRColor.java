@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.robotcontroller.external.samples;
+package org.firstinspires.ftc.teamcode;
 
 import android.app.Activity;
 import android.graphics.Color;
@@ -22,7 +22,7 @@ import com.qualcomm.robotcore.hardware.ColorSensor;
  * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
-@TeleOp(name = "Sensor: MR Color", group = "Sensor")
+@TeleOp(name = "Color Sensor Tests", group = "Sensor")
 @Disabled
 public class SensorMRColor extends LinearOpMode {
     ColorSensor colorSensor;    // Hardware Device Object
@@ -85,6 +85,8 @@ public class SensorMRColor extends LinearOpMode {
             telemetry.addData("Green", colorSensor.green());
             telemetry.addData("Blue ", colorSensor.blue());
             telemetry.addData("Hue", hsvValues[0]);
+            telemetry.addData("Value", hsvValues[2]);
+            telemetry.addData("Color", getColor(hsvValues));
 
             // change the background color to match the color detected by the RGB sensor.
             // pass a reference to the hue, saturation, and value array as an argument
@@ -104,6 +106,12 @@ public class SensorMRColor extends LinearOpMode {
                 relativeLayout.setBackgroundColor(Color.WHITE);
             }
         });
+    }
+
+    public String getColor(float[] hsv) {
+        if (hsv[2] < 100) return "black";
+        if (hsv[0] > 100) return "green";
+        else return "yellow";
     }
 }
 
