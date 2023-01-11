@@ -7,7 +7,6 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
 // This TeleOp is for testing purposes only (motors, etc)
-@Disabled
 @TeleOp(name="Crane & Claw Subsystm Testing")
 public class CraneClawTest extends OpMode {
     private DcMotor leftSlide;
