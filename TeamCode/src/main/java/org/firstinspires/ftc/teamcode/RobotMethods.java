@@ -3,18 +3,20 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 
 import java.util.ArrayList;
 
-@Autonomous(name="Autonomous Base")
-public class AutonomousBase extends LinearOpMode {
+public class RobotMethods {
     public final ElapsedTime runtime = new ElapsedTime();
 
     public static final double BASE_POWER = 0.35;
@@ -26,6 +28,10 @@ public class AutonomousBase extends LinearOpMode {
     public static final double TICKS_PER_CM = PULSES_PER_REVOLUTION / WHEEL_CIRCUMFERENCE;
 
     public static final int WAIT_TIME = 300;
+
+    public LinearOpMode parent;
+    public HardwareMap hardwareMap;
+    public Telemetry telemetry;
 
     public ArrayList<DcMotor> wheelList;
     public ArrayList<DcMotor> slideList;
@@ -44,24 +50,15 @@ public class AutonomousBase extends LinearOpMode {
     public BNO055IMU imu;
     public double initialAngle = 0;
 
-    @Override
-    public void runOpMode() {
-        initialize();
-
-        // Autonomous processes go here
-        telemetry.addData("Angle: ", getAngle());
-        telemetry.update();
-        sleep(1000);
-        telemetry.addData("Angle: ", getAngle());
-        telemetry.update();
-        sleep(1000);
-    }
-
     public double foo() {
         return 3.141;
     }
 
-    public void initialize() {
+    public RobotMethods(LinearOpMode parent) {
+        this.parent = parent;
+        hardwareMap = parent.hardwareMap;
+        telemetry = parent.telemetry;
+
         // Store wheels in list for iteration purposes
         wheelList = new ArrayList<DcMotor>();
         wheelList.add(hardwareMap.get(DcMotor.class, "FL"));
@@ -104,7 +101,7 @@ public class AutonomousBase extends LinearOpMode {
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
-        waitForStart();
+        parent.waitForStart();
         runtime.reset();
     }
 
