@@ -180,12 +180,11 @@ public class Robot {
     }
 
     // Drive robot distance (cm) forward, negative distance for reverse
-
     public void drive(double distance) {
         linearMove(distance, 90);
     }
-    // Strafe robot distance (cm) to right, negative distance for left
 
+    // Strafe robot distance (cm) to right, negative distance for left
     public void strafe(double distance) {
         linearMove(distance, 0);
     }
@@ -198,10 +197,10 @@ public class Robot {
     }
 
     // Sets motor power to 0 to stop the robot
-
     public void stopMovement() {
         setPower(0);
     }
+
     /**
      * Checks the current state of the robot to determine if should keep moving
      * @return true if any motors are busy.
@@ -215,7 +214,6 @@ public class Robot {
     }
 
     // Gets the degree value as a radian value
-
     public double getAngle() {
         double rawAngle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS).firstAngle;
         double netAngle = rawAngle - zeroAngle;
@@ -225,35 +223,35 @@ public class Robot {
 
         return netAngle;
     }
-    // Sets the zeroAngle of the robot to where it is currently facing
 
+    // Sets the zeroAngle of the robot to where it is currently facing
     public void resetAngle() {
         zeroAngle = getAngle() - Math.PI/2;
 
         if (zeroAngle < -Math.PI) zeroAngle += 2 * Math.PI;
         if (zeroAngle > Math.PI) zeroAngle -= 2 * Math.PI;
     }
-    // Moves the slides up and down
 
+    // Moves the slides up and down
     public void setSlides(int height) {
         leftSlide.setTargetPosition(height);
         rightSlide.setTargetPosition(height);
 
-        leftSlide.setPower(height);
-        rightSlide.setPower(height);
+        leftSlide.setPower(height < leftSlide.getCurrentPosition() ? 0.85 : 0.5);
+        rightSlide.setPower(height < rightSlide.getCurrentPosition() ? 0.85 : 0.5);
 
         leftSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rightSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
-    // toggles the claw, between gripped and un-gripped
 
+    // toggles the claw, between gripped and un-gripped
     public void toggleClaw() {
         pinch = !pinch;
         leftClaw.setPosition(pinch ? 0.7 : 1.0);
         rightClaw.setPosition(pinch ? 0.3 : 0.0);
     }
-    // true to close, false to open claw
 
+    // true to close, false to open claw
     public void toggleClaw(boolean state) {
         pinch = !state;
         toggleClaw();
