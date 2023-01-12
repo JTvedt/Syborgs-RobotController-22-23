@@ -106,7 +106,7 @@ public class RobotMethods {
 
         parent.waitForStart();
         runtime.reset();
-        toggleClaw(false);
+        toggleClaw(true);
     }
 
     /**
