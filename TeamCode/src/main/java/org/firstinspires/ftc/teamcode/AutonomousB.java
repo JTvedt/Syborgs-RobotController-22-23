@@ -5,11 +5,11 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 @Autonomous(name="Right Hand Autonomous")
 public class AutonomousB extends LinearOpMode {
-    public RobotMethods robot;
+    public Robot robot;
 
     @Override
     public void runOpMode() {
-        robot = new RobotMethods(this);
+        robot = new Robot(this);
 
         // Autonomous processes go here
         robot.setSlides(-2840);

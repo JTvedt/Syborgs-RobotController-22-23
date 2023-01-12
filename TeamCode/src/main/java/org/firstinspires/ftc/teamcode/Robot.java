@@ -15,7 +15,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 
 import java.util.ArrayList;
 
-public class RobotMethods {
+public class Robot {
     public final ElapsedTime runtime = new ElapsedTime();
 
     public static final double BASE_POWER = 0.35;
@@ -51,7 +51,7 @@ public class RobotMethods {
         telemetry.update();
     }
 
-    public RobotMethods(LinearOpMode parent) {
+    public Robot(LinearOpMode parent) {
         this.parent = parent;
         hardwareMap = parent.hardwareMap;
         telemetry = parent.telemetry;

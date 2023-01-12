@@ -5,14 +5,14 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 @TeleOp(name="Jeffrey TeleOp")
 public class SyTeleOp extends LinearOpMode {
-    public RobotMethods robot;
+    public Robot robot;
 
     // Controls claw opening
     public boolean a;
 
     @Override
     public void runOpMode() {
-        robot = new RobotMethods(this);
+        robot = new Robot(this);
         while (opModeIsActive()) runLoop();
     }
 
