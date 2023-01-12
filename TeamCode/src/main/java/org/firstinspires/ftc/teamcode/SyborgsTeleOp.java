@@ -12,6 +12,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.Range;
 
 @TeleOp(name = "Yash TeleOp")
 public class SyborgsTeleOp extends LinearOpMode {
@@ -91,7 +92,8 @@ public class SyborgsTeleOp extends LinearOpMode {
             double drive = gamepad1.left_stick_y * 0.5;
             double strafe = -gamepad1.left_stick_x * 0.7;
             double spin = gamepad1.right_stick_x * 0.4;
-            double up = gamepad2.right_stick_y * 0.5;
+            double up = gamepad2.right_stick_y;
+            up *= (up > 0 ? 0.9 : 1 ) * (up < 0 ? 0.5 : 1);
 
             //giving power to the motors
             frontLeft.setPower(drive + strafe - spin );
@@ -156,18 +158,16 @@ public class SyborgsTeleOp extends LinearOpMode {
             }
 
             if (gamepad2.a) {
-                leftClaw.setPosition(0.1);
-                rightClaw.setPosition(0.9);
+                leftClaw.setPosition(1.0);
+                rightClaw.setPosition(0.0);
             }
             if (gamepad2.b) {
-                leftClaw.setPosition(0.9);
-                rightClaw.setPosition(0.1);
+                leftClaw.setPosition(0.7);
+                rightClaw.setPosition(0.3);
             }
 
             telemetry.addData("Angle:   ", getAngle());
             telemetry.update();
-
-
         }
     }
 
