@@ -33,22 +33,22 @@ public class CraneClawTest extends OpMode {
         leftSlide.setPower(0.0);
         rightSlide.setPower(0.0);
 
-        if (gamepad2.a) {
+        if (gamepad1.a) {
             leftSlide.setPower(0.5);
             rightSlide.setPower(0.5);
         }
-        if (gamepad2.b) {
+        if (gamepad1.b) {
             leftSlide.setPower(-0.5);
             rightSlide.setPower(-0.5);
         }
 
-        if (gamepad2.x) {
-            leftClaw.setPosition(0.1);
-            rightClaw.setPosition(0.9);
+        if (gamepad1.x) { // Close
+            leftClaw.setPosition(0.7);
+            rightClaw.setPosition(0.3);
         }
-        if (gamepad2.y) {
-            leftClaw.setPosition(0.9);
-            rightClaw.setPosition(0.1);
+        if (gamepad1.y) { // Open
+            leftClaw.setPosition(1.0);
+            rightClaw.setPosition(0.0);
         }
     }
 }

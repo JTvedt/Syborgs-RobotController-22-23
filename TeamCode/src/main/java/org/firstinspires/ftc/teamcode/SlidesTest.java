@@ -1,34 +1,30 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-@Autonomous(name="Configure Slides")
+@TeleOp(name="Configure Slides")
 public class SlidesTest extends LinearOpMode {
-    Robot robot;
+    DcMotor leftSlide, rightSlide;
     int slideHeight;
     boolean a, b;
 
     @Override
     public void runOpMode() {
-        robot = new Robot(this);
+        leftSlide = hardwareMap.get(DcMotor.class, "LS");
+        rightSlide = hardwareMap.get(DcMotor.class, "RS");
+
+        leftSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightSlide.setDirection(DcMotor.Direction.REVERSE);
+
+        waitForStart();
         while (opModeIsActive()) runLoop();
     }
 
     public void runLoop() {
-        double multiplier = (gamepad1.left_trigger > 0.5 ? 10d : 1d) / (gamepad1.right_trigger > 0.5 ? 10d : 1d);
-
-        if (gamepad1.a && !a) slideHeight += 100 * multiplier;
-        if (gamepad1.b && !b) slideHeight -= 100 * multiplier;
-
-        robot.setSlides(slideHeight);
-
-        a = gamepad1.a;
-        b = gamepad1.b;
-
-        telemetry.addData("Slide Height:", slideHeight);
-        telemetry.addData("Left Position:", robot.leftSlide.getCurrentPosition());
-        telemetry.addData("Right Position:", robot.rightSlide.getCurrentPosition());
-        telemetry.update();
+        leftSlide.setPower(gamepad1.left_stick_y);
+        rightSlide.setPower(gamepad1.left_stick_y);
     }
 }

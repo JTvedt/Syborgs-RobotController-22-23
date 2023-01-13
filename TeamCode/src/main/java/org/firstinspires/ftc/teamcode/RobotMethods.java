@@ -15,10 +15,10 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 
 import java.util.ArrayList;
 
-public class Robot {
+public class RobotMethods {
     public final ElapsedTime runtime = new ElapsedTime();
 
-    public static final double BASE_POWER = 0.35;
+    public static final double BASE_POWER = 0.6;
     public static final double PULSES_PER_REVOLUTION = 537.7;
     public static final double WHEEL_CIRCUMFERENCE = 40.02;
     public static final double TICKS_PER_CM = PULSES_PER_REVOLUTION / WHEEL_CIRCUMFERENCE;
@@ -46,7 +46,7 @@ public class Robot {
     public boolean pinch = false; // true for gripped
 
     // Test method to send a message
-    public Robot(LinearOpMode parent) {
+    public RobotMethods(LinearOpMode parent) {
         this.parent = parent;
         hardwareMap = parent.hardwareMap;
         telemetry = parent.telemetry;
@@ -71,12 +71,15 @@ public class Robot {
 
         for (DcMotor motor : wheelList) {
             motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         }
 
         // Slide motors
         leftSlide = hardwareMap.get(DcMotor.class, "LS");
         rightSlide = hardwareMap.get(DcMotor.class, "RS");
+
+        leftSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         leftSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -118,10 +121,17 @@ public class Robot {
         if (Math.abs(leftPower) > 1) magnitude /= Math.abs(leftPower);
         if (Math.abs(rightPower) > 1) magnitude /= Math.abs(rightPower);
 
-        frontLeft.setPower(magnitude * leftPower - turnPower);
-        frontRight.setPower(magnitude * rightPower + turnPower);
-        backLeft.setPower(magnitude * leftPower - turnPower);
-        backRight.setPower(magnitude * rightPower + turnPower);
+        frontLeft.setPower(magnitude * leftPower + turnPower);
+        frontRight.setPower(magnitude * rightPower - turnPower);
+        backLeft.setPower(magnitude * leftPower + turnPower);
+        backRight.setPower(magnitude * rightPower - turnPower);
+    }
+
+    public void teleDrive(double drive, double strafe, double turn, double magnitude) {
+        frontLeft.setPower((drive + strafe + turn) * magnitude);
+        frontRight.setPower((drive - strafe - turn) * magnitude);
+        backLeft.setPower((drive - strafe + turn) * magnitude);
+        backRight.setPower((drive + strafe - turn) * magnitude);
     }
 
     /**
@@ -146,7 +156,11 @@ public class Robot {
         setPower(1.0);
 
         while (isMoving()) {
-            // Wait for robot to stop
+            telemetry.addData("FL Difference:", frontLeft.getTargetPosition() - frontLeft.getCurrentPosition());
+            telemetry.addData("FR Difference:", frontRight.getTargetPosition() - frontRight.getCurrentPosition());
+            telemetry.addData("BL Difference:", backLeft.getTargetPosition() - backLeft.getCurrentPosition());
+            telemetry.addData("BR Difference:", backRight.getTargetPosition() - backRight.getCurrentPosition());
+
         }
 
         try {
@@ -226,7 +240,7 @@ public class Robot {
 
     // Sets the zeroAngle of the robot to where it is currently facing
     public void resetAngle() {
-        zeroAngle = getAngle() - Math.PI/2;
+        zeroAngle = getAngle();
 
         if (zeroAngle < -Math.PI) zeroAngle += 2 * Math.PI;
         if (zeroAngle > Math.PI) zeroAngle -= 2 * Math.PI;
@@ -242,6 +256,12 @@ public class Robot {
 
         leftSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rightSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+    }
+
+    public void waitForSlides() {
+        while (leftSlide.isBusy() && rightSlide.isBusy()) {
+
+        }
     }
 
     // toggles the claw, between gripped and un-gripped

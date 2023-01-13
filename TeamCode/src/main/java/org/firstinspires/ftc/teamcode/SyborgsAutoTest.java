@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.util.Range;
 
 // This is the autonomous we programmed together
 @Disabled
+@Deprecated
 @Autonomous(name="Yash Autonomous", group="Linear Opmode")
 public class SyborgsAutoTest extends LinearOpMode
 {

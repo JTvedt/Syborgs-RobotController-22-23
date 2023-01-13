@@ -5,19 +5,17 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 @Autonomous(name="Left Hand Autonomous")
 public class AutonomousA extends LinearOpMode {
-    public Robot robot;
+    public RobotMethods robot;
 
     @Override
     public void runOpMode() {
-        robot = new Robot(this);
+        robot = new RobotMethods(this);
 
-        // Autonomous Processes go here
-        for (int i = 0; i < 10; i++) {
-            sleep(500);
-            robot.toggleClaw();
-        }
-
-        sleep(1000);
+        // Autonomous processes go here
+        robot.drive(60);
+        robot.strafe(60);
+        robot.drive(-60);
+        robot.strafe(-60);
     }
 
     // 0 for red, 1 for green, 2 for blue

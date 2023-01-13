@@ -22,8 +22,8 @@ import com.qualcomm.robotcore.hardware.ColorSensor;
  * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
-@TeleOp(name = "Color Sensor Tests", group = "Sensor")
-@Disabled
+@TeleOp(name = "SensorMRColor", group = "Sensor")
+// @Disabled
 public class SensorMRColor extends LinearOpMode {
     ColorSensor colorSensor;    // Hardware Device Object
 
@@ -78,9 +78,10 @@ public class SensorMRColor extends LinearOpMode {
 
     // Returns either black green or yellow based on the hsv read (SUBJECT TO CHANGE)
     public String getColor(float[] hsv) {
-        if (hsv[2] < 100) return "black";
-        if (hsv[0] > 100) return "green";
-        else return "yellow";
+        if (hsv[0] >= 100 && hsv[0] <= 190) return "green sus";
+        else if (hsv[0] <= 50 && hsv[0] >= 1) return "yellow sus";
+        else if (hsv[0] < 1) return "black sus";
+        else return "unknown";
     }
 }
 
