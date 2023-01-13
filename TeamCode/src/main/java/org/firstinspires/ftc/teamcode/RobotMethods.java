@@ -6,7 +6,6 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -110,11 +109,23 @@ public class RobotMethods {
     /**
      * TeleOp drive function
      * @param angle angle to move
-     * @param rawMagnitude magnitude at which robot moves, can't be too much
+     * @param magnitude magnitude at which robot moves, can't be too much
      * @param turnPower amount the robot should spin
      */
-    public void teleDrive(double angle, double rawMagnitude, double turnPower) {
+    public void teleDrive(double angle, double magnitude, double turnPower) {
+        //TODO delete this
+        turnPower = 0;
 
+        double horizontal = Math.cos(angle);
+        double vertical = Math.sin(angle) * 0.87;
+
+        if (magnitude * (horizontal + vertical) > 1) magnitude = Math.abs(1/(horizontal + vertical));
+        else if (magnitude * (horizontal - vertical) < -1) magnitude = Math.abs(1/(horizontal - vertical));
+
+        frontLeft.setPower((horizontal + vertical) * magnitude + turnPower);
+        frontRight.setPower((horizontal - vertical) * magnitude - turnPower);
+        backLeft.setPower((horizontal - vertical) * magnitude + turnPower);
+        backRight.setPower((horizontal + vertical) * magnitude - turnPower);
     }
 
     public void teleDrive(double drive, double strafe, double turn, double magnitude) {
@@ -135,15 +146,15 @@ public class RobotMethods {
         double vertical = Math.sin(radianAngle) * 0.87;
         int tickCount = (int)(distance * TICKS_PER_INCH);
 
-        setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        setDriveMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        setDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         frontLeft.setTargetPosition((int)((horizontal + vertical) * tickCount));
         frontRight.setTargetPosition((int)((-horizontal + vertical) * tickCount));
         backLeft.setTargetPosition((int)((-horizontal + vertical) * tickCount));
         backRight.setTargetPosition((int)((horizontal + vertical) * tickCount));
 
-        setPower(1.0);
+        setDrivePower(1.0);
 
         while (isMoving()) {
             telemetry.addData("FL Difference:", frontLeft.getTargetPosition() - frontLeft.getCurrentPosition());
@@ -168,15 +179,15 @@ public class RobotMethods {
         double radianAngle = angle * (Math.PI/180);
         int tickCount = (int)(radianAngle * 425);
 
-        setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        setDriveMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        setDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         frontLeft.setTargetPosition(-tickCount);
         frontRight.setTargetPosition(tickCount);
         backLeft.setTargetPosition(-tickCount);
         backRight.setTargetPosition(tickCount);
 
-        setPower(0.7);
+        setDrivePower(0.7);
 
         while (isMoving()) {
             // Wait for movement to finish
@@ -200,21 +211,21 @@ public class RobotMethods {
     }
 
     // Moves the robot using taxicab distance (x, y)
-    public void taxicabDrive(double x, double y) {
+    public void taxicabMove(double x, double y) {
         linearMove(Math.hypot(y, x), Math.atan2(y, x));
     }
 
-    public void setMode(DcMotor.RunMode runMode) {
+    public void setDriveMode(DcMotor.RunMode runMode) {
         for (DcMotor motor: wheelList) motor.setMode(runMode);
     }
 
-    public void setPower(double power) {
+    public void setDrivePower(double power) {
         for (DcMotor motor : wheelList) motor.setPower(power * BASE_POWER);
     }
 
     // Sets motor power to 0 to stop the robot
     public void stopMovement() {
-        setPower(0);
+        setDrivePower(0);
     }
 
     /**
@@ -248,22 +259,39 @@ public class RobotMethods {
         if (zeroAngle > Math.PI) zeroAngle -= 2 * Math.PI;
     }
 
-    // Moves the slides up and down
+    // Sets the slide to move to a position
     public void setSlides(int height) {
+        leftSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
         leftSlide.setTargetPosition(height);
         rightSlide.setTargetPosition(height);
 
         leftSlide.setPower(height < leftSlide.getCurrentPosition() ? 0.85 : 0.5);
         rightSlide.setPower(height < rightSlide.getCurrentPosition() ? 0.85 : 0.5);
+    }
 
-        leftSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        rightSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+    // Move the slides manually
+    public void moveSlides(double power) {
+        leftSlide.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightSlide.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        leftSlide.setPower(power * (power < 0 ? 0.85 : 0.5));
+        rightSlide.setPower(power * (power < 0 ? 0.85 : 0.5));
     }
 
     public void waitForSlides() {
         while (leftSlide.isBusy() && rightSlide.isBusy()) {
 
         }
+    }
+
+    public int slidePosition() {
+        return (leftSlide.getCurrentPosition() + rightSlide.getCurrentPosition()) / 2;
+    }
+
+    public int slideTarget() {
+        return leftSlide.getTargetPosition();
     }
 
     // toggles the claw, between gripped and un-gripped
