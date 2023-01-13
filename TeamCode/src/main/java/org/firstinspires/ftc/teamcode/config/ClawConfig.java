@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
-@TeleOp(name="Claw Config")
+@TeleOp(name="Claw Config", group="config")
 public class ClawConfig extends OpMode {
     private DcMotor leftSlide;
     private DcMotor rightSlide;
