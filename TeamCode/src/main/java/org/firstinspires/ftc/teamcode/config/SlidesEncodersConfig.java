@@ -27,5 +27,6 @@ public class SlidesEncodersConfig extends LinearOpMode {
 
         telemetry.addData("Slide Height", slidesHeight);
         telemetry.addData("Slide Position", robot.slidePosition());
+        telemetry.update();
     }
 }

@@ -37,8 +37,8 @@ public class CraneClawConfig extends OpMode {
             rightSlide.setPower(0.5);
         }
         if (gamepad1.b) {
-            leftSlide.setPower(-0.5);
-            rightSlide.setPower(-0.5);
+            leftSlide.setPower(-0.85);
+            rightSlide.setPower(-0.85);
         }
 
         if (gamepad1.x) { // Close
