@@ -14,10 +14,8 @@ public class AutonomousA extends LinearOpMode {
         robot = new RobotMethods(this);
 
         // Autonomous processes go here
-        robot.drive(60);
-        robot.strafe(60);
-        robot.drive(-60);
-        robot.strafe(-60);
+        robot.drive(36);
+        robot.drive(-36);
     }
 
     // 0 for red, 1 for green, 2 for blue

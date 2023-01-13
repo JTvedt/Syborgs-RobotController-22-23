@@ -11,8 +11,10 @@ public class AutonomousB extends LinearOpMode {
     @Override
     public void runOpMode() {
         robot = new RobotMethods(this);
+        robot.toggleClaw(true);
 
         // Autonomous processes go here
-
+        robot.spinTo(90);
+        robot.spinTo(180);
     }
 }

@@ -1,15 +1,13 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.robot.Robot;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 @TeleOp(name="Jeffrey TeleOp")
 public class SyTeleOp extends LinearOpMode {
     public RobotMethods robot;
 
-    public boolean a, x;
+    public boolean a, y, x, a2;
     public boolean uPad, dPad, lPad, rPad;
 
     @Override
@@ -24,40 +22,54 @@ public class SyTeleOp extends LinearOpMode {
 
     // Runs constantly
     public void runLoop() {
-        double drive = gamepad1.left_stick_y;
+        // P1 Stick Input
+        double drive = -gamepad1.left_stick_y;
         double strafe = gamepad1.left_stick_x;
         double turn = gamepad1.right_stick_x * 0.6;
 
         double stickAngle = Math.atan2(drive, strafe);
-
-        // If pressing B only move in four simple directions
-        if (gamepad1.b) stickAngle = Math.round(stickAngle * 2 / Math.PI) * (Math.PI / 2);
-
-        double angle = stickAngle - robot.getAngle();
         double magnitude = Math.hypot(drive, strafe);
-        double multiplier = (gamepad1.y ? 1.4 : 1) * (rTrigger(1) ? 0.25 : 1);
+        double multiplier = 0.6 * (gamepad1.b ? 1.4 : 1) * (rTrigger(1) ? 0.35 : 1);
 
-         robot.teleDrive(stickAngle, magnitude * multiplier, turn * multiplier);
-        // robot.teleDrive(drive * magnitude, strafe * magnitude, turn, multiplier);
+        // P2 Precision input
+        if (gamepad2.dpad_up) {
+            stickAngle = Math.PI/2;
+            magnitude = 0.35;
+        } else if (gamepad2.dpad_down) {
+            stickAngle = 3 * Math.PI/2;
+            magnitude = 0.35;
+        } else if (gamepad2.dpad_left) {
+            stickAngle = Math.PI;
+            magnitude = 0.35;
+        } else if (gamepad2.dpad_right) {
+            stickAngle = 0;
+            magnitude = 0.35;
+        }
+
+        // Plug in numbers
+        robot.teleDrive(stickAngle, magnitude, turn, multiplier);
 
         // Crane subsystem
         if (gamepad1.dpad_up && !uPad) robot.setSlides(-4300);
         if (gamepad1.dpad_right && !rPad) robot.setSlides(-2000);
         if (gamepad1.dpad_down && !dPad) robot.setSlides(0);
-
-        // Locks slide position
-        if (gamepad1.dpad_left && !lPad) robot.setSlides(robot.slidePosition());
+        if (gamepad1.dpad_left && !lPad) robot.setSlides(robot.slidePosition()); // Locks slides position
 
         // Manual movement by player
-        if (gamepad1.x && !x) robot.setSlides(robot.slideTarget() + (rTrigger(1) ? 35 : 100) * (lTrigger(1) ? -1 : 1));
-        if (gamepad2.right_stick_y != 0) robot.moveSlides(gamepad2.right_stick_y);
+        if (gamepad1.x && !x) robot.setSlides(robot.slideTarget() + (rTrigger(1) ? 35 : 100));
+        if (gamepad1.y && !y) robot.setSlides(robot.slideTarget() - (rTrigger(1) ? 35 : 100));
+        if (gamepad2.right_stick_y != 0) robot.manualSlides = true;
+        if (robot.manualSlides) robot.moveSlides(gamepad2.right_stick_y * 0.5);
 
         // Claw subsystem
         if (gamepad1.a && !a) robot.toggleClaw();
+        if (gamepad2.a && !a2) robot.setClaw(0.15); // Capstone claw
 
         // Reset buttons
         a = gamepad1.a;
+        y = gamepad1.y;
         x = gamepad1.x;
+        a2 = gamepad2.a;
         uPad = gamepad1.dpad_up;
         dPad = gamepad1.dpad_down;
         lPad = gamepad1.dpad_left;
@@ -69,9 +81,9 @@ public class SyTeleOp extends LinearOpMode {
         // telemetry.addData("Strafe", strafe);
         // telemetry.addData("Turn", turn);
 
-        telemetry.addData("Stick Angle", stickAngle);
-        telemetry.addData("Angle", angle);
-        telemetry.addData("Magnitude", magnitude);
+        // telemetry.addData("Stick Angle", stickAngle);
+        // telemetry.addData("Angle", stickAngle - robot.getAngle());
+        // telemetry.addData("Magnitude", magnitude);
 
         // telemetry.addData("Slide target", robot.slideTarget());
         // telemetry.addData("Slide position", robot.slidePosition());

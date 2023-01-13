@@ -12,6 +12,7 @@ import org.openftc.easyopencv.OpenCvPipeline;
 import java.util.ArrayList;
 import java.util.List;
 
+@Deprecated
 /**
  * Simple pipeline that crops the input image around the center,
  * and outputs the parking zone to park in (0, 1, or 2) depending if the input image is Red, Green, or Blue.

@@ -40,9 +40,11 @@ public class RobotMethods {
     public Servo leftClaw;
     public Servo rightClaw;
 
+    public Mode mode = Mode.POV;
     public BNO055IMU imu;
     public double zeroAngle = 0;
     public boolean pinch = false; // true for gripped
+    public boolean manualSlides = false;
 
     // Test method to send a message
     public RobotMethods(LinearOpMode parent) {
@@ -103,7 +105,6 @@ public class RobotMethods {
 
         parent.waitForStart();
         runtime.reset();
-        toggleClaw(true);
     }
 
     /**
@@ -112,27 +113,21 @@ public class RobotMethods {
      * @param magnitude magnitude at which robot moves, can't be too much
      * @param turnPower amount the robot should spin
      */
-    public void teleDrive(double angle, double magnitude, double turnPower) {
-        //TODO delete this
-        turnPower = 0;
-
+    public void teleDrive(double angle, double magnitude, double turnPower, double multiplier) {
         double horizontal = Math.cos(angle);
         double vertical = Math.sin(angle) * 0.87;
+        if (this.mode == Mode.POV) angle -= getAngle();
 
-        if (magnitude * (horizontal + vertical) > 1) magnitude = Math.abs(1/(horizontal + vertical));
-        else if (magnitude * (horizontal - vertical) < -1) magnitude = Math.abs(1/(horizontal - vertical));
+        magnitude *= multiplier;
+        turnPower *= multiplier;
 
-        frontLeft.setPower((horizontal + vertical) * magnitude + turnPower);
-        frontRight.setPower((horizontal - vertical) * magnitude - turnPower);
-        backLeft.setPower((horizontal - vertical) * magnitude + turnPower);
-        backRight.setPower((horizontal + vertical) * magnitude - turnPower);
-    }
+        if (magnitude * (vertical + horizontal) > 1) magnitude = Math.abs(1/(horizontal + vertical));
+        else if (magnitude * (vertical - horizontal) < -1) magnitude = Math.abs(1/(horizontal - vertical));
 
-    public void teleDrive(double drive, double strafe, double turn, double magnitude) {
-        frontLeft.setPower((drive + strafe + turn) * magnitude);
-        frontRight.setPower((drive - strafe - turn) * magnitude);
-        backLeft.setPower((drive - strafe + turn) * magnitude);
-        backRight.setPower((drive + strafe - turn) * magnitude);
+        frontLeft.setPower((vertical + horizontal) * magnitude + turnPower);
+        frontRight.setPower((vertical - horizontal) * magnitude - turnPower);
+        backLeft.setPower((vertical - horizontal) * magnitude + turnPower);
+        backRight.setPower((vertical + horizontal) * magnitude - turnPower);
     }
 
     /**
@@ -141,19 +136,19 @@ public class RobotMethods {
      * @param direction Direction of movement, in degrees
      */
     public void linearMove(double distance, double direction) {
-        double radianAngle = direction * (Math.PI / 180);
+        double radianAngle = direction * (Math.PI / 180) - ((mode == Mode.POV ? getAngle() : 0));
         double horizontal = Math.cos(radianAngle);
         double vertical = Math.sin(radianAngle) * 0.87;
         int tickCount = (int)(distance * TICKS_PER_INCH);
 
         setDriveMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        setDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         frontLeft.setTargetPosition((int)((horizontal + vertical) * tickCount));
         frontRight.setTargetPosition((int)((-horizontal + vertical) * tickCount));
         backLeft.setTargetPosition((int)((-horizontal + vertical) * tickCount));
         backRight.setTargetPosition((int)((horizontal + vertical) * tickCount));
 
+        setDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
         setDrivePower(1.0);
 
         while (isMoving()) {
@@ -164,11 +159,7 @@ public class RobotMethods {
             telemetry.update();
         }
 
-        try {
-            Thread.sleep(WAIT_TIME);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        rest();
     }
 
     /**
@@ -180,12 +171,13 @@ public class RobotMethods {
         int tickCount = (int)(radianAngle * 425);
 
         setDriveMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        setDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         frontLeft.setTargetPosition(-tickCount);
         frontRight.setTargetPosition(tickCount);
         backLeft.setTargetPosition(-tickCount);
         backRight.setTargetPosition(tickCount);
+
+        setDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         setDrivePower(0.7);
 
@@ -193,11 +185,7 @@ public class RobotMethods {
             // Wait for movement to finish
         }
 
-        try {
-            Thread.sleep(WAIT_TIME);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        rest();
     }
 
     // Drive robot distance (in) forward, negative distance for reverse
@@ -215,6 +203,11 @@ public class RobotMethods {
         linearMove(Math.hypot(y, x), Math.atan2(y, x));
     }
 
+    // Spin to a particular direction (degrees)
+    public void spinTo(double newAngle) {
+        spin(newAngle - (getAngle() * 180/Math.PI));
+    }
+
     public void setDriveMode(DcMotor.RunMode runMode) {
         for (DcMotor motor: wheelList) motor.setMode(runMode);
     }
@@ -228,16 +221,42 @@ public class RobotMethods {
         setDrivePower(0);
     }
 
-    /**
-     * Checks the current state of the robot to determine if should keep moving
-     * @return true if any motors are busy.
-     */
-    public boolean isMoving() {
+    // Sets the mode
+    public void setMode(Mode mode) {
+        this.mode = mode;
+    }
+
+    public enum Mode {
+        POV, DIRECTIONAL;
+    }
+
+    public boolean isMoving(int mOfError) {
         for (DcMotor motor : wheelList) {
-            if (motor.isBusy()) return true;
+            if (Math.abs(motor.getTargetPosition() - motor.getCurrentPosition()) > mOfError) return true;
         }
 
         return false;
+    }
+
+    public boolean isMoving(int mOfError, int max) {
+        int buffer = 0;
+        for (DcMotor motor : wheelList) {
+            if (Math.abs(motor.getTargetPosition() - motor.getCurrentPosition()) > max) return true;
+            buffer += Math.abs(motor.getTargetPosition() - motor.getCurrentPosition());
+        }
+        return (buffer / 4 > mOfError);
+    }
+
+    public boolean isMoving() {
+        return isMoving(12, 18);
+    }
+
+    public void rest() {
+        try {
+            Thread.sleep(WAIT_TIME);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 
     // Gets the degree value as a radian value
@@ -261,11 +280,12 @@ public class RobotMethods {
 
     // Sets the slide to move to a position
     public void setSlides(int height) {
-        leftSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        rightSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
+        manualSlides = false;
         leftSlide.setTargetPosition(height);
         rightSlide.setTargetPosition(height);
+
+        leftSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         leftSlide.setPower(height < leftSlide.getCurrentPosition() ? 0.85 : 0.5);
         rightSlide.setPower(height < rightSlide.getCurrentPosition() ? 0.85 : 0.5);
@@ -273,17 +293,20 @@ public class RobotMethods {
 
     // Move the slides manually
     public void moveSlides(double power) {
+        manualSlides = true;
         leftSlide.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightSlide.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        leftSlide.setPower(power * (power < 0 ? 0.85 : 0.5));
-        rightSlide.setPower(power * (power < 0 ? 0.85 : 0.5));
+        leftSlide.setPower(power * (power < 0 ? 0.85 : 0.1));
+        rightSlide.setPower(power * (power < 0 ? 0.85 : 0.1));
     }
 
     public void waitForSlides() {
         while (leftSlide.isBusy() && rightSlide.isBusy()) {
 
         }
+
+        rest();
     }
 
     public int slidePosition() {
@@ -305,6 +328,12 @@ public class RobotMethods {
     public void toggleClaw(boolean state) {
         pinch = !state;
         toggleClaw();
+    }
+
+    public void setClaw(double pinch) {
+        this.pinch = true;
+        leftClaw.setPosition(1 - pinch);
+        rightClaw.setPosition(pinch);
     }
 
     public void foo() {
