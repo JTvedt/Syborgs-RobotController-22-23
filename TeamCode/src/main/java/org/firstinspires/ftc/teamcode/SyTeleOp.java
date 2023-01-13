@@ -42,8 +42,8 @@ public class SyTeleOp extends LinearOpMode {
         if (gamepad1.y) multiplier *= 1.4;
         if (gamepad1.right_trigger > 0.5) multiplier /= 4;
 
-        // robot.teleDrive(angle, magnitude * multiplier, turn);
-        robot.teleDrive(drive * magnitude, strafe * magnitude, turn, multiplier);
+         robot.teleDrive(angle, magnitude * multiplier, turn);
+        // robot.teleDrive(drive * magnitude, strafe * magnitude, turn, multiplier);
 
         // Crane subsystem
         if (gamepad1.dpad_right) robot.setSlides(-2000);

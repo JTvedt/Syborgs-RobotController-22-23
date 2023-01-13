@@ -20,8 +20,8 @@ public class RobotMethods {
 
     public static final double BASE_POWER = 0.6;
     public static final double PULSES_PER_REVOLUTION = 537.7;
-    public static final double WHEEL_CIRCUMFERENCE = 40.02;
-    public static final double TICKS_PER_CM = PULSES_PER_REVOLUTION / WHEEL_CIRCUMFERENCE;
+    public static final double WHEEL_CIRCUMFERENCE = 15.76;
+    public static final double TICKS_PER_INCH = PULSES_PER_REVOLUTION / WHEEL_CIRCUMFERENCE;
 
     public static final int WAIT_TIME = 300;
 
@@ -114,17 +114,7 @@ public class RobotMethods {
      * @param turnPower amount the robot should spin
      */
     public void teleDrive(double angle, double rawMagnitude, double turnPower) {
-        double magnitude = Range.clip(rawMagnitude, -1.0, 1.0);
-        double leftPower = Math.sin(angle) + Math.cos(angle);
-        double rightPower = Math.sin(angle) - Math.cos(angle);
 
-        if (Math.abs(leftPower) > 1) magnitude /= Math.abs(leftPower);
-        if (Math.abs(rightPower) > 1) magnitude /= Math.abs(rightPower);
-
-        frontLeft.setPower(magnitude * leftPower + turnPower);
-        frontRight.setPower(magnitude * rightPower - turnPower);
-        backLeft.setPower(magnitude * leftPower + turnPower);
-        backRight.setPower(magnitude * rightPower - turnPower);
     }
 
     public void teleDrive(double drive, double strafe, double turn, double magnitude) {
@@ -136,23 +126,23 @@ public class RobotMethods {
 
     /**
      * Moves robot in a linear direction
-     * @param distance Distance to travel, in centimeters
+     * @param distance Distance to travel, in inches
      * @param direction Direction of movement, in degrees
      */
     public void linearMove(double distance, double direction) {
         double radianAngle = direction * (Math.PI / 180);
         double horizontal = Math.cos(radianAngle);
         double vertical = Math.sin(radianAngle) * 0.87;
-        int tickCount = (int)(distance * TICKS_PER_CM);
+        int tickCount = (int)(distance * TICKS_PER_INCH);
 
         setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         frontLeft.setTargetPosition((int)((horizontal + vertical) * tickCount));
         frontRight.setTargetPosition((int)((-horizontal + vertical) * tickCount));
         backLeft.setTargetPosition((int)((-horizontal + vertical) * tickCount));
         backRight.setTargetPosition((int)((horizontal + vertical) * tickCount));
 
-        setMode(DcMotor.RunMode.RUN_TO_POSITION);
         setPower(1.0);
 
         while (isMoving()) {
@@ -160,7 +150,7 @@ public class RobotMethods {
             telemetry.addData("FR Difference:", frontRight.getTargetPosition() - frontRight.getCurrentPosition());
             telemetry.addData("BL Difference:", backLeft.getTargetPosition() - backLeft.getCurrentPosition());
             telemetry.addData("BR Difference:", backRight.getTargetPosition() - backRight.getCurrentPosition());
-
+            telemetry.update();
         }
 
         try {
@@ -179,29 +169,41 @@ public class RobotMethods {
         int tickCount = (int)(radianAngle * 425);
 
         setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         frontLeft.setTargetPosition(-tickCount);
         frontRight.setTargetPosition(tickCount);
         backLeft.setTargetPosition(-tickCount);
         backRight.setTargetPosition(tickCount);
 
-        setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        setPower(1.0);
+        setPower(0.7);
 
         while (isMoving()) {
             // Wait for movement to finish
         }
+
+        try {
+            Thread.sleep(WAIT_TIME);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 
-    // Drive robot distance (cm) forward, negative distance for reverse
+    // Drive robot distance (in) forward, negative distance for reverse
     public void drive(double distance) {
         linearMove(distance, 90);
     }
 
-    // Strafe robot distance (cm) to right, negative distance for left
+    // Strafe robot distance (in) to right, negative distance for left
     public void strafe(double distance) {
         linearMove(distance, 0);
     }
+
+    // Moves the robot using taxicab distance (x, y)
+    public void taxicabDrive(double x, double y) {
+        linearMove(Math.hypot(y, x), Math.atan2(y, x));
+    }
+
     public void setMode(DcMotor.RunMode runMode) {
         for (DcMotor motor: wheelList) motor.setMode(runMode);
     }

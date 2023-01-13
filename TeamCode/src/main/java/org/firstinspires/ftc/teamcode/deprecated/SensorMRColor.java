@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.deprecated;
 
 import android.app.Activity;
 import android.graphics.Color;
@@ -23,7 +23,8 @@ import com.qualcomm.robotcore.hardware.ColorSensor;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 @TeleOp(name = "SensorMRColor", group = "Sensor")
-// @Disabled
+@Disabled
+@Deprecated
 public class SensorMRColor extends LinearOpMode {
     ColorSensor colorSensor;    // Hardware Device Object
 

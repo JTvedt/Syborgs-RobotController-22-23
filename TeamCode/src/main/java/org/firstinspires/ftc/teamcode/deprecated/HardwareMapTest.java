@@ -1,6 +1,7 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.deprecated;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
@@ -10,6 +11,8 @@ import java.util.ArrayList;
  * Test the motors to see if they are mapped correctly in the Configuration
  * Before pressing play, hold the robot upside down to see each wheel
  */
+@Deprecated
+@Disabled
 @Autonomous(name="Test Hardware Map")
 public class HardwareMapTest extends LinearOpMode {
     public void runOpMode() {

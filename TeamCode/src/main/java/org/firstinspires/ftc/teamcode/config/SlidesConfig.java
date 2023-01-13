@@ -1,11 +1,11 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.config;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 @TeleOp(name="Configure Slides")
-public class SlidesTest extends LinearOpMode {
+public class SlidesConfig extends LinearOpMode {
     DcMotor leftSlide, rightSlide;
     int slideHeight;
     boolean a, b;

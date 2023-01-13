@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.cv;
 
 import com.qualcomm.robotcore.util.Range;
 
@@ -37,7 +37,7 @@ public class RGBPipeline extends OpenCvPipeline {
 
 
         //Change percent to whatever's best.
-        submat = cropCenter(bgrInput, 0.3, 0.0, 0.0);
+        submat = cropCenter(bgrInput, 1.0, 0.0, 0.0);
 
         Core.split(submat, bgrChannels);
 
@@ -47,8 +47,8 @@ public class RGBPipeline extends OpenCvPipeline {
 
         double max = Math.max(meanB, Math.max(meanG, meanR));
 
-        if(max == meanG) parkingZone = 2;
-        else if(max == meanB) parkingZone = 1;
+        if(max == meanG) parkingZone = 1;
+        else if(max == meanB) parkingZone = 2;
         else parkingZone = 0;
 
 

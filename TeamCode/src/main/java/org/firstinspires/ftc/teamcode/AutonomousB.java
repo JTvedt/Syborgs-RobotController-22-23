@@ -13,17 +13,6 @@ public class AutonomousB extends LinearOpMode {
         robot = new RobotMethods(this);
 
         // Autonomous processes go here
-        robot.drive(100);
-        robot.spin(90);
-        robot.setSlides(3800);
-        robot.drive(8);
-        robot.waitForSlides();
-        robot.toggleClaw();
-        robot.setSlides(0);
-        robot.drive(-8);
-        robot.spin(-100);
-        robot.drive(-60);
-        robot.strafe(60);
-        robot.waitForSlides();
+
     }
 }
