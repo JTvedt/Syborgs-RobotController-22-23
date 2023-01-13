@@ -4,11 +4,10 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-@TeleOp(name="Configure Slides", group="config")
+@TeleOp(name="Slide Motors Config", group="config")
 public class SlidesConfig extends LinearOpMode {
     DcMotor leftSlide, rightSlide;
     int slideHeight;
-    boolean a, b;
 
     @Override
     public void runOpMode() {
