@@ -22,9 +22,9 @@ public class CvPipeline extends OpenCvPipeline {
 
     @Override
     public Mat processFrame(Mat input) {
-        double cropSize = 0.5;
-        double offsetX = 0.0;
-        double offsetY = 0.0;
+        double cropSize = 0.24;
+        double offsetX = 0.45;
+        double offsetY = 0.08;
 
         int size = (int)Math.min(input.rows() * cropSize, input.cols() * cropSize);
 
