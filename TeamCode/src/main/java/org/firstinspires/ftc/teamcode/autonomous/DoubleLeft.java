@@ -8,7 +8,7 @@ import org.firstinspires.ftc.teamcode.RobotMethods;
 import org.firstinspires.ftc.teamcode.cv.CvPipeline;
 
 @Disabled
-@Autonomous(name="2C Right Autonomous")
+@Autonomous(name="2C Left Autonomous")
 public class DoubleLeft extends LinearOpMode {
     public RobotMethods robot;
     public CvPipeline cv;

@@ -13,8 +13,8 @@ public class ClawConfig extends OpMode {
     private Servo leftClaw;
     private Servo rightClaw;
 
-    private double leftPos = 0.1;
-    private double rightPos = 0.9;
+    private double leftPos = 1.0;
+    private double rightPos = 0.0;
 
     private boolean a = false, b = false;
     private boolean x = false, y = false;

@@ -340,8 +340,8 @@ public class RobotMethods {
         leftSlide.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightSlide.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        leftSlide.setPower(power * (power < 0 ? 0.85 : 0.1));
-        rightSlide.setPower(power * (power < 0 ? 0.85 : 0.1));
+        leftSlide.setPower(power * (power < 0 ? 0.85 : 0.5));
+        rightSlide.setPower(power * (power < 0 ? 0.85 : 0.5));
     }
 
     public void waitForSlides() {
