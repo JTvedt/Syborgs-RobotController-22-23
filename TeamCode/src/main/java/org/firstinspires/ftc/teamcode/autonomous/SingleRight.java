@@ -7,7 +7,7 @@ import org.firstinspires.ftc.teamcode.RobotMethods;
 import org.firstinspires.ftc.teamcode.cv.CvPipeline;
 
 @Autonomous(name="1C Right Autonomous")
-public class LeftSingle extends LinearOpMode {
+public class SingleRight extends LinearOpMode {
     public RobotMethods robot;
     public CvPipeline cv;
 

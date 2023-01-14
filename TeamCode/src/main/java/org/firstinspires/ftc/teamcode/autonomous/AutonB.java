@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.RobotMethods;
 
 @Disabled
-@Autonomous(name="Test Autonomous B")
+@Autonomous(name="Test Autonomous B", group="test")
 public class AutonB extends LinearOpMode {
     public RobotMethods robot;
 
