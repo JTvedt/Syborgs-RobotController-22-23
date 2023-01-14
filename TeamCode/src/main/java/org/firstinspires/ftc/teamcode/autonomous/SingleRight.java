@@ -39,6 +39,8 @@ public class SingleRight extends LinearOpMode {
         robot.toggleClaw(true);
         sleep(1000);
         int parkZone = pipeline.getZone();
+        telemetry.addData("Parking in", parkZone);
+        telemetry.update();
         sleep(600);
 
         // Autonomous processes go here
