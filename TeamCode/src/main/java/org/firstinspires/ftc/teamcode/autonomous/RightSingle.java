@@ -1,11 +1,13 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.autonomous;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+
+import org.firstinspires.ftc.teamcode.RobotMethods;
 import org.firstinspires.ftc.teamcode.cv.CvPipeline;
 
-@Autonomous(name="Right Hand Autonomous")
-public class AutonomousB extends LinearOpMode {
+@Autonomous(name="1C Right Autonomous")
+public class RightSingle extends LinearOpMode {
     public RobotMethods robot;
     public CvPipeline cv;
 
