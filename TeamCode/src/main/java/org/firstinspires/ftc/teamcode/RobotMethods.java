@@ -17,12 +17,13 @@ import java.util.ArrayList;
 public class RobotMethods {
     public final ElapsedTime runtime = new ElapsedTime();
 
-    public static final double BASE_POWER = 0.6;
+    public static final double BASE_POWER = 0.35;
     public static final double PULSES_PER_REVOLUTION = 537.7;
     public static final double WHEEL_CIRCUMFERENCE = 15.76;
     public static final double TICKS_PER_INCH = PULSES_PER_REVOLUTION / WHEEL_CIRCUMFERENCE;
 
-    public static final int WAIT_TIME = 300;
+    public static final int WAIT_TIME = 400;
+    public static final int TICK_THRESHOLD = 300;
 
     public LinearOpMode parent;
     public HardwareMap hardwareMap;
@@ -114,9 +115,9 @@ public class RobotMethods {
      * @param turnPower amount the robot should spin
      */
     public void teleDrive(double angle, double magnitude, double turnPower, double multiplier) {
+        if (this.mode == Mode.POV) angle -= getAngle();
         double horizontal = Math.cos(angle);
         double vertical = Math.sin(angle) * 0.87;
-        if (this.mode == Mode.POV) angle -= getAngle();
 
         magnitude *= multiplier;
         turnPower *= multiplier;
@@ -149,13 +150,22 @@ public class RobotMethods {
         backRight.setTargetPosition((int)((horizontal + vertical) * tickCount));
 
         setDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
-        setDrivePower(1.0);
+        setDrivePower(BASE_POWER);
 
         while (isMoving()) {
+            int diff = getMeanDifference();
+            if (diff > TICK_THRESHOLD) setDrivePower(BASE_POWER);
+            else setDrivePower(BASE_POWER - (1 - (double)diff/TICK_THRESHOLD) * 0.25);
+
             telemetry.addData("FL Difference:", frontLeft.getTargetPosition() - frontLeft.getCurrentPosition());
             telemetry.addData("FR Difference:", frontRight.getTargetPosition() - frontRight.getCurrentPosition());
             telemetry.addData("BL Difference:", backLeft.getTargetPosition() - backLeft.getCurrentPosition());
             telemetry.addData("BR Difference:", backRight.getTargetPosition() - backRight.getCurrentPosition());
+
+            telemetry.addData("FL Power:", frontLeft.getPower());
+            telemetry.addData("FR Power:", frontRight.getPower());
+            telemetry.addData("BL Power:", backLeft.getPower());
+            telemetry.addData("BR Power:", backRight.getPower());
             telemetry.update();
         }
 
@@ -178,11 +188,40 @@ public class RobotMethods {
         backRight.setTargetPosition(tickCount);
 
         setDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-        setDrivePower(0.7);
+        setDrivePower(BASE_POWER);
 
         while (isMoving()) {
-            // Wait for movement to finish
+            setDrivePower(BASE_POWER);
+        }
+
+        rest();
+    }
+
+    // TODO finish this method
+    public void spinDrive(double distance, double ddirection, double angle) {
+        double radianDirection = angle * (Math.PI/180) - ((mode == Mode.POV ? getAngle() : 0));
+        double radianAngle = angle * (Math.PI/180);
+        double horizontal = Math.cos(radianDirection);
+        double vertical = Math.sin(radianDirection);
+
+        int driveTicks = (int)(distance * TICKS_PER_INCH);
+        int spinTicks = (int)(radianAngle * 425);
+
+        setDriveMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        frontLeft.setTargetPosition((int)((horizontal + vertical) * driveTicks) - spinTicks);
+        frontRight.setTargetPosition((int)((-horizontal + vertical) * driveTicks) + spinTicks);
+        backLeft.setTargetPosition((int)((-horizontal + vertical) * driveTicks) - spinTicks);
+        backRight.setTargetPosition((int)((horizontal + vertical) * driveTicks) + spinTicks);
+
+        int maxTicks = 0;
+        for (DcMotor motor: wheelList) if (motor.getTargetPosition() > maxTicks) maxTicks = motor.getTargetPosition();
+
+        setDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
+        setDrivePower(BASE_POWER);
+
+        while (isMoving()) {
+            for (DcMotor motor : wheelList) motor.setPower(0.5 * (motor.getTargetPosition() / maxTicks));
         }
 
         rest();
@@ -213,7 +252,13 @@ public class RobotMethods {
     }
 
     public void setDrivePower(double power) {
-        for (DcMotor motor : wheelList) motor.setPower(power * BASE_POWER);
+        for (DcMotor motor : wheelList) motor.setPower(power);
+    }
+
+    public int getMeanDifference() {
+        int buffer = 0;
+        for (DcMotor motor : wheelList) buffer += Math.abs(motor.getTargetPosition() - motor.getCurrentPosition());
+        return buffer/4;
     }
 
     // Sets motor power to 0 to stop the robot
@@ -231,11 +276,7 @@ public class RobotMethods {
     }
 
     public boolean isMoving(int mOfError) {
-        for (DcMotor motor : wheelList) {
-            if (Math.abs(motor.getTargetPosition() - motor.getCurrentPosition()) > mOfError) return true;
-        }
-
-        return false;
+        return (getMeanDifference() / 4 > mOfError);
     }
 
     public boolean isMoving(int mOfError, int max) {
@@ -248,7 +289,7 @@ public class RobotMethods {
     }
 
     public boolean isMoving() {
-        return isMoving(12, 18);
+        return isMoving(16);
     }
 
     public void rest() {
@@ -280,6 +321,8 @@ public class RobotMethods {
 
     // Sets the slide to move to a position
     public void setSlides(int height) {
+        double power = height < slideTarget() ? 0.85 : 0.5;
+
         manualSlides = false;
         leftSlide.setTargetPosition(height);
         rightSlide.setTargetPosition(height);
@@ -287,8 +330,8 @@ public class RobotMethods {
         leftSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rightSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        leftSlide.setPower(height < leftSlide.getCurrentPosition() ? 0.85 : 0.5);
-        rightSlide.setPower(height < rightSlide.getCurrentPosition() ? 0.85 : 0.5);
+        leftSlide.setPower(power);
+        rightSlide.setPower(power);
     }
 
     // Move the slides manually
@@ -302,8 +345,8 @@ public class RobotMethods {
     }
 
     public void waitForSlides() {
-        while (leftSlide.isBusy() && rightSlide.isBusy()) {
-
+        while (Math.abs(slidePosition() - slideTarget()) > 16) {
+            telemetry.addData("Slide Difference", Math.abs(slidePosition() - slideTarget()));
         }
 
         rest();

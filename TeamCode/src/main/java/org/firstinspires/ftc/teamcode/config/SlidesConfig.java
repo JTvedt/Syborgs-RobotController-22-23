@@ -23,6 +23,6 @@ public class SlidesConfig extends LinearOpMode {
 
     public void runLoop() {
         leftSlide.setPower(gamepad1.left_stick_y);
-        rightSlide.setPower(gamepad1.left_stick_y);
+        rightSlide.setPower(gamepad1.right_stick_y);
     }
 }

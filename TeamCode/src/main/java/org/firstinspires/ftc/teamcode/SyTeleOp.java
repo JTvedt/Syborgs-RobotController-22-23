@@ -60,6 +60,7 @@ public class SyTeleOp extends LinearOpMode {
         if (gamepad1.y && !y) robot.setSlides(robot.slideTarget() - (rTrigger(1) ? 35 : 100));
         if (gamepad2.right_stick_y != 0) robot.manualSlides = true;
         if (robot.manualSlides) robot.moveSlides(gamepad2.right_stick_y * 0.5);
+        if (gamepad1.left_trigger > .5) robot.moveSlides(0.5);
 
         // Claw subsystem
         if (gamepad1.a && !a) robot.toggleClaw();
@@ -85,9 +86,12 @@ public class SyTeleOp extends LinearOpMode {
         // telemetry.addData("Angle", stickAngle - robot.getAngle());
         // telemetry.addData("Magnitude", magnitude);
 
-        // telemetry.addData("Slide target", robot.slideTarget());
-        // telemetry.addData("Slide position", robot.slidePosition());
-        // telemetry.addData("Claw state", robot.pinch ? "closed" : "open");
+        telemetry.addData("Slide target", robot.slideTarget());
+        telemetry.addData("Slide position", robot.slidePosition());
+        telemetry.addData("LSlide power", robot.leftSlide.getPower());
+        telemetry.addData("RSlide power", robot.rightSlide.getPower());
+
+        telemetry.addData("Claw state", robot.pinch ? "closed" : "open");
 
         telemetry.update();
     }
