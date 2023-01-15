@@ -3,21 +3,21 @@ package org.firstinspires.ftc.teamcode.autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.teamcode.util.SyBot;
+import org.firstinspires.ftc.teamcode.util.Sybot;
 import org.firstinspires.ftc.teamcode.cv.CvPipeline;
 import org.openftc.easyopencv.OpenCvCamera;
 
 @Autonomous(name="1C Left Autonomous")
 public class SingleLeft extends LinearOpMode {
-    public SyBot robot;
+    public Sybot robot;
     public CvPipeline pipeline;
     public OpenCvCamera camera;
 
     @Override
     public void runOpMode() {
-        robot = new SyBot(this, SyBot.OpModeType.AUTONOMOUS);
+        robot = new Sybot(this, Sybot.OpModeType.AUTONOMOUS);
 
-        robot.toggleClaw(true);
+        robot.setClaw(true);
         sleep(400);
         int parkZone = robot.pipeline.getZone();
         telemetry.addData("Parking in", parkZone);

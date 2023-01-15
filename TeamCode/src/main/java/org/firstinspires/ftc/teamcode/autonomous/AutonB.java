@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.util.SyBot;
+import org.firstinspires.ftc.teamcode.util.Sybot;
 import org.firstinspires.ftc.teamcode.cv.CvPipeline;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
@@ -12,7 +12,7 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 
 @Autonomous(name="Test Autonomous B", group="test")
 public class AutonB extends LinearOpMode {
-    public SyBot robot;
+    public Sybot robot;
     public CvPipeline pipeline;
     public OpenCvCamera camera;
 
@@ -36,7 +36,7 @@ public class AutonB extends LinearOpMode {
             }
         });
 
-        robot = new SyBot(this);
+        robot = new Sybot(this);
 
         // Autonomous processes go here
         // TODO test the CvPipeline

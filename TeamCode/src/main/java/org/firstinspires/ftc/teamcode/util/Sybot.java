@@ -20,7 +20,12 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 
 import java.util.ArrayList;
 
-public class SyBot {
+/**
+ * Class containing methods for everything on the robot
+ * responsible for driving, subsystems, and everything
+ * @author Jeffrey Tvedt
+ */
+public class Sybot {
     public final ElapsedTime runtime = new ElapsedTime();
 
     public static final double BASE_POWER = 0.35;
@@ -29,6 +34,8 @@ public class SyBot {
     public static final double TICKS_PER_INCH = PULSES_PER_REVOLUTION / WHEEL_CIRCUMFERENCE;
     public static final double TICKS_PER_TILE = TICKS_PER_INCH * 24;
     public static final double TICKS_PER_CM = TICKS_PER_INCH * 2.54;
+    public static final double SLIDE_SPEED_UP = 0.85;
+    public static final double SLIDE_SPEED_DOWN = 0.5;
 
     public static final int WAIT_TIME = 400;
     public static final int TICK_THRESHOLD = 300;
@@ -49,7 +56,7 @@ public class SyBot {
     public Servo leftClaw;
     public Servo rightClaw;
 
-    public DriveType mode = DriveType.POV;
+    public DriveType driveType = DriveType.POV;
     public DistanceUnit driveUnit = DistanceUnit.INCHES;
     public BNO055IMU imu;
     public double zeroAngle = 0;
@@ -59,13 +66,20 @@ public class SyBot {
     public CvPipeline pipeline;
     public OpenCvCamera camera;
 
-    // Test method to send a message
-    public SyBot(LinearOpMode parent, OpModeType type, Side side) {
+    /**
+     * Constructor for Sybot, takes in the parent, OpMode type, and starting side
+     * Starting side is only relevant for autonomous
+     * @param parent The OpMode that will be using this class's methods
+     * @param type The type of OpMode, Autonomous or TeleOp
+     * @param side Starting position of the robot, relevant for autonomous.
+     *             If placed on the left side, strafing will be mirrored by default
+     */
+    public Sybot(LinearOpMode parent, OpModeType type, StartSide side) {
         this.parent = parent;
         hardwareMap = parent.hardwareMap;
         telemetry = parent.telemetry;
 
-        telemetry.addData ("Status", "...");
+        telemetry.addData("Status", "...");
         telemetry.update();
 
         // Store wheels in list for iteration purposes
@@ -107,8 +121,8 @@ public class SyBot {
         if (type == OpModeType.AUTONOMOUS) {
             WebcamName webcamName = hardwareMap.get(WebcamName.class, "Camera");
             // TODO plug in numbers
-            if (side == Side.LEFT) pipeline = new CvPipeline(0, 0, 1, 1);
-            else if (side == Side.RIGHT) pipeline = new CvPipeline(0, 0, 1, 1);
+            if (side == StartSide.LEFT) pipeline = new CvPipeline(0, 0, 1, 1);
+            else if (side == StartSide.RIGHT) pipeline = new CvPipeline(0, 0, 1, 1);
             else pipeline = new CvPipeline(0, 0, 1, 1);
             int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
             camera = OpenCvCameraFactory.getInstance().createWebcam(webcamName, cameraMonitorViewId);
@@ -150,32 +164,46 @@ public class SyBot {
         runtime.reset();
     }
 
-    public SyBot(LinearOpMode parent, OpModeType type) {
-        this(parent, type, Side.RIGHT);
+    /**
+     * Constructor that does not require side
+     * @param parent The OpMode that will be using this class's methods
+     * @param type The type of OpMode, TeleOp or Autonomous
+     */
+    public Sybot(LinearOpMode parent, OpModeType type) {
+        this(parent, type, StartSide.RIGHT);
     }
 
-    public SyBot(LinearOpMode parent) {
-        this(parent, OpModeType.AUTONOMOUS, Side.RIGHT);
+    /**
+     * Constructor that takes in the parent opmode
+     * @param parent The OpMode that will be using this class's methods
+     */
+    public Sybot(LinearOpMode parent) {
+        this(parent, OpModeType.AUTONOMOUS, StartSide.RIGHT);
     }
 
     public enum OpModeType {
         TELEOP, AUTONOMOUS;
     }
 
-    public enum Side {
+    /**
+     * Starting position of the robot, on the left side or right side.
+     * Left side will mirror the robot
+     */
+    public enum StartSide {
         LEFT, RIGHT;
     }
 
     /**
      * TeleOp drive function
-     * @param angle angle to move
-     * @param magnitude magnitude at which robot moves, can't be too much
-     * @param turnPower amount the robot should spin
+     * @param direction Direction in which the robot will move, measured in degrees
+     * @param magnitude magnitude at which robot moves, roughly a measure of velocity
+     * @param turnPower in which direction the robot should rotate and how much,
+     *                  positive values to turn clockwise and negative valeus to turn counterclockwise
      */
-    public void teleDrive(double angle, double magnitude, double turnPower, double multiplier) {
-        if (this.mode == DriveType.POV) angle -= getAngle();
-        double horizontal = Math.cos(angle);
-        double vertical = Math.sin(angle) * 0.87;
+    public void teleDrive(double direction, double magnitude, double turnPower, double multiplier) {
+        if (this.driveType == DriveType.POV) direction -= getAngle();
+        double horizontal = Math.cos(direction);
+        double vertical = Math.sin(direction) * 0.87;
 
         magnitude *= multiplier;
         turnPower *= multiplier;
@@ -191,11 +219,11 @@ public class SyBot {
 
     /**
      * Moves robot in a linear direction
-     * @param distance Distance to travel, in inches
-     * @param direction Direction of movement, in degrees
+     * @param distance Distance to travel based on the distance unit
+     * @param direction Direction of movement, in degrees, 0 degrees to go right
      */
-    public void linearMove(double distance, double direction) {
-        double radianAngle = direction * (Math.PI / 180) - ((mode == DriveType.POV ? getAngle() : 0));
+    public void polarMove(double distance, double direction) {
+        double radianAngle = direction * (Math.PI / 180) - ((driveType == DriveType.POV ? getAngle() : 0));
         double horizontal = Math.cos(radianAngle);
         double vertical = Math.sin(radianAngle) * 0.87;
         int tickCount = toTicks(distance);
@@ -232,7 +260,7 @@ public class SyBot {
 
     /**
      * Spins the robot either clockwise or counterclockwise
-     * @param angle angle to turn in degrees, positive counterclockwise, negative clockwise
+     * @param angle angle to turn in degrees, positive values turn counterclockwise and negative values turn clockwise
      */
     public void spin(double angle) {
         double radianAngle = angle * (Math.PI/180);
@@ -256,8 +284,9 @@ public class SyBot {
     }
 
     // TODO finish this method
-    public void spinDrive(double distance, double ddirection, double angle) {
-        double radianDirection = angle * (Math.PI/180) - ((mode == DriveType.POV ? getAngle() : 0));
+    // NOT TESTED DO NOT USE
+    public void spinDrive(double distance, double direction, double angle) {
+        double radianDirection = direction * (Math.PI/180) - ((driveType == DriveType.POV ? getAngle() : 0));
         double radianAngle = angle * (Math.PI/180);
         double horizontal = Math.cos(radianDirection);
         double vertical = Math.sin(radianDirection);
@@ -285,62 +314,112 @@ public class SyBot {
         rest();
     }
 
-    // Drive robot distance (in) forward, negative distance for reverse
+    // TODO finish this method
+    // NOT TESTED DO NOT USE
+    public void driveSpin(double direction) {
+
+    }
+
+    /**
+     * Moves the robot either forwards or backwards
+     * @param distance distance for the robot to move, positive values to move forward, negative values to move backward
+     */
     public void drive(double distance) {
-        linearMove(distance, 90);
+        polarMove(distance, 90);
     }
 
-    // Strafe robot distance (in) to right, negative distance for left
+    /**
+     * Moves the robot to either side
+     * @param distance distance for the robot to move, positive values to move to the right, negative values to move to the left.
+     *                 Moves independent of robot angle by default
+     */
     public void strafe(double distance) {
-        linearMove(distance, 0);
+        polarMove(distance, 0);
     }
 
-    // Moves the robot using taxicab distance (x, y)
-    public void taxicabMove(double x, double y) {
-        linearMove(Math.hypot(y, x), Math.atan2(y, x));
+    /**
+     * Drives the robot in a particular direction using cartesian coordinates
+     * @param x The amount the robot should move left and right
+     * @param y The amount the robot should move forward
+     */
+    public void cartesianMove(double x, double y) {
+        polarMove(Math.hypot(y, x), Math.atan2(y, x));
     }
 
-    // Spin to a particular direction (degrees)
+    /**
+     * Spins the robot to a new position based on its current one
+     * @param newAngle The new angle to spin to relative to old angle
+     */
     public void spinTo(double newAngle) {
+        // TODO make this method work consistently
         spin(newAngle - (getAngle() * 180/Math.PI));
     }
 
+    /**
+     * Sets the mode of all wheels of the robot
+     * @param runMode the run mode to be applied to all wheels
+     */
     public void setDriveMode(DcMotor.RunMode runMode) {
         for (DcMotor motor: wheelList) motor.setMode(runMode);
     }
 
+    /**
+     * Sets the power to all four wheels
+     * @param power the power applied to all wheels
+     */
     public void setDrivePower(double power) {
         for (DcMotor motor : wheelList) motor.setPower(power);
     }
 
+    /**
+     * Gets the average ticks remaining on each wheel.
+     * Always returns a positive value
+     * @return The average ticks remaining
+     */
     public int getMeanDifference() {
         int buffer = 0;
         for (DcMotor motor : wheelList) buffer += Math.abs(motor.getTargetPosition() - motor.getCurrentPosition());
         return buffer/4;
     }
 
-    // Sets motor power to 0 to stop the robot
+    /**
+     * Cuts power to all wheels, forces a brake
+     */
     public void stopMovement() {
         setDrivePower(0);
     }
 
-    // Sets the mode
-    public void setDriveType(DriveType mode) {
-        this.mode = mode;
+    /**
+     * Sets the mode of movement, whether POV or directional
+     * @param driveType the type of driving to be done,
+     *                  POV to move regardless of robot angle,
+     *                  DIRECTIONAL to move relative to angle
+     */
+    public void setDriveType(DriveType driveType) {
+        this.driveType = driveType;
     }
 
-    public enum DriveType {
-        POV, DIRECTIONAL;
-    }
-
+    /**
+     * Sets the unit to be used when calculating ticks
+     * @param unit The unit to be used in methods like polarMove() and drive()
+     */
     public void setDriveUnit(DistanceUnit unit) {
         this.driveUnit = unit;
     }
 
-    public enum DistanceUnit {
-        INCHES, CENTIMETERS, TILES;
+    /**
+     * The type of movement for the robot, determines whether the imu is used for calculation
+     */
+    public enum DriveType {
+        POV,
+        DIRECTIONAL
     }
 
+    /**
+     * Converts a given distance into ticks
+     * @param distance input distance to be converted, any unit
+     * @return distance represented as ticks for encoders
+     */
     public int toTicks(double distance) {
         if (driveUnit == DistanceUnit.INCHES) return (int)(distance * TICKS_PER_INCH);
         else if (driveUnit == DistanceUnit.CENTIMETERS) return (int)(distance * TICKS_PER_CM);
@@ -348,14 +427,26 @@ public class SyBot {
         else return 0;
     }
 
-    public boolean isMoving(int mOfError) {
-        return getMeanDifference() / 4 > mOfError;
+    /**
+     * Checks to determine if the robot is moving or not
+     * @param marginOfError The amount of ticks remaining is allowed to consider the robot mobile
+     * @return boolean value of the robot's movement. True if moving, false if stopped
+     */
+    public boolean isMoving(int marginOfError) {
+        return getMeanDifference() / 4 > marginOfError;
     }
 
+    /**
+     * Checks to determine if the robot is moving or not
+     * @return boolean value of the robot's movement. True if moving, false if stopped
+     */
     public boolean isMoving() {
         return isMoving(16);
     }
 
+    /**
+     * Puts the thread to sleep for about 300 milliseconds
+     */
     public void rest() {
         try {
             Thread.sleep(WAIT_TIME);
@@ -364,7 +455,10 @@ public class SyBot {
         }
     }
 
-    // Gets the degree value as a radian value
+    /**
+     * Returns the direction in which the robot is facing
+     * @return the robot's direction as a value from -PI to PI, measured in radians
+     */
     public double getAngle() {
         double rawAngle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS).firstAngle;
         double netAngle = rawAngle - zeroAngle;
@@ -375,7 +469,9 @@ public class SyBot {
         return netAngle;
     }
 
-    // Sets the zeroAngle of the robot to where it is currently facing
+    /**
+     * Resets the angle so that the direction the robot currently faces is zero degrees
+     */
     public void resetAngle() {
         zeroAngle = getAngle();
 
@@ -383,9 +479,12 @@ public class SyBot {
         if (zeroAngle > Math.PI) zeroAngle -= 2 * Math.PI;
     }
 
-    // Sets the slide to move to a position
+    /**
+     * Sets the slide position using the motor encoders
+     * @param height height to which the slide should move to, negative values are high, 0 at rest
+     */
     public void setSlides(int height) {
-        double power = height < slideTarget() ? 0.85 : 0.5;
+        double power = height < slideTarget() ? SLIDE_SPEED_UP : SLIDE_SPEED_DOWN;
 
         manualSlides = false;
         leftSlide.setTargetPosition(height);
@@ -398,16 +497,22 @@ public class SyBot {
         rightSlide.setPower(power);
     }
 
-    // Move the slides manually
+    /**
+     * Moves the slides manually by setting their power, overrides encoders
+     * @param power power at which the slides should move multiplied by a constant
+     */
     public void moveSlides(double power) {
         manualSlides = true;
         leftSlide.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightSlide.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        leftSlide.setPower(power * (power < 0 ? 0.85 : 0.5));
-        rightSlide.setPower(power * (power < 0 ? 0.85 : 0.5));
+        leftSlide.setPower(power * (power < 0 ? SLIDE_SPEED_UP : SLIDE_SPEED_DOWN));
+        rightSlide.setPower(power * (power < 0 ? SLIDE_SPEED_UP : SLIDE_SPEED_DOWN));
     }
 
+    /**
+     * Puts the current thread on pause until the slides are in their target position
+     */
     public void waitForSlides() {
         while (Math.abs(slidePosition() - slideTarget()) > 16) {
             telemetry.addData("Slide Difference", Math.abs(slidePosition() - slideTarget()));
@@ -416,40 +521,55 @@ public class SyBot {
         rest();
     }
 
+    /**
+     * Resets the slide encoders so the current position is 0
+     */
     public void resetSlides() {
         leftSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
 
+    /**
+     * Returns the current slide position
+     * @return the average encoder value of both slides
+     */
     public int slidePosition() {
         return (leftSlide.getCurrentPosition() + rightSlide.getCurrentPosition()) / 2;
     }
 
+    /**
+     * Returns the target value at which the slides attempt to move to
+     * @return target position of the slides
+     */
     public int slideTarget() {
         return leftSlide.getTargetPosition();
     }
 
-    // toggles the claw, between gripped and un-gripped
+    /**
+     * Toggles the claw between a closed and open position
+     */
     public void toggleClaw() {
         pinch = !pinch;
         leftClaw.setPosition(pinch ? 0.7 : 1.0);
         rightClaw.setPosition(pinch ? 0.3 : 0.0);
     }
 
-    // true to close, false to open claw
-    public void toggleClaw(boolean state) {
+    /**
+     * Sets the claw to either an open or closed position
+     * @param state new state of claw to be in, true for closed, false for open
+     */
+    public void setClaw(boolean state) {
         pinch = !state;
         toggleClaw();
     }
 
+    /**
+     * Sets the claw to a specific position based on the pinch value
+     * @param pinch value at which the claws should close, 0.0 represents a fully open claw
+     */
     public void setClaw(double pinch) {
         this.pinch = true;
         leftClaw.setPosition(1 - pinch);
         rightClaw.setPosition(pinch);
-    }
-
-    public void foo() {
-        telemetry.addData("Foo", "Bar");
-        telemetry.update();
     }
 }
