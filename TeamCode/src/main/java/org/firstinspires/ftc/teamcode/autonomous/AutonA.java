@@ -3,15 +3,15 @@ package org.firstinspires.ftc.teamcode.autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.teamcode.RobotMethods;
+import org.firstinspires.ftc.teamcode.util.SyBot;
 
 @Autonomous(name="Test Autonomous A", group="test")
 public class AutonA extends LinearOpMode {
-    public RobotMethods robot;
+    public SyBot robot;
 
     @Override
     public void runOpMode() {
-        robot = new RobotMethods(this);
+        robot = new SyBot(this);
         robot.toggleClaw(true);
 
         // Autonomous processes go here

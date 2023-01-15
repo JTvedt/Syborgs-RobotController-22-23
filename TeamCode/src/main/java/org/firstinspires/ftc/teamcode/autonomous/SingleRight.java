@@ -3,20 +3,15 @@ package org.firstinspires.ftc.teamcode.autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.RobotMethods;
-import org.firstinspires.ftc.teamcode.cv.CvPipeline;
-import org.openftc.easyopencv.OpenCvCamera;
-import org.openftc.easyopencv.OpenCvCameraFactory;
-import org.openftc.easyopencv.OpenCvCameraRotation;
+import org.firstinspires.ftc.teamcode.util.SyBot;
 
 @Autonomous(name="1C Right Autonomous")
 public class SingleRight extends LinearOpMode {
-    public RobotMethods robot;
+    public SyBot robot;
 
     @Override
     public void runOpMode() {
-        robot = new RobotMethods(this, RobotMethods.OpModeType.AUTONOMOUS);
+        robot = new SyBot(this, SyBot.OpModeType.AUTONOMOUS);
 
         robot.toggleClaw(true);
         sleep(400);

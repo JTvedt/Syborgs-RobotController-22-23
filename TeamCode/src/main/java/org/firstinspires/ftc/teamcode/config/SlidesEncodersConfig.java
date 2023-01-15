@@ -2,17 +2,17 @@ package org.firstinspires.ftc.teamcode.config;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import org.firstinspires.ftc.teamcode.RobotMethods;
+import org.firstinspires.ftc.teamcode.util.SyBot;
 
 @TeleOp(name="Slides Encoder Config", group="config")
 public class SlidesEncodersConfig extends LinearOpMode {
-    public RobotMethods robot;
+    public SyBot robot;
     int slidesHeight = 0;
     boolean x, y;
 
     @Override
     public void runOpMode() {
-        robot = new RobotMethods(this);
+        robot = new SyBot(this);
 
         while (opModeIsActive()) runLoop();
     }

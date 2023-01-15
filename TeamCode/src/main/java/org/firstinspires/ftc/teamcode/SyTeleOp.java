@@ -3,16 +3,18 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.teamcode.util.SyBot;
+
 @TeleOp(name="Jeffrey TeleOp")
 public class SyTeleOp extends LinearOpMode {
-    public RobotMethods robot;
+    public SyBot robot;
 
     public boolean a, b, x, y;
     public boolean uPad, dPad, lPad, rPad;
 
     @Override
     public void runOpMode() {
-        robot = new RobotMethods(this, RobotMethods.OpModeType.TELEOP);
+        robot = new SyBot(this, SyBot.OpModeType.TELEOP);
         robot.toggleClaw(false);
 
         while (opModeIsActive()) {

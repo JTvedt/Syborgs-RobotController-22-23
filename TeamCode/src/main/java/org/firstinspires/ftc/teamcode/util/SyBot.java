@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.util;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -20,7 +20,7 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 
 import java.util.ArrayList;
 
-public class RobotMethods {
+public class SyBot {
     public final ElapsedTime runtime = new ElapsedTime();
 
     public static final double BASE_POWER = 0.35;
@@ -60,7 +60,7 @@ public class RobotMethods {
     public OpenCvCamera camera;
 
     // Test method to send a message
-    public RobotMethods(LinearOpMode parent, OpModeType type, Side side) {
+    public SyBot(LinearOpMode parent, OpModeType type, Side side) {
         this.parent = parent;
         hardwareMap = parent.hardwareMap;
         telemetry = parent.telemetry;
@@ -150,11 +150,11 @@ public class RobotMethods {
         runtime.reset();
     }
 
-    public RobotMethods(LinearOpMode parent, OpModeType type) {
+    public SyBot(LinearOpMode parent, OpModeType type) {
         this(parent, type, Side.RIGHT);
     }
 
-    public RobotMethods(LinearOpMode parent) {
+    public SyBot(LinearOpMode parent) {
         this(parent, OpModeType.AUTONOMOUS, Side.RIGHT);
     }
 
