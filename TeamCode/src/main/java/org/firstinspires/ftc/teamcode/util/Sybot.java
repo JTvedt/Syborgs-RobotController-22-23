@@ -62,6 +62,7 @@ public class Sybot {
     public double zeroAngle = 0;
     public boolean pinch = false; // true for gripped
     public boolean manualSlides = false;
+    public boolean mirror = false;
 
     public CvPipeline pipeline;
     public OpenCvCamera camera;
@@ -119,6 +120,10 @@ public class Sybot {
 
         // Computer Vision
         if (type == OpModeType.AUTONOMOUS) {
+            // Mirror inputs
+            if (side == StartSide.LEFT) mirror = true;
+
+            // CV + Camera
             WebcamName webcamName = hardwareMap.get(WebcamName.class, "Camera");
             // TODO plug in numbers
             if (side == StartSide.LEFT) pipeline = new CvPipeline(0, 0, 1, 1);
@@ -218,13 +223,14 @@ public class Sybot {
     }
 
     /**
-     * Moves robot in a linear direction
+     * Moves robot in a linear direction.
+     * Mirrored on left side by default
      * @param distance Distance to travel based on the distance unit
      * @param direction Direction of movement, in degrees, 0 degrees to go right
      */
     public void polarMove(double distance, double direction) {
-        double radianAngle = direction * (Math.PI / 180) - ((driveType == DriveType.POV ? getAngle() : 0));
-        double horizontal = Math.cos(radianAngle);
+        double radianAngle = direction * (Math.PI / 180) - (driveType == DriveType.POV ? getAngle() : 0);
+        double horizontal = Math.cos(radianAngle) * (mirror ? -1 : 1);
         double vertical = Math.sin(radianAngle) * 0.87;
         int tickCount = toTicks(distance);
 
@@ -329,16 +335,18 @@ public class Sybot {
     }
 
     /**
-     * Moves the robot to either side
+     * Moves the robot to either side.
+     * Moves independent of robot angle by default.
+     * Mirrored on left side by default.
      * @param distance distance for the robot to move, positive values to move to the right, negative values to move to the left.
-     *                 Moves independent of robot angle by default
      */
     public void strafe(double distance) {
         polarMove(distance, 0);
     }
 
     /**
-     * Drives the robot in a particular direction using cartesian coordinates
+     * Drives the robot in a particular direction using cartesian coordinates.
+     * Mirrored on left side by default.
      * @param x The amount the robot should move left and right
      * @param y The amount the robot should move forward
      */
@@ -347,6 +355,7 @@ public class Sybot {
     }
 
     /**
+     * NOT TESTED DO NOT USE
      * Spins the robot to a new position based on its current one
      * @param newAngle The new angle to spin to relative to old angle
      */

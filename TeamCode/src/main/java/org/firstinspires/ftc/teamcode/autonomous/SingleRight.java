@@ -19,6 +19,7 @@ public class SingleRight extends LinearOpMode {
         telemetry.addData("Parking in", parkZone);
         telemetry.update();
         sleep(600);
+        robot.camera.stopStreaming();
 
         // Autonomous processes go here
         robot.setSlides(-4130);

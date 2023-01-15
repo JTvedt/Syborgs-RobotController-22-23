@@ -26,17 +26,18 @@ public class SingleLeft extends LinearOpMode {
         robot.camera.stopStreaming();
 
         // Autonomous processes go here
+        // Everything in this section is mirrored
         robot.setSlides(-4130);
         robot.drive(56);
-        robot.strafe(12);
+        robot.strafe(-12);
         robot.waitForSlides();
         robot.drive(3);
         robot.setSlides(0);
-        sleep(300);
+        robot.rest();
         robot.toggleClaw();
-        sleep(300);
+        robot.rest();
         robot.drive(-3);
-        robot.strafe(-12);
+        robot.strafe(12);
         robot.drive(-26);
 
         park(parkZone);
@@ -46,7 +47,7 @@ public class SingleLeft extends LinearOpMode {
 
     // 0 for red, 1 for green, 2 for blue
     public void park(int parkingSpot) {
-        if (parkingSpot == 0) robot.strafe(-26);
-        else if (parkingSpot == 2) robot.strafe(26);
+        if (parkingSpot == 0) robot.strafe(26);
+        else if (parkingSpot == 2) robot.strafe(-26);
     }
 }
