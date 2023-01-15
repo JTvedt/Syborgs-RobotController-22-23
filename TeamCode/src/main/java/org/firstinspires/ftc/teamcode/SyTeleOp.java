@@ -25,7 +25,7 @@ public class SyTeleOp extends LinearOpMode {
         // P1 Stick Input
         double drive = -gamepad1.left_stick_y;
         double strafe = gamepad1.left_stick_x;
-        double turn = gamepad1.right_stick_x * 0.6;
+        double turn = gamepad1.right_stick_x * 0.75;
 
         double stickAngle = Math.atan2(drive, strafe);
         double magnitude = Math.hypot(drive, strafe);
@@ -46,6 +46,13 @@ public class SyTeleOp extends LinearOpMode {
             magnitude = 0.35;
         }
 
+        // Turn control
+        if (gamepad1.left_bumper) robot.resetAngle();
+        if (lTrigger(1)) {
+            double roundedAngle = Math.round(robot.getAngle() * 2/Math.PI) * Math.PI/2;
+            if (robot.getAngle() != roundedAngle) turn = 0.3 * (robot.getAngle() < roundedAngle ? -1 : 1);
+        }
+
         // Plug in numbers
         robot.teleDrive(stickAngle, magnitude, turn, multiplier);
 
@@ -60,7 +67,8 @@ public class SyTeleOp extends LinearOpMode {
         if (gamepad2.y && !y) robot.setSlides(robot.slideTarget() - (rTrigger(2) ? 35 : 100));
         if (gamepad2.right_stick_y != 0) robot.manualSlides = true;
         if (robot.manualSlides) robot.moveSlides(gamepad2.right_stick_y * 0.5);
-        if (gamepad2.left_trigger > .5) robot.moveSlides(0.5);
+        if (gamepad2.left_trigger > .5) robot.moveSlides(1.0);
+        if (gamepad2.left_bumper) robot.resetSlides();
 
         // Claw subsystem
         if (gamepad2.a && !a) robot.toggleClaw(); // Regulr cones

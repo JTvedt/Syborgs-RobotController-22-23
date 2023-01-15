@@ -349,16 +349,7 @@ public class RobotMethods {
     }
 
     public boolean isMoving(int mOfError) {
-        return (getMeanDifference() / 4 > mOfError);
-    }
-
-    public boolean isMoving(int mOfError, int max) {
-        int buffer = 0;
-        for (DcMotor motor : wheelList) {
-            if (Math.abs(motor.getTargetPosition() - motor.getCurrentPosition()) > max) return true;
-            buffer += Math.abs(motor.getTargetPosition() - motor.getCurrentPosition());
-        }
-        return (buffer / 4 > mOfError);
+        return getMeanDifference() / 4 > mOfError;
     }
 
     public boolean isMoving() {
@@ -423,6 +414,11 @@ public class RobotMethods {
         }
 
         rest();
+    }
+
+    public void resetSlides() {
+        leftSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
 
     public int slidePosition() {
