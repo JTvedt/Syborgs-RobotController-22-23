@@ -13,8 +13,6 @@ public class SlidesConfig extends LinearOpMode {
         leftSlide = hardwareMap.get(DcMotor.class, "LS");
         rightSlide = hardwareMap.get(DcMotor.class, "RS");
 
-        leftSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rightSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightSlide.setDirection(DcMotor.Direction.REVERSE);
 
         waitForStart();

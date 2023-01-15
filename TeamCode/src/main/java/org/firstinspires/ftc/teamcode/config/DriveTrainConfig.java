@@ -41,10 +41,10 @@ public class DriveTrainConfig extends OpMode {
         if (gamepad1.a) backRight.setPower(0.35);
 
         if (gamepad1.left_stick_y != 0) {
-            frontLeft.setPower(-gamepad1.left_stick_y);
-            frontRight.setPower(-gamepad1.left_stick_y);
-            backLeft.setPower(-gamepad1.left_stick_y);
-            backRight.setPower(-gamepad1.left_stick_y);
+            frontLeft.setPower(-gamepad1.left_stick_y * 0.5);
+            frontRight.setPower(-gamepad1.left_stick_y * 0.5);
+            backLeft.setPower(-gamepad1.left_stick_y * 0.5);
+            backRight.setPower(-gamepad1.left_stick_y * 0.5);
         }
     }
 }

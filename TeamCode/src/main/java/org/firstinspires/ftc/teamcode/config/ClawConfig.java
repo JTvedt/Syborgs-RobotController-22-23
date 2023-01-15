@@ -34,14 +34,14 @@ public class ClawConfig extends OpMode {
 
     @Override
     public void loop() {
-        double up = gamepad2.left_stick_y * 0.5;
+        double up = gamepad1.left_stick_y * 0.5;
         leftSlide.setPower(up);
         rightSlide.setPower(up);
 
-        double multiplier = (gamepad2.left_trigger > 0.5 ? 4d : 1d) / (gamepad2.right_trigger > 0.5 ? 2d : 1d);
+        double multiplier = (gamepad1.left_trigger > 0.5 ? 4 : 1) * (gamepad1.right_trigger > 0.5 ? 0.2 : 1);
 
-        leftPos += multiplier * ((gamepad2.a && !a ? 0.05 : 0) - (gamepad2.b && !b ? 0.05 : 0));
-        rightPos += multiplier * ((gamepad2.x && !x ? 0.05 : 0) - (gamepad2.y && !y ? 0.05 : 0));
+        leftPos += multiplier * ((gamepad1.y && !y ? 0.05 : 0) - (gamepad1.x && !x ? 0.05 : 0));
+        rightPos += multiplier * ((gamepad1.a && !a ? 0.05 : 0) - (gamepad1.b && !b ? 0.05 : 0));
 
         leftClaw.setPosition(leftPos);
         rightClaw.setPosition(rightPos);

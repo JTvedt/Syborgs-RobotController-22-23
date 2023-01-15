@@ -31,7 +31,7 @@ public class SyTeleOp extends LinearOpMode {
         double magnitude = Math.hypot(drive, strafe);
         double multiplier = 0.6 * (gamepad1.b ? 1.4 : 1) * (rTrigger(1) ? 0.35 : 1);
 
-        // P2 Precision input
+        // Precision input w/ D-Pad
         if (gamepad1.dpad_up) {
             stickAngle = Math.PI/2;
             magnitude = 0.35;
@@ -49,13 +49,13 @@ public class SyTeleOp extends LinearOpMode {
         // Plug in numbers
         robot.teleDrive(stickAngle, magnitude, turn, multiplier);
 
-        // Crane subsystem
+        // P2 Crane subsystem
         if (gamepad2.dpad_up && !uPad) robot.setSlides(-4300);
         if (gamepad2.dpad_right && !rPad) robot.setSlides(-2000);
         if (gamepad2.dpad_down && !dPad) robot.setSlides(0);
         if (gamepad2.dpad_left && !lPad) robot.setSlides(robot.slidePosition()); // Locks slides position
 
-        // Manual movement by player
+        // Manual slide fine tuning
         if (gamepad2.x && !x) robot.setSlides(robot.slideTarget() + (rTrigger(2) ? 35 : 100));
         if (gamepad2.y && !y) robot.setSlides(robot.slideTarget() - (rTrigger(2) ? 35 : 100));
         if (gamepad2.right_stick_y != 0) robot.manualSlides = true;
@@ -63,8 +63,8 @@ public class SyTeleOp extends LinearOpMode {
         if (gamepad2.left_trigger > .5) robot.moveSlides(0.5);
 
         // Claw subsystem
-        if (gamepad2.a && !a) robot.toggleClaw();
-        if (gamepad2.b && !b) robot.setClaw(0.25);
+        if (gamepad2.a && !a) robot.toggleClaw(); // Regulr cones
+        if (gamepad2.b && !b) robot.setClaw(0.25); // Capstone
 
         // Reset buttons
         a = gamepad2.a;
