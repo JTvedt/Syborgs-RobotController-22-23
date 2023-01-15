@@ -48,6 +48,9 @@ public class SyTeleOp extends LinearOpMode {
             magnitude = 0.35;
         }
 
+        // Move only in cardinal directions if pressing Y
+        if (gamepad1.y) stickAngle = Math.round(robot.getAngle() * 2/Math.PI) * Math.PI/2;
+
         // Turn control
         if (gamepad1.left_bumper) robot.resetAngle();
         if (lTrigger(1)) {
