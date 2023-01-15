@@ -8,9 +8,15 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.teamcode.cv.CvPipeline;
+
+import org.openftc.easyopencv.OpenCvCamera;
+import org.openftc.easyopencv.OpenCvCameraFactory;
+import org.openftc.easyopencv.OpenCvCameraRotation;
 
 import java.util.ArrayList;
 
@@ -21,6 +27,8 @@ public class RobotMethods {
     public static final double PULSES_PER_REVOLUTION = 537.7;
     public static final double WHEEL_CIRCUMFERENCE = 15.76;
     public static final double TICKS_PER_INCH = PULSES_PER_REVOLUTION / WHEEL_CIRCUMFERENCE;
+    public static final double TICKS_PER_TILE = TICKS_PER_INCH * 24;
+    public static final double TICKS_PER_CM = TICKS_PER_INCH * 2.54;
 
     public static final int WAIT_TIME = 400;
     public static final int TICK_THRESHOLD = 300;
@@ -41,14 +49,18 @@ public class RobotMethods {
     public Servo leftClaw;
     public Servo rightClaw;
 
-    public Mode mode = Mode.POV;
+    public DriveType mode = DriveType.POV;
+    public DistanceUnit driveUnit = DistanceUnit.INCHES;
     public BNO055IMU imu;
     public double zeroAngle = 0;
     public boolean pinch = false; // true for gripped
     public boolean manualSlides = false;
 
+    public CvPipeline pipeline;
+    public OpenCvCamera camera;
+
     // Test method to send a message
-    public RobotMethods(LinearOpMode parent) {
+    public RobotMethods(LinearOpMode parent, OpModeType type, Side side) {
         this.parent = parent;
         hardwareMap = parent.hardwareMap;
         telemetry = parent.telemetry;
@@ -91,6 +103,30 @@ public class RobotMethods {
         leftClaw = hardwareMap.get(Servo.class, "LC");
         rightClaw = hardwareMap.get(Servo.class, "RC");
 
+        // Computer Vision
+        if (type == OpModeType.AUTONOMOUS) {
+            WebcamName webcamName = hardwareMap.get(WebcamName.class, "Camera");
+            // TODO plug in numbers
+            if (side == Side.LEFT) pipeline = new CvPipeline(0, 0, 1, 1);
+            else if (side == Side.RIGHT) pipeline = new CvPipeline(0, 0, 1, 1);
+            else pipeline = new CvPipeline(0, 0, 1, 1);
+            int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+            camera = OpenCvCameraFactory.getInstance().createWebcam(webcamName, cameraMonitorViewId);
+            camera.setPipeline(pipeline);
+            camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
+                @Override
+                public void onOpened() {
+                    camera.startStreaming(640, 480, OpenCvCameraRotation.UPRIGHT);
+                }
+
+                @Override
+                public void onError(int errorCode) {
+
+                }
+            });
+        }
+
+        // IMU
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.mode = BNO055IMU.SensorMode.IMU;
         parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
@@ -101,11 +137,33 @@ public class RobotMethods {
         imu.initialize(parameters);
         resetAngle();
 
+        while (!imu.isGyroCalibrated())
+        {
+            // Wait for callibration
+            Thread.yield();
+        }
+
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
         parent.waitForStart();
         runtime.reset();
+    }
+
+    public RobotMethods(LinearOpMode parent, OpModeType type) {
+        this(parent, type, Side.RIGHT);
+    }
+
+    public RobotMethods(LinearOpMode parent) {
+        this(parent, OpModeType.AUTONOMOUS, Side.RIGHT);
+    }
+
+    public enum OpModeType {
+        TELEOP, AUTONOMOUS;
+    }
+
+    public enum Side {
+        LEFT, RIGHT;
     }
 
     /**
@@ -115,7 +173,7 @@ public class RobotMethods {
      * @param turnPower amount the robot should spin
      */
     public void teleDrive(double angle, double magnitude, double turnPower, double multiplier) {
-        if (this.mode == Mode.POV) angle -= getAngle();
+        if (this.mode == DriveType.POV) angle -= getAngle();
         double horizontal = Math.cos(angle);
         double vertical = Math.sin(angle) * 0.87;
 
@@ -137,10 +195,10 @@ public class RobotMethods {
      * @param direction Direction of movement, in degrees
      */
     public void linearMove(double distance, double direction) {
-        double radianAngle = direction * (Math.PI / 180) - ((mode == Mode.POV ? getAngle() : 0));
+        double radianAngle = direction * (Math.PI / 180) - ((mode == DriveType.POV ? getAngle() : 0));
         double horizontal = Math.cos(radianAngle);
         double vertical = Math.sin(radianAngle) * 0.87;
-        int tickCount = (int)(distance * TICKS_PER_INCH);
+        int tickCount = toTicks(distance);
 
         setDriveMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
@@ -199,7 +257,7 @@ public class RobotMethods {
 
     // TODO finish this method
     public void spinDrive(double distance, double ddirection, double angle) {
-        double radianDirection = angle * (Math.PI/180) - ((mode == Mode.POV ? getAngle() : 0));
+        double radianDirection = angle * (Math.PI/180) - ((mode == DriveType.POV ? getAngle() : 0));
         double radianAngle = angle * (Math.PI/180);
         double horizontal = Math.cos(radianDirection);
         double vertical = Math.sin(radianDirection);
@@ -267,12 +325,27 @@ public class RobotMethods {
     }
 
     // Sets the mode
-    public void setMode(Mode mode) {
+    public void setDriveType(DriveType mode) {
         this.mode = mode;
     }
 
-    public enum Mode {
+    public enum DriveType {
         POV, DIRECTIONAL;
+    }
+
+    public void setDriveUnit(DistanceUnit unit) {
+        this.driveUnit = unit;
+    }
+
+    public enum DistanceUnit {
+        INCHES, CENTIMETERS, TILES;
+    }
+
+    public int toTicks(double distance) {
+        if (driveUnit == DistanceUnit.INCHES) return (int)(distance * TICKS_PER_INCH);
+        else if (driveUnit == DistanceUnit.CENTIMETERS) return (int)(distance * TICKS_PER_CM);
+        else if (driveUnit == DistanceUnit.TILES) return (int)(distance * TICKS_PER_TILE);
+        else return 0;
     }
 
     public boolean isMoving(int mOfError) {

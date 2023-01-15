@@ -13,32 +13,14 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 @Autonomous(name="1C Right Autonomous")
 public class SingleRight extends LinearOpMode {
     public RobotMethods robot;
-    public CvPipeline pipeline;
-    public OpenCvCamera camera;
 
     @Override
     public void runOpMode() {
-        //Initialize CV + camera
-        WebcamName webcamName = hardwareMap.get(WebcamName.class, "Camera");
-        pipeline = new CvPipeline();
-        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        camera = OpenCvCameraFactory.getInstance().createWebcam(webcamName, cameraMonitorViewId);
-        camera.setPipeline(pipeline);
-        camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
-            @Override
-            public void onOpened() {
-                camera.startStreaming(640, 480, OpenCvCameraRotation.UPRIGHT);
-            }
+        robot = new RobotMethods(this, RobotMethods.OpModeType.AUTONOMOUS);
 
-            @Override
-            public void onError(int errorCode) {
-
-            }
-        });
-        robot = new RobotMethods(this);
         robot.toggleClaw(true);
-        sleep(1000);
-        int parkZone = pipeline.getZone();
+        sleep(400);
+        int parkZone = robot.pipeline.getZone();
         telemetry.addData("Parking in", parkZone);
         telemetry.update();
         sleep(600);
@@ -50,9 +32,9 @@ public class SingleRight extends LinearOpMode {
         robot.waitForSlides();
         robot.drive(3);
         robot.setSlides(0);
-        sleep(300);
+        robot.rest();
         robot.toggleClaw();
-        sleep(300);
+        robot.rest();
         robot.drive(-3);
         robot.strafe(12);
         robot.drive(-26);

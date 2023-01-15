@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.cv;
 
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
+import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
@@ -19,21 +20,27 @@ public class CvPipeline extends OpenCvPipeline {
     private Mat output = new Mat();
     private Mat submat = new Mat();
     private int parkingZone = -1;
+    double x1 = 0, y1 = 0;
+    double x2 = 1, y2 = 1;
+
+    public CvPipeline(double x1, double y1, double x2, double y2) {
+        super();
+        this.x1 = x1;
+        this.y1 = y1;
+        this.x2 = x2;
+        this.y2 = y2;
+    }
+
+    public CvPipeline() {
+        this(0, 0, 1, 1);
+    }
 
     @Override
     public Mat processFrame(Mat input) {
-        double cropSize = 0.24;
-        double offsetX = 0.45;
-        double offsetY = 0.08;
-
-        int size = (int)Math.min(input.rows() * cropSize, input.cols() * cropSize);
-
         Imgproc.cvtColor(input, bgrInput, Imgproc.COLOR_RGBA2BGR);
-
         submat = bgrInput.submat(new Rect(
-                (int)(offsetX * input.rows()),
-                (int)(offsetY * input.cols()),
-                size, size));
+                new Point((x1 * input.cols()), (y1 * input.rows())),
+                new Point((x2 * input.cols()), (y2 * input.rows()))));
 
         Core.split(submat, channels);
 
@@ -42,9 +49,9 @@ public class CvPipeline extends OpenCvPipeline {
         double meanR = Core.mean(channels.get(2)).val[0];
         double max = Math.max(meanB, Math.max(meanG, meanR));
 
-        if(max == meanB) parkingZone = 2;
-        else if(max == meanG) parkingZone = 1;
-        else parkingZone = 0;
+        if(max == meanB) parkingZone = 3;
+        else if(max == meanG) parkingZone = 2;
+        else parkingZone = 1;
 
         Imgproc.cvtColor(submat, output, Imgproc.COLOR_BGR2RGBA);
         return output;

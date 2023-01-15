@@ -15,7 +15,7 @@ public class DoubleLeft extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        robot = new RobotMethods(this);
+        robot = new RobotMethods(this, RobotMethods.OpModeType.AUTONOMOUS);
         robot.toggleClaw(true);
         sleep(670);
 

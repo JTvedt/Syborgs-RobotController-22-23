@@ -12,7 +12,7 @@ public class SyTeleOp extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        robot = new RobotMethods(this);
+        robot = new RobotMethods(this, RobotMethods.OpModeType.TELEOP);
         robot.toggleClaw(false);
 
         while (opModeIsActive()) {
@@ -86,10 +86,10 @@ public class SyTeleOp extends LinearOpMode {
         // telemetry.addData("Angle", stickAngle - robot.getAngle());
         // telemetry.addData("Magnitude", magnitude);
 
-        telemetry.addData("Slide target", robot.slideTarget());
-        telemetry.addData("Slide position", robot.slidePosition());
-        telemetry.addData("LSlide power", robot.leftSlide.getPower());
-        telemetry.addData("RSlide power", robot.rightSlide.getPower());
+        // telemetry.addData("Slide target", robot.slideTarget());
+        // telemetry.addData("Slide position", robot.slidePosition());
+        // telemetry.addData("LSlide power", robot.leftSlide.getPower());
+        // telemetry.addData("RSlide power", robot.rightSlide.getPower());
 
         telemetry.addData("Claw state", robot.pinch ? "closed" : "open");
 

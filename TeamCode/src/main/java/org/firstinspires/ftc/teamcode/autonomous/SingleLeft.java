@@ -18,27 +18,11 @@ public class SingleLeft extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        //Initialize CV + camera
-        WebcamName webcamName = hardwareMap.get(WebcamName.class, "Camera");
-        pipeline = new CvPipeline();
-        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        camera = OpenCvCameraFactory.getInstance().createWebcam(webcamName, cameraMonitorViewId);
-        camera.setPipeline(pipeline);
-        camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
-            @Override
-            public void onOpened() {
-                camera.startStreaming(640, 480, OpenCvCameraRotation.UPRIGHT);
-            }
+        robot = new RobotMethods(this, RobotMethods.OpModeType.AUTONOMOUS);
 
-            @Override
-            public void onError(int errorCode) {
-
-            }
-        });
-        robot = new RobotMethods(this);
         robot.toggleClaw(true);
-        sleep(1000);
-        int parkZone = pipeline.getZone();
+        sleep(400);
+        int parkZone = robot.pipeline.getZone();
         telemetry.addData("Parking in", parkZone);
         telemetry.update();
         sleep(600);
