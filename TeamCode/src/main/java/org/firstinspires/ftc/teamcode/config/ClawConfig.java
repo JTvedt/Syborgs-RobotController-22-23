@@ -5,6 +5,15 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
+/**
+ * Tests the claw to determine the grip strength necessary to carry objects.
+ * X and A to close the left and right claw.
+ * Y and B to open the left and right claw.
+ * LT to increase claw increments.
+ * RT to decrease claw increments.
+ * Left stick to move the slides up and down.
+ * Claw positions are shown on telemetry.
+ */
 @TeleOp(name="Claw Config", group="config")
 public class ClawConfig extends OpMode {
     private DcMotor leftSlide;
@@ -34,7 +43,7 @@ public class ClawConfig extends OpMode {
 
     @Override
     public void loop() {
-        double up = gamepad1.left_stick_y * 0.5;
+        double up = gamepad1.left_stick_y * 0.7;
         leftSlide.setPower(up);
         rightSlide.setPower(up);
 

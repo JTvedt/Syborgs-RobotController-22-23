@@ -5,13 +5,17 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.util.Sybot;
 
+/**
+ * Places one cone on the high junction and parks. Starting position on the right side
+ * @author Jeffrey Tvedt
+ */
 @Autonomous(name="1C Right Autonomous")
 public class SingleRight extends LinearOpMode {
     public Sybot robot;
 
     @Override
     public void runOpMode() {
-        robot = new Sybot(this, Sybot.OpModeType.AUTONOMOUS);
+        robot = new Sybot(this, Sybot.OpModeType.AUTONOMOUS, Sybot.StartSide.RIGHT);
 
         robot.setClaw(true);
         sleep(400);

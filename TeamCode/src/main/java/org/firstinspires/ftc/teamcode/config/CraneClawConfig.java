@@ -5,7 +5,11 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
-// This TeleOp is for testing purposes only (motors, etc)
+/**
+ * Tests the crane and claw subsystem.
+ * X and Y to close and open the claw.
+ * B and A to move the slides up and down.
+ */
 @TeleOp(name="Crane & Claw Config", group="config")
 public class CraneClawConfig extends OpMode {
     private DcMotor leftSlide;

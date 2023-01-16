@@ -7,6 +7,10 @@ import org.firstinspires.ftc.teamcode.util.Sybot;
 import org.firstinspires.ftc.teamcode.cv.CvPipeline;
 import org.openftc.easyopencv.OpenCvCamera;
 
+/**
+ * Places one cone on the high junction and parks. Starting position on the left side
+ * @author Jeffrey Tvedt
+ */
 @Autonomous(name="1C Left Autonomous")
 public class SingleLeft extends LinearOpMode {
     public Sybot robot;
@@ -15,7 +19,7 @@ public class SingleLeft extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        robot = new Sybot(this, Sybot.OpModeType.AUTONOMOUS);
+        robot = new Sybot(this, Sybot.OpModeType.AUTONOMOUS, Sybot.StartSide.LEFT);
 
         robot.setClaw(true);
         sleep(400);

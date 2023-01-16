@@ -4,6 +4,12 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+/**
+ * Tests each slide motor individually, useful for de-tangling slides.
+ * Hold claw up with hand manually, and then move slides.
+ * Move left and right stick to control left and right slide.
+ * As the slides move up, the spool loosens, and it tightens on the way down.
+ */
 @TeleOp(name="Slide Motors Config", group="config")
 public class SlidesConfig extends LinearOpMode {
     DcMotor leftSlide, rightSlide;

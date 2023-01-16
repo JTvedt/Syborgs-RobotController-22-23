@@ -5,6 +5,12 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+/**
+ * Tests the motors on the hardware map to test mapping.
+ * X and Y to move the motors labelled Fl and FR.
+ * A and B to move the motors labelled BL and BR.
+ * Left stick to move all wheels forward or backwards.
+ */
 @TeleOp(name="Drive Train Config", group="config")
 public class DriveTrainConfig extends OpMode {
     public DcMotor frontLeft;
