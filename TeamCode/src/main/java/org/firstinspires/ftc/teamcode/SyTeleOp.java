@@ -69,7 +69,7 @@ public class SyTeleOp extends LinearOpMode {
         // P2 Crane subsystem
         if (gamepad2.dpad_up && !uPad) robot.setSlides(-4300);
         if (gamepad2.dpad_right && !rPad) robot.setSlides(-2000);
-        if (gamepad2.dpad_down && !dPad) robot.setSlides(0);
+        if (gamepad2.dpad_down && !dPad) robot.setSlides(-100);
         if (gamepad2.dpad_left && !lPad) robot.setSlides(robot.slidePosition()); // Locks slides position
 
         // Manual slide fine tuning

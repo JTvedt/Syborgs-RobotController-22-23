@@ -158,7 +158,7 @@ public class Sybot {
 
         while (!imu.isGyroCalibrated())
         {
-            // Wait for callibration
+            // Wait for calibration
             Thread.yield();
         }
 
@@ -493,6 +493,11 @@ public class Sybot {
      * @param height height to which the slide should move to, negative values are high, 0 at rest
      */
     public void setSlides(int height) {
+        if (height > slideTarget()) {
+            new Thread(new DropSlides(height));
+            return;
+        }
+
         double power = height < slideTarget() ? SLIDE_SPEED_UP : SLIDE_SPEED_DOWN;
 
         manualSlides = false;
@@ -504,6 +509,45 @@ public class Sybot {
 
         leftSlide.setPower(power);
         rightSlide.setPower(power);
+    }
+
+    /**
+     * Runnable class that drops the slides to a particular position.
+     * Does not use encoders, purpose is to lower slides
+     * Runs on a separate thread. Not thread safe.
+     */
+    public class DropSlides implements Runnable {
+        int height;
+
+        public DropSlides(int height) {
+            this.height = height;
+        }
+
+        @Override
+        public void run() {
+            if (slideTarget() == height) return;
+
+            leftSlide.setTargetPosition(height);
+            rightSlide.setTargetPosition(height);
+
+            leftSlide.setPower(SLIDE_SPEED_DOWN);
+            rightSlide.setPower(SLIDE_SPEED_DOWN);
+
+            leftSlide.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            rightSlide.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+            while (slidePosition() > height && slideTarget() == height && !manualSlides) {
+                Thread.yield();
+            }
+
+            if (!manualSlides) {
+                leftSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                leftSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+                leftSlide.setPower(SLIDE_SPEED_UP);
+                rightSlide.setPower(SLIDE_SPEED_UP);
+            }
+        }
     }
 
     /**
