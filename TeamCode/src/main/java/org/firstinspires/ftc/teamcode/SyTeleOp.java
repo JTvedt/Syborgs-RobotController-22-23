@@ -5,10 +5,15 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.util.Sybot;
 
+/**
+ * TeleOp to be used for the robot
+ * @author Jeffrey Tvedt
+ */
 @TeleOp(name="Jeffrey TeleOp")
 public class SyTeleOp extends LinearOpMode {
     public Sybot robot;
 
+    // boolean values indicating button state
     public boolean a, b, x, y;
     public boolean uPad, dPad, lPad, rPad;
 
