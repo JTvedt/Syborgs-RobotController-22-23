@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.teleop;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -16,6 +16,7 @@ public class SyTeleOp extends LinearOpMode {
     // boolean values indicating button state
     public boolean a, b, x, y;
     public boolean uPad, dPad, lPad, rPad;
+    public boolean p1Mode = false;
 
     @Override
     public void runOpMode() {
@@ -77,8 +78,8 @@ public class SyTeleOp extends LinearOpMode {
         if (gamepad2.y && !y) robot.setSlides(robot.slideTarget() - (rTrigger(2) ? 35 : 100));
         if (gamepad2.right_stick_y != 0) robot.manualSlides = true;
         if (robot.manualSlides) robot.moveSlides(gamepad2.right_stick_y * 0.5);
-        if (gamepad2.left_trigger > .5) robot.moveSlides(1.0);
         if (gamepad2.left_bumper) robot.resetSlides();
+        if (lTrigger(2)) robot.moveSlides(1.0);
 
         // Claw subsystem
         if (gamepad2.a && !a) robot.toggleClaw(); // Regulr cones
