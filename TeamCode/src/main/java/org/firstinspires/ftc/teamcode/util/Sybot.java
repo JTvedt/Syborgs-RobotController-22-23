@@ -63,6 +63,7 @@ public class Sybot {
     public boolean pinch = false; // true for gripped
     public boolean manualSlides = false;
     public boolean mirror = false;
+    public volatile int slideHeight = 0;
 
     public CvPipeline pipeline;
     public OpenCvCamera camera;
@@ -289,38 +290,34 @@ public class Sybot {
     // TODO finish this method
     // NOT TESTED DO NOT USE
     public void spinDrive(double distance, double direction, double angle) {
-        double radianDirection = direction * (Math.PI/180) - ((driveType == DriveType.POV ? getAngle() : 0));
+        double radianDirection = direction * (Math.PI/180) - getAngle();
         double radianAngle = angle * (Math.PI/180);
         double horizontal = Math.cos(radianDirection);
-        double vertical = Math.sin(radianDirection);
+        double vertical = Math.sin(radianDirection) * 0.87;
 
         int driveTicks = (int)(distance * TICKS_PER_INCH);
         int spinTicks = (int)(radianAngle * 425);
+        // TODO shouldn't there be a method to get the sign?
+        double spin = spinTicks/Math.abs(spinTicks) * 0.2;
 
         setDriveMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        frontLeft.setTargetPosition((int)((horizontal + vertical) * driveTicks) - spinTicks);
-        frontRight.setTargetPosition((int)((-horizontal + vertical) * driveTicks) + spinTicks);
-        backLeft.setTargetPosition((int)((-horizontal + vertical) * driveTicks) - spinTicks);
-        backRight.setTargetPosition((int)((horizontal + vertical) * driveTicks) + spinTicks);
-
-        int maxTicks = 0;
-        for (DcMotor motor: wheelList) if (motor.getTargetPosition() > maxTicks) maxTicks = motor.getTargetPosition();
-
-        setDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
-        setDrivePower(BASE_POWER);
+        frontLeft.setTargetPosition((int)((vertical + horizontal) * driveTicks) - spinTicks);
+        frontRight.setTargetPosition((int)((vertical - horizontal) * driveTicks) + spinTicks);
+        backLeft.setTargetPosition((int)((vertical - horizontal) * driveTicks) - spinTicks);
+        backRight.setTargetPosition((int)((vertical + horizontal) * driveTicks) + spinTicks);
 
         while (isMoving()) {
-            for (DcMotor motor : wheelList) motor.setPower(0.5 * (motor.getTargetPosition() / maxTicks));
+            radianDirection = direction * (Math.PI/180) - getAngle();
+            horizontal = Math.cos(radianDirection);
+            vertical = Math.sin(radianDirection) * 0.87;
+
+            // Update power to move in a straight line
+            frontLeft.setPower((horizontal + vertical) * 0.65);
+            frontRight.setPower((horizontal - vertical) * 0.65);
+            backLeft.setPower((horizontal - vertical) * 0.65);
+            backRight.setPower((horizontal + vertical) * 0.65);
         }
-
-        rest();
-    }
-
-    // TODO finish this method
-    // NOT TESTED DO NOT USE
-    public void driveSpin(double direction) {
-
     }
 
     /**
@@ -486,29 +483,6 @@ public class Sybot {
     }
 
     /**
-     * Sets the slide position using the motor encoders
-     * @param height height to which the slide should move to, negative values are high, 0 at rest
-     */
-    public void setSlides(int height) {
-        if (height > slideTarget()) {
-            new Thread(new DropSlides(height));
-            return;
-        }
-
-        double power = height < slideTarget() ? SLIDE_SPEED_UP : SLIDE_SPEED_DOWN;
-
-        manualSlides = false;
-        leftSlide.setTargetPosition(height);
-        rightSlide.setTargetPosition(height);
-
-        leftSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        rightSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-        leftSlide.setPower(power);
-        rightSlide.setPower(power);
-    }
-
-    /**
      * Runnable class that drops the slides to a particular position.
      * Does not use encoders, purpose is to lower slides
      * Runs on a separate thread. Not thread safe.
@@ -534,17 +508,74 @@ public class Sybot {
             rightSlide.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
             while (slidePosition() > height && slideTarget() == height && !manualSlides) {
-                Thread.yield();
+                if (slideTarget() != height || manualSlides) return;
             }
 
-            if (!manualSlides) {
-                leftSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                leftSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            leftSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            leftSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-                leftSlide.setPower(SLIDE_SPEED_UP);
-                rightSlide.setPower(SLIDE_SPEED_UP);
-            }
+            leftSlide.setPower(SLIDE_SPEED_UP);
+            rightSlide.setPower(SLIDE_SPEED_UP);
         }
+    }
+
+    // TODO refactor this to combine PushSlides and DropSlides
+    /**
+     * Runnable that pushes the slides to their target position without using encoders.
+     * Runs on a separate thread. Thread safety not tested.
+     */
+    public class PushSlides implements Runnable {
+        int height;
+
+        public PushSlides(int height) {
+            this.height = height;
+        }
+
+        @Override
+        public void run() {
+            if (slideTarget() == height) return;
+
+            leftSlide.setTargetPosition(height);
+            rightSlide.setTargetPosition(height);
+
+            leftSlide.setPower(SLIDE_SPEED_UP);
+            rightSlide.setPower(SLIDE_SPEED_UP);
+
+            leftSlide.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            rightSlide.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+            while (Math.abs(slidePosition() - slideTarget()) > 16) {
+                if (slideTarget() != height || manualSlides) return;
+            }
+
+            leftSlide.setPower(0.0);
+            rightSlide.setPower(0.0);
+        }
+    }
+
+    /**
+     * Sets the slide position using the motor encoders
+     * @param height height to which the slide should move to, negative values are high, 0 at rest
+     */
+    public void setSlides(int height) {
+        if (height == slideTarget()) return;
+
+//        if (height > slidePosition()) {
+//            new Thread(new DropSlides(height)).start();
+//            return;
+//        }
+
+        double power = height < slideTarget() ? SLIDE_SPEED_UP : SLIDE_SPEED_DOWN;
+
+        manualSlides = false;
+        leftSlide.setTargetPosition(height);
+        rightSlide.setTargetPosition(height);
+
+        leftSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        leftSlide.setPower(power);
+        rightSlide.setPower(power);
     }
 
     /**
