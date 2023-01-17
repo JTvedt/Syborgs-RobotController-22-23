@@ -120,9 +120,6 @@ public class Sybot {
 
         // Computer Vision
         if (type == OpModeType.AUTONOMOUS) {
-            // Mirror inputs
-            if (side == StartSide.LEFT) mirror = true;
-
             // CV + Camera
             WebcamName webcamName = hardwareMap.get(WebcamName.class, "Camera");
             // TODO plug in numbers
@@ -175,7 +172,7 @@ public class Sybot {
      * @param type The type of OpMode, TeleOp or Autonomous
      */
     public Sybot(LinearOpMode parent, OpModeType type) {
-        this(parent, type, StartSide.RIGHT);
+        this(parent, type, StartSide.UNSPECIFIED);
     }
 
     /**
@@ -183,7 +180,7 @@ public class Sybot {
      * @param parent The OpMode that will be using this class's methods
      */
     public Sybot(LinearOpMode parent) {
-        this(parent, OpModeType.AUTONOMOUS, StartSide.RIGHT);
+        this(parent, OpModeType.AUTONOMOUS, StartSide.UNSPECIFIED);
     }
 
     public enum OpModeType {
@@ -195,7 +192,7 @@ public class Sybot {
      * Left side will mirror the robot
      */
     public enum StartSide {
-        LEFT, RIGHT;
+        LEFT, RIGHT, UNSPECIFIED;
     }
 
     /**

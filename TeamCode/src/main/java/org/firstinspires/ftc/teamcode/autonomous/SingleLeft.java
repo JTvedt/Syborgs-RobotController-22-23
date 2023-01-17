@@ -20,6 +20,7 @@ public class SingleLeft extends LinearOpMode {
     @Override
     public void runOpMode() {
         robot = new Sybot(this, Sybot.OpModeType.AUTONOMOUS, Sybot.StartSide.LEFT);
+        robot.mirror = true;
 
         robot.setClaw(true);
         sleep(400);
