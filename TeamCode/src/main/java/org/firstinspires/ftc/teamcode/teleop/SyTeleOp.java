@@ -5,6 +5,8 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.util.Sybot;
 
+// Thanks Arjun. Go do your homework
+
 /**
  * TeleOp to be used for the robot
  * @author Jeffrey Tvedt
