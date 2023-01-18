@@ -12,10 +12,9 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.util.Range;
 
 @TeleOp(name = "Yash TeleOp")
-public class SyborgsTeleOp extends LinearOpMode {
+public class YashTeleOp extends LinearOpMode {
 
     private DcMotor frontRight;
     private DcMotor frontLeft;

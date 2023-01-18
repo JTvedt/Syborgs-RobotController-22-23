@@ -12,7 +12,7 @@ import org.firstinspires.ftc.teamcode.util.Sybot;
  * @author Jeffrey Tvedt
  */
 @TeleOp(name="Jeffrey TeleOp")
-public class SyTeleOp extends LinearOpMode {
+public class JeffreyTeleOp extends LinearOpMode {
     public Sybot robot;
 
     // boolean values indicating button state
