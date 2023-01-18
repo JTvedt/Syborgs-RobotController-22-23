@@ -537,8 +537,8 @@ public class Sybot {
             leftSlide.setTargetPosition(height);
             rightSlide.setTargetPosition(height);
 
-            leftSlide.setPower(SLIDE_SPEED_UP);
-            rightSlide.setPower(SLIDE_SPEED_UP);
+            leftSlide.setPower(height < slidePosition() ? SLIDE_SPEED_UP : SLIDE_SPEED_DOWN);
+            rightSlide.setPower(height < slidePosition() ? SLIDE_SPEED_UP : SLIDE_SPEED_DOWN);
 
             leftSlide.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             rightSlide.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -552,17 +552,24 @@ public class Sybot {
         }
     }
 
+    public void pushSlides(int height) {
+        if (height == slideTarget()) return;
+
+        if (height > slidePosition()) {
+            new Thread(new DropSlides(height)).start();
+            return;
+        } else {
+            new Thread(new PushSlides(height)).start();
+            return;
+        }
+    }
+
     /**
      * Sets the slide position using the motor encoders
      * @param height height to which the slide should move to, negative values are high, 0 at rest
      */
     public void setSlides(int height) {
         if (height == slideTarget()) return;
-
-//        if (height > slidePosition()) {
-//            new Thread(new DropSlides(height)).start();
-//            return;
-//        }
 
         double power = height < slideTarget() ? SLIDE_SPEED_UP : SLIDE_SPEED_DOWN;
 
