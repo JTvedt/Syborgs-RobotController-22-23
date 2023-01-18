@@ -297,8 +297,7 @@ public class Sybot {
 
         int driveTicks = (int)(distance * TICKS_PER_INCH);
         int spinTicks = (int)(radianAngle * 425);
-        // TODO shouldn't there be a method to get the sign?
-        double spin = spinTicks/Math.abs(spinTicks) * 0.2;
+        double spin = Math.signum(spinTicks) * 0.2;
 
         setDriveMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
