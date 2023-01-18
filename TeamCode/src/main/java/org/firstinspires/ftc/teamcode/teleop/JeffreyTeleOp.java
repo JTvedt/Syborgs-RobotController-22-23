@@ -5,8 +5,6 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.util.Sybot;
 
-// Thanks Arjun. Go do your homework
-
 /**
  * TeleOp to be used for the robot
  * @author Jeffrey Tvedt
@@ -66,7 +64,15 @@ public class JeffreyTeleOp extends LinearOpMode {
 
     // Loop for cycling cones on junction
     public void coneCycleLoop() {
+        double stickAngle = Math.atan2(-gamepad1.left_stick_y, gamepad1.left_stick_x);
+        double multiplier = 1 * (rTrigger(1) ? 0.35 : 1);
+        stickAngle = Math.round(stickAngle * 2/Math.PI) * Math.PI/2;
 
+        double roundedAngle = Math.round(robot.getAngle() * 2/Math.PI) * Math.PI/2;
+        double turn = 0;
+        if (robot.getAngle() != roundedAngle) turn = 0.3 * (robot.getAngle() < roundedAngle ? -1 : 1);
+
+        robot.teleDrive(stickAngle, 1, turn, multiplier);
     }
 
     // Standard loop that involves two players
@@ -80,7 +86,6 @@ public class JeffreyTeleOp extends LinearOpMode {
         double magnitude = Math.hypot(drive, strafe);
         double multiplier = 0.6 * (gamepad1.b ? 1.4 : 1) * (rTrigger(1) ? 0.35 : 1);
 
-        double roundedAngle = Math.round(robot.getAngle() * 2/Math.PI) * Math.PI/2;
 
         // Precision input w/ D-Pad
         if (gamepad1.dpad_up) {
@@ -98,12 +103,13 @@ public class JeffreyTeleOp extends LinearOpMode {
         }
 
         // Move only in cardinal directions if pressing Y
-        if (gamepad1.y) stickAngle = roundedAngle;
+        if (gamepad1.y) stickAngle = Math.round(stickAngle * 2/Math.PI) * Math.PI/2;
 
         // Turn control
         if (gamepad1.left_bumper) robot.resetAngle();
-        if (lTrigger(1) && robot.getAngle() != roundedAngle) {
-            turn = 0.3 * (robot.getAngle() < roundedAngle ? -1 : 1);
+        if (lTrigger(1)) {
+            double roundedAngle = Math.round(robot.getAngle() * 2/Math.PI) * Math.PI/2;
+            if (robot.getAngle() != roundedAngle) turn = 0.3 * (robot.getAngle() < roundedAngle ? -1 : 1);
         }
 
         // Plug in numbers
