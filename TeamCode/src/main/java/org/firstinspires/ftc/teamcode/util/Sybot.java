@@ -34,8 +34,8 @@ public class Sybot {
     public static final double TICKS_PER_INCH = PULSES_PER_REVOLUTION / WHEEL_CIRCUMFERENCE;
     public static final double TICKS_PER_TILE = TICKS_PER_INCH * 24;
     public static final double TICKS_PER_CM = TICKS_PER_INCH * 2.54;
-    public static final double SLIDE_SPEED_UP = 0.85;
-    public static final double SLIDE_SPEED_DOWN = 0.5;
+    public static final double SLIDE_SPEED_UP = 0.5;
+    public static final double SLIDE_SPEED_DOWN = 0.25;
 
     public static final int WAIT_TIME = 400;
     public static final int TICK_THRESHOLD = 300;
@@ -63,10 +63,13 @@ public class Sybot {
     public boolean pinch = false; // true for gripped
     public boolean manualSlides = false;
     public boolean mirror = false;
+    public boolean enableThreads = true;
     public volatile int slideHeight = 0;
 
     public CvPipeline pipeline;
     public OpenCvCamera camera;
+
+    public ArrayList<Thread> threadQueue = new ArrayList<Thread>();
 
     /**
      * Constructor for Sybot, takes in the parent, OpMode type, and starting side
@@ -218,6 +221,10 @@ public class Sybot {
         frontRight.setPower((vertical - horizontal) * magnitude - turnPower);
         backLeft.setPower((vertical - horizontal) * magnitude + turnPower);
         backRight.setPower((vertical + horizontal) * magnitude - turnPower);
+    }
+
+    public void teleDrive(double direction, double magnitude, double turnPower) {
+        teleDrive(direction, magnitude, turnPower, 1);
     }
 
     /**
@@ -537,15 +544,24 @@ public class Sybot {
             leftSlide.setTargetPosition(height);
             rightSlide.setTargetPosition(height);
 
-            leftSlide.setPower(height < slidePosition() ? SLIDE_SPEED_UP : SLIDE_SPEED_DOWN);
-            rightSlide.setPower(height < slidePosition() ? SLIDE_SPEED_UP : SLIDE_SPEED_DOWN);
+//            leftSlide.setPower(height < slidePosition() ? SLIDE_SPEED_UP : SLIDE_SPEED_DOWN);
+//            rightSlide.setPower(height < slidePosition() ? SLIDE_SPEED_UP : SLIDE_SPEED_DOWN);
+            leftSlide.setPower(0.5);
+            rightSlide.setPower(0.5);
 
             leftSlide.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             rightSlide.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-            while (Math.abs(slidePosition() - slideTarget()) > 16) {
-                if (slideTarget() != height || manualSlides) return;
+            while (Math.abs(slideTarget() - slidePosition()) > 30) {
+                telemetry.addData("Slide Position", slidePosition());
+                telemetry.addData("Slide Target", slideTarget());
+                telemetry.addData("Difference", slideTarget() - slidePosition());
+                telemetry.update();
+                if (slideTarget() != height || manualSlides || !enableThreads) return;
             }
+
+            telemetry.addData("Target", "reached");
+            telemetry.update();
 
             leftSlide.setPower(0.0);
             rightSlide.setPower(0.0);
@@ -554,14 +570,8 @@ public class Sybot {
 
     public void pushSlides(int height) {
         if (height == slideTarget()) return;
-
-        if (height > slidePosition()) {
-            new Thread(new DropSlides(height)).start();
-            return;
-        } else {
-            new Thread(new PushSlides(height)).start();
-            return;
-        }
+        new Thread(new PushSlides(height)).start();
+//        new Thread(height > slidePosition() ? new DropSlides(height) : new PushSlides(height)).start();
     }
 
     /**

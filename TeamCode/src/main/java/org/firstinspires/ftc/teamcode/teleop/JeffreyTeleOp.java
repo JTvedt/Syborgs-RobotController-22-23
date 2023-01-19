@@ -16,7 +16,7 @@ public class JeffreyTeleOp extends LinearOpMode {
     // boolean values indicating button state
     public ControlMode control = ControlMode.MULTIPLAYER;
 
-    public boolean a, b;
+    public boolean a, b, x;
     public boolean a2, b2, x2, y2;
     public boolean uPad2, dPad2, lPad2, rPad2;
 
@@ -28,6 +28,9 @@ public class JeffreyTeleOp extends LinearOpMode {
         while (opModeIsActive()) {
             runLoop();
         }
+
+        robot.enableThreads = false;
+        telemetry.update();
     }
 
     public void runLoop() {
@@ -45,34 +48,33 @@ public class JeffreyTeleOp extends LinearOpMode {
                 standardLoop();
                 break;
         }
-
-        // TODO find a way to automate this process
-        // Reset P1 buttons
-        a = gamepad1.a;
-        b = gamepad1.b;
-
-        // Reset P2 buttons
-        a2 = gamepad2.a;
-        b2 = gamepad2.b;
-        y2 = gamepad2.y;
-        x2 = gamepad2.x;
-        uPad2 = gamepad2.dpad_up;
-        dPad2 = gamepad2.dpad_down;
-        lPad2 = gamepad2.dpad_left;
-        rPad2 = gamepad2.dpad_right;
     }
 
     // Loop for cycling cones on junction
     public void coneCycleLoop() {
+        // Stick Input
         double stickAngle = Math.atan2(-gamepad1.left_stick_y, gamepad1.left_stick_x);
-        double multiplier = 1 * (rTrigger(1) ? 0.35 : 1);
+        double magnitude = 1 * (rTrigger(1) ? 0.35 : 1);
         stickAngle = Math.round(stickAngle * 2/Math.PI) * Math.PI/2;
 
-        double roundedAngle = Math.round(robot.getAngle() * 2/Math.PI) * Math.PI/2;
         double turn = 0;
+        double roundedAngle = Math.round(robot.getAngle() * 2/Math.PI) * Math.PI/2;
         if (robot.getAngle() != roundedAngle) turn = 0.3 * (robot.getAngle() < roundedAngle ? -1 : 1);
 
-        robot.teleDrive(stickAngle, 1, turn, multiplier);
+        robot.teleDrive(stickAngle, magnitude, turn);
+
+        if (gamepad1.x && !x) robot.toggleClaw();
+        if (gamepad1.a && !a) {
+            robot.setClaw(false);
+            robot.pushSlides(0);
+        }
+        if (gamepad1.b && !b) {
+            robot.setClaw(true);
+            robot.pushSlides(-4150);
+        }
+
+        if (gamepad1.right_stick_y != 0) robot.manualSlides = true;
+        if (robot.manualSlides) robot.moveSlides(gamepad1.right_stick_y * 0.7);
     }
 
     // Standard loop that involves two players
@@ -116,10 +118,10 @@ public class JeffreyTeleOp extends LinearOpMode {
         robot.teleDrive(stickAngle, magnitude, turn, multiplier);
 
         // P2 Crane subsystem
-//        if (gamepad2.dpad_up && !uPad2) robot.setSlides(-4300);
-//        if (gamepad2.dpad_right && !rPad2) robot.setSlides(-2000);
-//        if (gamepad2.dpad_down && !dPad2) robot.setSlides(0);
-//        if (gamepad2.dpad_left && !lPad2) robot.setSlides(robot.slidePosition()); // Locks slides position
+        if (gamepad1.dpad_up && !uPad2) robot.setSlides(-4300);
+        if (gamepad1.dpad_right && !rPad2) robot.setSlides(-2000);
+        if (gamepad1.dpad_down && !dPad2) robot.setSlides(0);
+        if (gamepad1.dpad_left && !lPad2) robot.setSlides(robot.slidePosition()); // Locks slides position
 
         if (gamepad2.dpad_up && !uPad2) robot.pushSlides(-4300);
         if (gamepad2.dpad_right && !rPad2) robot.pushSlides(-2000);
@@ -134,10 +136,12 @@ public class JeffreyTeleOp extends LinearOpMode {
         if (lTrigger(2)) robot.moveSlides(1.0);
 
         // Claw subsystem
-        if (gamepad2.a && !a2) robot.toggleClaw(); // Regulr cones
+        if (gamepad2.a && !a2) robot.toggleClaw(); // Regular cones
         if (gamepad2.b && !b2) robot.setClaw(0.25); // Capstone
 
-        telemetry.addData("Robot angle", robot.getAngle());
+        resetButtons();
+
+        // telemetry.addData("Robot angle", robot.getAngle());
 
         // telemetry.addData("Drive", drive);
         // telemetry.addData("Strafe", strafe);
@@ -152,15 +156,32 @@ public class JeffreyTeleOp extends LinearOpMode {
         // telemetry.addData("LSlide power", robot.leftSlide.getPower());
         // telemetry.addData("RSlide power", robot.rightSlide.getPower());
 
-        telemetry.addData("Claw state", robot.pinch ? "closed" : "open");
+        // telemetry.addData("Claw state", robot.pinch ? "closed" : "open");
 
-        telemetry.update();
+         // telemetry.update();
     }
 
     public enum ControlMode {
         CONE_CYCLE,
         MULTIPLAYER,
         AUTOMATIC
+    }
+
+    public void resetButtons() {
+        // Reset P1 buttons
+        a = gamepad1.a;
+        b = gamepad1.b;
+        x = gamepad1.x;
+
+        // Reset P2 buttons
+        a2 = gamepad2.a;
+        b2 = gamepad2.b;
+        y2 = gamepad2.y;
+        x2 = gamepad2.x;
+        uPad2 = gamepad2.dpad_up;
+        dPad2 = gamepad2.dpad_down;
+        lPad2 = gamepad2.dpad_left;
+        rPad2 = gamepad2.dpad_right;
     }
 
     public boolean lTrigger(int player) {
