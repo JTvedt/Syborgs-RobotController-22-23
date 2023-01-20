@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 /**
  * Tests each slide motor individually, useful for de-tangling slides.
  * Hold claw up with hand manually, and then move slides.
- * Move left and right stick to control left and right slide.
+ * Move left and right stick to control left hand and right hand slide.
  * As the slides move up, the spool loosens, and it tightens on the way down.
  */
 @TeleOp(name="Slide Motors Config", group="config")
@@ -26,7 +26,7 @@ public class SlidesConfig extends LinearOpMode {
     }
 
     public void runLoop() {
-        leftSlide.setPower(gamepad1.left_stick_y * 0.25);
-        rightSlide.setPower(gamepad1.right_stick_y * 0.25);
+        leftSlide.setPower(-gamepad1.right_stick_y * 0.25);
+        rightSlide.setPower(-gamepad1.left_stick_y * 0.25);
     }
 }
