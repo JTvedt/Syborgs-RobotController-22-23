@@ -118,14 +118,10 @@ public class JeffreyTeleOp extends LinearOpMode {
         robot.teleDrive(stickAngle, magnitude, turn, multiplier);
 
         // P2 Crane subsystem
-        if (gamepad1.dpad_up && !uPad2) robot.setSlides(-4300);
-        if (gamepad1.dpad_right && !rPad2) robot.setSlides(-2000);
-        if (gamepad1.dpad_down && !dPad2) robot.setSlides(0);
-        if (gamepad1.dpad_left && !lPad2) robot.setSlides(robot.slidePosition()); // Locks slides position
-
-        if (gamepad2.dpad_up && !uPad2) robot.pushSlides(-4300);
-        if (gamepad2.dpad_right && !rPad2) robot.pushSlides(-2000);
-        if (gamepad2.dpad_down && !dPad2) robot.pushSlides(-400);
+        if (gamepad2.dpad_up && !uPad2) robot.setSlides(-4300);
+        if (gamepad2.dpad_right && !rPad2) robot.setSlides(-2000);
+        if (gamepad2.dpad_down && !dPad2) robot.setSlides(0);
+        if (gamepad2.dpad_left && !lPad2) robot.setSlides(robot.slidePosition()); // Locks slides position
 
         // Manual slide fine tuning
         if (gamepad2.x && !x2) robot.setSlides(robot.slideTarget() + (rTrigger(2) ? 35 : 100));
@@ -151,8 +147,8 @@ public class JeffreyTeleOp extends LinearOpMode {
         // telemetry.addData("Angle", stickAngle - robot.getAngle());
         // telemetry.addData("Magnitude", magnitude);
 
-        // telemetry.addData("Slide target", robot.slideTarget());
-        // telemetry.addData("Slide position", robot.slidePosition());
+        telemetry.addData("Slide target", robot.slideTarget());
+        telemetry.addData("Slide position", robot.slidePosition());
         // telemetry.addData("LSlide power", robot.leftSlide.getPower());
         // telemetry.addData("RSlide power", robot.rightSlide.getPower());
 

@@ -34,8 +34,8 @@ public class Sybot {
     public static final double TICKS_PER_INCH = PULSES_PER_REVOLUTION / WHEEL_CIRCUMFERENCE;
     public static final double TICKS_PER_TILE = TICKS_PER_INCH * 24;
     public static final double TICKS_PER_CM = TICKS_PER_INCH * 2.54;
-    public static final double SLIDE_SPEED_UP = 0.5;
-    public static final double SLIDE_SPEED_DOWN = 0.25;
+    public static final double SLIDE_SPEED_UP = 0.95;
+    public static final double SLIDE_SPEED_DOWN = 0.6;
 
     public static final int WAIT_TIME = 400;
     public static final int TICK_THRESHOLD = 300;
@@ -488,43 +488,6 @@ public class Sybot {
         if (zeroAngle > Math.PI) zeroAngle -= 2 * Math.PI;
     }
 
-    /**
-     * Runnable class that drops the slides to a particular position.
-     * Does not use encoders, purpose is to lower slides
-     * Runs on a separate thread. Not thread safe.
-     */
-    public class DropSlides implements Runnable {
-        int height;
-
-        public DropSlides(int height) {
-            this.height = height;
-        }
-
-        @Override
-        public void run() {
-            if (slideTarget() == height) return;
-
-            leftSlide.setTargetPosition(height);
-            rightSlide.setTargetPosition(height);
-
-            leftSlide.setPower(SLIDE_SPEED_DOWN);
-            rightSlide.setPower(SLIDE_SPEED_DOWN);
-
-            leftSlide.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            rightSlide.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-
-            while (slidePosition() > height && slideTarget() == height && !manualSlides) {
-                if (slideTarget() != height || manualSlides) return;
-            }
-
-            leftSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            leftSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-            leftSlide.setPower(SLIDE_SPEED_UP);
-            rightSlide.setPower(SLIDE_SPEED_UP);
-        }
-    }
-
     // TODO refactor this to combine PushSlides and DropSlides
     /**
      * Runnable that pushes the slides to their target position without using encoders.
@@ -568,10 +531,22 @@ public class Sybot {
         }
     }
 
+    public class DropSlides implements Runnable {
+        @Override
+        public void run() {
+            // TODO configure this number
+            while (slidePosition() < -2000) {
+                if (!enableThreads || slideTarget() != 0) return;
+            }
+
+            leftSlide.setPower(0.8);
+            rightSlide.setPower(0.8);
+        }
+    }
+
     public void pushSlides(int height) {
         if (height == slideTarget()) return;
         new Thread(new PushSlides(height)).start();
-//        new Thread(height > slidePosition() ? new DropSlides(height) : new PushSlides(height)).start();
     }
 
     /**
@@ -580,6 +555,10 @@ public class Sybot {
      */
     public void setSlides(int height) {
         if (height == slideTarget()) return;
+        if (height == 0) {
+            dropSlides();
+            return;
+        }
 
         double power = height < slideTarget() ? SLIDE_SPEED_UP : SLIDE_SPEED_DOWN;
 
@@ -587,11 +566,30 @@ public class Sybot {
         leftSlide.setTargetPosition(height);
         rightSlide.setTargetPosition(height);
 
+        leftSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
         leftSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rightSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         leftSlide.setPower(power);
         rightSlide.setPower(power);
+    }
+
+    /**
+     * Drops the slides to ground level
+     */
+    public void dropSlides() {
+        leftSlide.setTargetPosition(0);
+        rightSlide.setTargetPosition(0);
+
+        leftSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        rightSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+
+        leftSlide.setPower(0);
+        rightSlide.setPower(0);
+
+        new Thread(new DropSlides()).start();
     }
 
     /**
