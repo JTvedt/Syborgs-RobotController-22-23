@@ -12,7 +12,7 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.teamcode.cv.CvPipeline;
+import org.firstinspires.ftc.teamcode.cv.EasyOpenCvPipeline;
 
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
@@ -39,7 +39,7 @@ public class Sybot {
 
     public static final int WAIT_TIME = 400;
     public static final int TICK_THRESHOLD = 300;
-    public static int SLIDE_THRESHOLD = -1120;
+    public static final int SLIDE_THRESHOLD = -1120;
 
     public LinearOpMode parent;
     public HardwareMap hardwareMap;
@@ -63,11 +63,12 @@ public class Sybot {
     public double zeroAngle = 0;
     public boolean pinch = false; // true for gripped
     public boolean manualSlides = false;
+    public boolean slideRelease = true;
     public boolean mirror = false;
     public boolean enableThreads = true;
-    public volatile int slideHeight = 0;
 
-    public CvPipeline pipeline;
+    public static CvImplementation implementation = CvImplementation.EASYOPENCV;
+    public EasyOpenCvPipeline pipeline;
     public OpenCvCamera camera;
 
     public ArrayList<Thread> threadQueue = new ArrayList<Thread>();
@@ -125,26 +126,7 @@ public class Sybot {
 
         // Computer Vision
         if (type == OpModeType.AUTONOMOUS) {
-            // CV + Camera
-            WebcamName webcamName = hardwareMap.get(WebcamName.class, "Camera");
-            // TODO plug in numbers
-            if (side == StartSide.LEFT) pipeline = new CvPipeline(0, 0, 1, 1);
-            else if (side == StartSide.RIGHT) pipeline = new CvPipeline(0, 0, 1, 1);
-            else pipeline = new CvPipeline(0, 0, 1, 1);
-            int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-            camera = OpenCvCameraFactory.getInstance().createWebcam(webcamName, cameraMonitorViewId);
-            camera.setPipeline(pipeline);
-            camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
-                @Override
-                public void onOpened() {
-                    camera.startStreaming(640, 480, OpenCvCameraRotation.UPRIGHT);
-                }
-
-                @Override
-                public void onError(int errorCode) {
-
-                }
-            });
+            initializeCv(side);
         }
 
         // IMU
@@ -169,6 +151,40 @@ public class Sybot {
 
         parent.waitForStart();
         runtime.reset();
+    }
+
+    public void initializeCv(StartSide side) {
+        switch (implementation) {
+            case EASYOPENCV:
+                // TODO plug in numbers
+                if (side == StartSide.LEFT) pipeline = new EasyOpenCvPipeline(0, 0, 1, 1);
+                else if (side == StartSide.RIGHT) pipeline = new EasyOpenCvPipeline(0, 0, 1, 1);
+                else pipeline = new EasyOpenCvPipeline(0, 0, 1, 1);
+                break;
+            case APRIL_TAGS:
+                // TODO whoever is doing April Tags add this stuff
+        }
+
+        WebcamName webcamName = hardwareMap.get(WebcamName.class, "Camera");
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        camera = OpenCvCameraFactory.getInstance().createWebcam(webcamName, cameraMonitorViewId);
+        camera.setPipeline(pipeline);
+        camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
+            @Override
+            public void onOpened() {
+                camera.startStreaming(640, 480, OpenCvCameraRotation.UPRIGHT);
+            }
+
+            @Override
+            public void onError(int errorCode) {
+
+            }
+        });
+    }
+
+    public enum CvImplementation {
+        EASYOPENCV,
+        APRIL_TAGS
     }
 
     /**
@@ -489,70 +505,6 @@ public class Sybot {
         if (zeroAngle > Math.PI) zeroAngle -= 2 * Math.PI;
     }
 
-    // TODO refactor this to combine PushSlides and DropSlides
-    /**
-     * Runnable that pushes the slides to their target position without using encoders.
-     * Runs on a separate thread. Thread safety not tested.
-     */
-    public class PushSlides implements Runnable {
-        int height;
-
-        public PushSlides(int height) {
-            this.height = height;
-        }
-
-        @Override
-        public void run() {
-            if (slideTarget() == height) return;
-
-            leftSlide.setTargetPosition(height);
-            rightSlide.setTargetPosition(height);
-
-//            leftSlide.setPower(height < slidePosition() ? SLIDE_SPEED_UP : SLIDE_SPEED_DOWN);
-//            rightSlide.setPower(height < slidePosition() ? SLIDE_SPEED_UP : SLIDE_SPEED_DOWN);
-            leftSlide.setPower(0.5);
-            rightSlide.setPower(0.5);
-
-            leftSlide.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            rightSlide.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-
-            while (Math.abs(slideTarget() - slidePosition()) > 30) {
-                telemetry.addData("Slide Position", slidePosition());
-                telemetry.addData("Slide Target", slideTarget());
-                telemetry.addData("Difference", slideTarget() - slidePosition());
-                telemetry.update();
-                if (slideTarget() != height || manualSlides || !enableThreads) return;
-            }
-
-            telemetry.addData("Target", "reached");
-            telemetry.update();
-
-            leftSlide.setPower(0.0);
-            rightSlide.setPower(0.0);
-        }
-    }
-
-    public class DropSlides implements Runnable {
-        @Override
-        public void run() {
-            // TODO configure this number
-            while (slidePosition() < SLIDE_THRESHOLD) {
-                if (!enableThreads || slideTarget() != 0) return;
-            }
-
-            leftSlide.setPower(0.95);
-            rightSlide.setPower(0.95);
-
-            leftSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            rightSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        }
-    }
-
-    public void pushSlides(int height) {
-        if (height == slideTarget()) return;
-        new Thread(new PushSlides(height)).start();
-    }
-
     /**
      * Sets the slide position using the motor encoders
      * @param height height to which the slide should move to, negative values are high, 0 at rest
@@ -574,22 +526,64 @@ public class Sybot {
 
         leftSlide.setPower(power);
         rightSlide.setPower(power);
+
+        new Thread(new ReleaseSlides()).start();
+    }
+
+    /**
+     * Runnable class that drops the slides to ground position.
+     * Not tested for thread safety, probably safe.
+     */
+    public class DropSlides implements Runnable {
+        @Override
+        public void run() {
+            leftSlide.setTargetPosition(0);
+            rightSlide.setTargetPosition(0);
+
+            leftSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+            rightSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+
+            leftSlide.setPower(0);
+            rightSlide.setPower(0);
+
+            while (slidePosition() < SLIDE_THRESHOLD) {
+                if (!enableThreads || slideTarget() != 0) return;
+            }
+
+            leftSlide.setPower(0.95);
+            rightSlide.setPower(0.95);
+
+            leftSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            rightSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        }
     }
 
     /**
      * Drops the slides to ground level
      */
     public void dropSlides() {
-        leftSlide.setTargetPosition(0);
-        rightSlide.setTargetPosition(0);
-
-        leftSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        rightSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-
-        leftSlide.setPower(0);
-        rightSlide.setPower(0);
-
         new Thread(new DropSlides()).start();
+        new Thread(new ReleaseSlides()).start();
+    }
+
+    /**
+     * Runnable class that disables the encoders once the slides reach their target
+     * Runs on a separate thread and continuously checks for the slide position
+     * Not tested for thread safety, probably safe
+     */
+    public class ReleaseSlides implements Runnable {
+        @Override
+        public void run() {
+            if (!slideRelease) return;
+            int target = slideTarget();
+
+            while (Math.abs(slidePosition() - slideTarget()) > 16) {
+                if (slideTarget() != target || !enableThreads || !slideRelease) return;
+                Thread.yield();
+            }
+
+            moveSlides(0.0);
+        }
     }
 
     /**

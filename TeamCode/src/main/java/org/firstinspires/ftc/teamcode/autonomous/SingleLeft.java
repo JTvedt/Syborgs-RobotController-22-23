@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.util.Sybot;
-import org.firstinspires.ftc.teamcode.cv.CvPipeline;
+import org.firstinspires.ftc.teamcode.cv.EasyOpenCvPipeline;
 import org.openftc.easyopencv.OpenCvCamera;
 
 /**
@@ -14,8 +14,6 @@ import org.openftc.easyopencv.OpenCvCamera;
 @Autonomous(name="1C Left Autonomous")
 public class SingleLeft extends LinearOpMode {
     public Sybot robot;
-    public CvPipeline pipeline;
-    public OpenCvCamera camera;
 
     @Override
     public void runOpMode() {

@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.util.Sybot;
-import org.firstinspires.ftc.teamcode.cv.CvPipeline;
+import org.firstinspires.ftc.teamcode.cv.EasyOpenCvPipeline;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
@@ -13,14 +13,14 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 @Autonomous(name="Test Autonomous B", group="test")
 public class AutonB extends LinearOpMode {
     public Sybot robot;
-    public CvPipeline pipeline;
+    public EasyOpenCvPipeline pipeline;
     public OpenCvCamera camera;
 
     @Override
     public void runOpMode() {
         //Initialize CV + camera
         WebcamName webcamName = hardwareMap.get(WebcamName.class, "Camera");
-        pipeline = new CvPipeline();
+        pipeline = new EasyOpenCvPipeline();
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         camera = OpenCvCameraFactory.getInstance().createWebcam(webcamName, cameraMonitorViewId);
         camera.setPipeline(pipeline);

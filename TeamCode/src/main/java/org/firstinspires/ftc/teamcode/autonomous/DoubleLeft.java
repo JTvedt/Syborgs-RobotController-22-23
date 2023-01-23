@@ -5,13 +5,13 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.util.Sybot;
-import org.firstinspires.ftc.teamcode.cv.CvPipeline;
+import org.firstinspires.ftc.teamcode.cv.EasyOpenCvPipeline;
 
 @Disabled
 @Autonomous(name="2C Left Autonomous")
 public class DoubleLeft extends LinearOpMode {
     public Sybot robot;
-    public CvPipeline cv;
+    public EasyOpenCvPipeline cv;
 
     @Override
     public void runOpMode() {

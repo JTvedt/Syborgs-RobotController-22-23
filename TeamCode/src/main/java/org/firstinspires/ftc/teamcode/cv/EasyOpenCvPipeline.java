@@ -14,7 +14,7 @@ import java.util.List;
  * Simple pipeline that crops image to get color values
  * @author Peter Tvedt (Supersonics 124 2022/2023)
  */
-public class CvPipeline extends OpenCvPipeline {
+public class EasyOpenCvPipeline extends OpenCvPipeline {
     List<Mat> channels = new ArrayList<>(3);
     private Mat bgrInput = new Mat();
     private Mat output = new Mat();
@@ -23,7 +23,7 @@ public class CvPipeline extends OpenCvPipeline {
     double x1 = 0, y1 = 0;
     double x2 = 1, y2 = 1;
 
-    public CvPipeline(double x1, double y1, double x2, double y2) {
+    public EasyOpenCvPipeline(double x1, double y1, double x2, double y2) {
         super();
         this.x1 = x1;
         this.y1 = y1;
@@ -31,7 +31,7 @@ public class CvPipeline extends OpenCvPipeline {
         this.y2 = y2;
     }
 
-    public CvPipeline() {
+    public EasyOpenCvPipeline() {
         this(0, 0, 1, 1);
     }
 
