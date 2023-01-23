@@ -120,7 +120,7 @@ public class JeffreyTeleOp extends LinearOpMode {
         // P2 Crane subsystem
         if (gamepad2.dpad_up && !uPad2) robot.setSlides(-4300);
         if (gamepad2.dpad_right && !rPad2) robot.setSlides(-2000);
-        if (gamepad2.dpad_down && !dPad2) robot.setSlides(0);
+        if (gamepad2.dpad_down && !dPad2) robot.dropSlides();
         if (gamepad2.dpad_left && !lPad2) robot.setSlides(robot.slidePosition()); // Locks slides position
 
         // Manual slide fine tuning
@@ -149,12 +149,13 @@ public class JeffreyTeleOp extends LinearOpMode {
 
         telemetry.addData("Slide target", robot.slideTarget());
         telemetry.addData("Slide position", robot.slidePosition());
-        // telemetry.addData("LSlide power", robot.leftSlide.getPower());
-        // telemetry.addData("RSlide power", robot.rightSlide.getPower());
+        telemetry.addData("LSlide power", robot.leftSlide.getPower());
+        telemetry.addData("RSlide power", robot.rightSlide.getPower());
+        telemetry.addData("Slide Threshold", Sybot.SLIDE_THRESHOLD);
 
         // telemetry.addData("Claw state", robot.pinch ? "closed" : "open");
 
-         // telemetry.update();
+        telemetry.update();
     }
 
     public enum ControlMode {

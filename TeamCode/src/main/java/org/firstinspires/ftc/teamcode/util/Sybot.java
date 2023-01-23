@@ -39,6 +39,7 @@ public class Sybot {
 
     public static final int WAIT_TIME = 400;
     public static final int TICK_THRESHOLD = 300;
+    public static int SLIDE_THRESHOLD = -1120;
 
     public LinearOpMode parent;
     public HardwareMap hardwareMap;
@@ -535,12 +536,15 @@ public class Sybot {
         @Override
         public void run() {
             // TODO configure this number
-            while (slidePosition() < -2000) {
+            while (slidePosition() < SLIDE_THRESHOLD) {
                 if (!enableThreads || slideTarget() != 0) return;
             }
 
-            leftSlide.setPower(0.8);
-            rightSlide.setPower(0.8);
+            leftSlide.setPower(0.95);
+            rightSlide.setPower(0.95);
+
+            leftSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            rightSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         }
     }
 
@@ -555,10 +559,6 @@ public class Sybot {
      */
     public void setSlides(int height) {
         if (height == slideTarget()) return;
-        if (height == 0) {
-            dropSlides();
-            return;
-        }
 
         double power = height < slideTarget() ? SLIDE_SPEED_UP : SLIDE_SPEED_DOWN;
 
