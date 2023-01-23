@@ -66,6 +66,7 @@ public class Sybot {
     public boolean slideRelease = true;
     public boolean mirror = false;
     public boolean enableThreads = true;
+    public int debugVal = 0;
 
     public static CvImplementation implementation = CvImplementation.EASYOPENCV;
     public EasyOpenCvPipeline pipeline;
@@ -577,9 +578,9 @@ public class Sybot {
             if (!slideRelease) return;
             int target = slideTarget();
 
-            while (Math.abs(slidePosition() - slideTarget()) > 16) {
+            while (Math.abs(slidePosition() - target) > 16) {
                 if (slideTarget() != target || !enableThreads || !slideRelease) return;
-                Thread.yield();
+                debugVal = target;
             }
 
             moveSlides(0.0);

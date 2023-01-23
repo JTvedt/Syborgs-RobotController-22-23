@@ -66,11 +66,11 @@ public class JeffreyTeleOp extends LinearOpMode {
         if (gamepad1.x && !x) robot.toggleClaw();
         if (gamepad1.a && !a) {
             robot.setClaw(false);
-            robot.pushSlides(0);
+            robot.dropSlides();
         }
         if (gamepad1.b && !b) {
             robot.setClaw(true);
-            robot.pushSlides(-4150);
+            robot.setSlides(-4150);
         }
 
         if (gamepad1.right_stick_y != 0) robot.manualSlides = true;
@@ -118,14 +118,14 @@ public class JeffreyTeleOp extends LinearOpMode {
         robot.teleDrive(stickAngle, magnitude, turn, multiplier);
 
         // P2 Crane subsystem
-        if (gamepad2.dpad_up && !uPad2) robot.setSlides(-4300);
+        if (gamepad2.dpad_up && !uPad2) robot.setSlides(-4400);
         if (gamepad2.dpad_right && !rPad2) robot.setSlides(-2000);
         if (gamepad2.dpad_down && !dPad2) robot.dropSlides();
         if (gamepad2.dpad_left && !lPad2) robot.setSlides(robot.slidePosition()); // Locks slides position
 
         // Manual slide fine tuning
-        if (gamepad2.x && !x2) robot.setSlides(robot.slideTarget() + (rTrigger(2) ? 35 : 100));
-        if (gamepad2.y && !y2) robot.setSlides(robot.slideTarget() - (rTrigger(2) ? 35 : 100));
+//        if (gamepad2.x && !x2) robot.setSlides(robot.slideTarget() + (rTrigger(2) ? 35 : 100));
+//        if (gamepad2.y && !y2) robot.setSlides(robot.slideTarget() - (rTrigger(2) ? 35 : 100));
         if (gamepad2.right_stick_y != 0) robot.manualSlides = true;
         if (robot.manualSlides) robot.moveSlides(gamepad2.right_stick_y * 0.5);
         if (gamepad2.left_bumper) robot.resetSlides();
@@ -134,6 +134,7 @@ public class JeffreyTeleOp extends LinearOpMode {
         // Claw subsystem
         if (gamepad2.a && !a2) robot.toggleClaw(); // Regular cones
         if (gamepad2.b && !b2) robot.setClaw(0.25); // Capstone
+        if (gamepad2.x && !x2) robot.slideRelease = !robot.slideRelease;
 
         resetButtons();
 
@@ -151,7 +152,7 @@ public class JeffreyTeleOp extends LinearOpMode {
         telemetry.addData("Slide position", robot.slidePosition());
         telemetry.addData("LSlide power", robot.leftSlide.getPower());
         telemetry.addData("RSlide power", robot.rightSlide.getPower());
-        telemetry.addData("Slide Threshold", Sybot.SLIDE_THRESHOLD);
+        telemetry.addData("Debug value", robot.debugVal);
 
         // telemetry.addData("Claw state", robot.pinch ? "closed" : "open");
 
