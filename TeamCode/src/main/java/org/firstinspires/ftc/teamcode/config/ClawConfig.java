@@ -59,9 +59,9 @@ public class ClawConfig extends OpMode {
         telemetry.addData("right claw pos", "%.2f", rightPos);
         telemetry.update();
 
-        a = gamepad2.a;
-        b = gamepad2.b;
-        x = gamepad2.x;
-        y = gamepad2.y;
+        a = gamepad1.a;
+        b = gamepad1.b;
+        x = gamepad1.x;
+        y = gamepad1.y;
     }
 }

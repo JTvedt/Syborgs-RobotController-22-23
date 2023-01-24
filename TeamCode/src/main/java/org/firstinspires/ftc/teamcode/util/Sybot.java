@@ -63,12 +63,14 @@ public class Sybot {
     public double zeroAngle = 0;
     public boolean pinch = false; // true for gripped
     public boolean manualSlides = false;
-    public boolean slideRelease = true;
+    public boolean slideRelease = false;
     public boolean mirror = false;
     public boolean enableThreads = true;
-    public int debugVal = 0;
+    public double debugDouble = 0;
+    public int debugInt = 0;
+    public int counter;
 
-    public static CvImplementation implementation = CvImplementation.EASYOPENCV;
+    public static CvImplementation cvImplementation = CvImplementation.EASYOPENCV;
     public EasyOpenCvPipeline pipeline;
     public OpenCvCamera camera;
 
@@ -155,7 +157,7 @@ public class Sybot {
     }
 
     public void initializeCv(StartSide side) {
-        switch (implementation) {
+        switch (cvImplementation) {
             case EASYOPENCV:
                 // TODO plug in numbers
                 if (side == StartSide.LEFT) pipeline = new EasyOpenCvPipeline(0, 0, 1, 1);
@@ -215,6 +217,13 @@ public class Sybot {
      */
     public enum StartSide {
         LEFT, RIGHT, UNSPECIFIED;
+    }
+
+    /**
+     * To be run after stop is pressed, closes all threads
+     */
+    public void stop() {
+        enableThreads = false;
     }
 
     /**
@@ -511,16 +520,15 @@ public class Sybot {
      * @param height height to which the slide should move to, negative values are high, 0 at rest
      */
     public void setSlides(int height) {
-        if (height == slideTarget()) return;
+        if (height == slideTarget()) {
+            return;
+        }
 
         double power = height < slideTarget() ? SLIDE_SPEED_UP : SLIDE_SPEED_DOWN;
 
         manualSlides = false;
         leftSlide.setTargetPosition(height);
         rightSlide.setTargetPosition(height);
-
-        leftSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rightSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         leftSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rightSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -548,7 +556,11 @@ public class Sybot {
             rightSlide.setPower(0);
 
             while (slidePosition() < SLIDE_THRESHOLD) {
-                if (!enableThreads || slideTarget() != 0) return;
+                if (!enableThreads || slideTarget() != 0) {
+                    leftSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                    rightSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                    return;
+                };
             }
 
             leftSlide.setPower(0.95);
@@ -564,7 +576,6 @@ public class Sybot {
      */
     public void dropSlides() {
         new Thread(new DropSlides()).start();
-        new Thread(new ReleaseSlides()).start();
     }
 
     /**
@@ -579,12 +590,27 @@ public class Sybot {
             int target = slideTarget();
 
             while (Math.abs(slidePosition() - target) > 16) {
-                if (slideTarget() != target || !enableThreads || !slideRelease) return;
-                debugVal = target;
+                if (slideTarget() != target || !enableThreads || !slideRelease) {
+                    return;
+                }
+                debugDouble = Math.abs(slidePosition() - target);
+                debugInt = target;
             }
 
             moveSlides(0.0);
         }
+    }
+
+    public void lockSlides() {
+        manualSlides = false;
+        leftSlide.setTargetPosition(leftSlide.getCurrentPosition());
+        rightSlide.setTargetPosition(rightSlide.getCurrentPosition());
+
+        leftSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        leftSlide.setPower(0.5);
+        rightSlide.setPower(0.5);
     }
 
     /**
@@ -598,6 +624,38 @@ public class Sybot {
 
         leftSlide.setPower(power * (power < 0 ? SLIDE_SPEED_UP : SLIDE_SPEED_DOWN));
         rightSlide.setPower(power * (power < 0 ? SLIDE_SPEED_UP : SLIDE_SPEED_DOWN));
+    }
+
+    public class PinchSlide implements Runnable {
+        boolean state;
+
+        public PinchSlide(boolean state) {
+            this.state = state;
+        }
+
+        @Override
+        public void run() {
+            setClaw(state);
+            rest();
+            if (state) setSlides(-4300);
+            else dropSlides();
+        }
+
+        public void rest() {
+            try {
+                Thread.sleep(700);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+    }
+
+    /**
+     * Grabs a cone and moves the slides up simultaneously.
+     * Will grab cone and move up or release cone and move down.
+     */
+    public void pinchSlide() {
+        new Thread(new PinchSlide(!pinch)).start();
     }
 
     /**

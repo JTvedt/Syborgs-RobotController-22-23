@@ -11,14 +11,14 @@ import org.firstinspires.ftc.teamcode.util.Sybot;
  */
 @TeleOp(name="Jeffrey TeleOp")
 public class JeffreyTeleOp extends LinearOpMode {
-    public Sybot robot;
+    Sybot robot;
 
     // boolean values indicating button state
-    public ControlMode control = ControlMode.MULTIPLAYER;
+    ControlMode control = ControlMode.MULTIPLAYER;
 
-    public boolean a, b, x;
-    public boolean a2, b2, x2, y2;
-    public boolean uPad2, dPad2, lPad2, rPad2;
+    boolean a, b, x;
+    boolean a2, b2, x2, y2;
+    boolean uPad2, dPad2, lPad2, rPad2;
 
     @Override
     public void runOpMode() {
@@ -29,7 +29,7 @@ public class JeffreyTeleOp extends LinearOpMode {
             runLoop();
         }
 
-        robot.enableThreads = false;
+        robot.stop();
         telemetry.update();
     }
 
@@ -54,7 +54,7 @@ public class JeffreyTeleOp extends LinearOpMode {
     public void coneCycleLoop() {
         // Stick Input
         double stickAngle = Math.atan2(-gamepad1.left_stick_y, gamepad1.left_stick_x);
-        double magnitude = 1 * (rTrigger(1) ? 0.35 : 1);
+        double magnitude = (rTrigger(1) ? 0.35 : 1);
         stickAngle = Math.round(stickAngle * 2/Math.PI) * Math.PI/2;
 
         double turn = 0;
@@ -121,11 +121,9 @@ public class JeffreyTeleOp extends LinearOpMode {
         if (gamepad2.dpad_up && !uPad2) robot.setSlides(-4400);
         if (gamepad2.dpad_right && !rPad2) robot.setSlides(-2000);
         if (gamepad2.dpad_down && !dPad2) robot.dropSlides();
-        if (gamepad2.dpad_left && !lPad2) robot.setSlides(robot.slidePosition()); // Locks slides position
+        if (gamepad2.dpad_left && !lPad2) robot.lockSlides();
 
         // Manual slide fine tuning
-//        if (gamepad2.x && !x2) robot.setSlides(robot.slideTarget() + (rTrigger(2) ? 35 : 100));
-//        if (gamepad2.y && !y2) robot.setSlides(robot.slideTarget() - (rTrigger(2) ? 35 : 100));
         if (gamepad2.right_stick_y != 0) robot.manualSlides = true;
         if (robot.manualSlides) robot.moveSlides(gamepad2.right_stick_y * 0.5);
         if (gamepad2.left_bumper) robot.resetSlides();
@@ -152,7 +150,9 @@ public class JeffreyTeleOp extends LinearOpMode {
         telemetry.addData("Slide position", robot.slidePosition());
         telemetry.addData("LSlide power", robot.leftSlide.getPower());
         telemetry.addData("RSlide power", robot.rightSlide.getPower());
-        telemetry.addData("Debug value", robot.debugVal);
+        telemetry.addData("Debug int", robot.debugInt);
+        telemetry.addData("Debug double", robot.debugDouble);
+        telemetry.addData("Counter", robot.counter);
 
         // telemetry.addData("Claw state", robot.pinch ? "closed" : "open");
 
