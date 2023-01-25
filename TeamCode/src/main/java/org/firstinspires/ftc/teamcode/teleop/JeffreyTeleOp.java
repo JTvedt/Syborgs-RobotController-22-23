@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.util.Sybot;
+import org.firstinspires.ftc.teamcode.util.Angle.*;
 
 /**
  * TeleOp to be used for the robot
@@ -48,33 +49,6 @@ public class JeffreyTeleOp extends LinearOpMode {
                 standardLoop();
                 break;
         }
-    }
-
-    // Loop for cycling cones on junction
-    public void coneCycleLoop() {
-        // Stick Input
-        double stickAngle = Math.atan2(-gamepad1.left_stick_y, gamepad1.left_stick_x);
-        double magnitude = (rTrigger(1) ? 0.35 : 1);
-        stickAngle = Math.round(stickAngle * 2/Math.PI) * Math.PI/2;
-
-        double turn = 0;
-        double roundedAngle = Math.round(robot.getAngle() * 2/Math.PI) * Math.PI/2;
-        if (robot.getAngle() != roundedAngle) turn = 0.3 * (robot.getAngle() < roundedAngle ? -1 : 1);
-
-        robot.teleDrive(stickAngle, magnitude, turn);
-
-        if (gamepad1.x && !x) robot.toggleClaw();
-        if (gamepad1.a && !a) {
-            robot.setClaw(false);
-            robot.dropSlides();
-        }
-        if (gamepad1.b && !b) {
-            robot.setClaw(true);
-            robot.setSlides(-4150);
-        }
-
-        if (gamepad1.right_stick_y != 0) robot.manualSlides = true;
-        if (robot.manualSlides) robot.moveSlides(gamepad1.right_stick_y * 0.7);
     }
 
     // Standard loop that involves two players
@@ -150,13 +124,41 @@ public class JeffreyTeleOp extends LinearOpMode {
         telemetry.addData("Slide position", robot.slidePosition());
         telemetry.addData("LSlide power", robot.leftSlide.getPower());
         telemetry.addData("RSlide power", robot.rightSlide.getPower());
-        telemetry.addData("Debug int", robot.debugInt);
-        telemetry.addData("Debug double", robot.debugDouble);
+
+        // telemetry.addData("Debug int", robot.debugInt);
+        // telemetry.addData("Debug double", robot.debugDouble);
         telemetry.addData("Counter", robot.counter);
 
         // telemetry.addData("Claw state", robot.pinch ? "closed" : "open");
 
         telemetry.update();
+    }
+
+    // Loop for cycling cones on junction
+    public void coneCycleLoop() {
+        // Stick Input
+        double stickAngle = Math.atan2(-gamepad1.left_stick_y, gamepad1.left_stick_x);
+        double magnitude = (rTrigger(1) ? 0.35 : 1);
+        stickAngle = Math.round(stickAngle * 2/Math.PI) * Math.PI/2;
+
+        double turn = 0;
+        double roundedAngle = Math.round(robot.getAngle() * 2/Math.PI) * Math.PI/2;
+        if (robot.getAngle() != roundedAngle) turn = 0.3 * (robot.getAngle() < roundedAngle ? -1 : 1);
+
+        robot.teleDrive(stickAngle, magnitude, turn);
+
+        if (gamepad1.x && !x) robot.toggleClaw();
+        if (gamepad1.a && !a) {
+            robot.setClaw(false);
+            robot.dropSlides();
+        }
+        if (gamepad1.b && !b) {
+            robot.setClaw(true);
+            robot.setSlides(-4150);
+        }
+
+        if (gamepad1.right_stick_y != 0) robot.manualSlides = true;
+        if (robot.manualSlides) robot.moveSlides(gamepad1.right_stick_y * 0.7);
     }
 
     public enum ControlMode {

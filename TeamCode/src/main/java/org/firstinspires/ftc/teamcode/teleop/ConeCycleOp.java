@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.teleop;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.teamcode.util.Angle;
 import org.firstinspires.ftc.teamcode.util.Sybot;
 
 @TeleOp(name="Cone Cycle TeleOp")
@@ -47,14 +48,19 @@ public class ConeCycleOp extends LinearOpMode {
 
         if (rigidMove) stickAngle = Math.round(stickAngle * 2/Math.PI) * Math.PI/2;
         if (correctSpin && turn == 0) {
-            turn = robot.getAngle() > Math.round(robot.getAngle() * 2/Math.PI) * Math.PI/2 ? -0.3 : 0.3;
+            double angleDiff = robot.getAngleDifference(Angle.roundAngle(robot.getAngle()));
+            if (Math.abs(angleDiff) < Math.PI/60) turn = 0;
+            else if (Math.abs(angleDiff) < Math.PI/36) turn = 0.1 * Math.signum(angleDiff);
+            else turn = 0.3 * Math.signum(angleDiff);
         }
 
-        robot.teleDrive(stickAngle, magnitude, turn, multiplier);
+        if (gamepad1.right_stick_x == 0) robot.teleDrive(stickAngle, magnitude * multiplier, turn);
+        else robot.teleDrive(stickAngle, magnitude, turn, multiplier);
     }
 
     public void slideSubsystem() {
-
+        if (gamepad1.right_stick_y != 0) robot.manualSlides = true;
+        if (robot.manualSlides) robot.moveSlides(gamepad1.right_stick_y * (gamepad1.left_trigger/2 + .5));
     }
 
     public void clawSubsystem() {

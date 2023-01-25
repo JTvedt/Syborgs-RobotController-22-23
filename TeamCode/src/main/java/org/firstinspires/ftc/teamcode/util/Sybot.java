@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.util;
 
+import static org.firstinspires.ftc.teamcode.util.Angle.*;
+
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -34,12 +36,15 @@ public class Sybot {
     public static final double TICKS_PER_INCH = PULSES_PER_REVOLUTION / WHEEL_CIRCUMFERENCE;
     public static final double TICKS_PER_TILE = TICKS_PER_INCH * 24;
     public static final double TICKS_PER_CM = TICKS_PER_INCH * 2.54;
+
     public static final double SLIDE_SPEED_UP = 0.95;
     public static final double SLIDE_SPEED_DOWN = 0.6;
 
     public static final int WAIT_TIME = 400;
     public static final int TICK_THRESHOLD = 300;
     public static final int SLIDE_THRESHOLD = -1120;
+
+    public static final double CLOSE_CLAW = 0.27;
 
     public LinearOpMode parent;
     public HardwareMap hardwareMap;
@@ -74,8 +79,6 @@ public class Sybot {
     public EasyOpenCvPipeline pipeline;
     public OpenCvCamera camera;
 
-    public ArrayList<Thread> threadQueue = new ArrayList<Thread>();
-
     /**
      * Constructor for Sybot, takes in the parent, OpMode type, and starting side
      * Starting side is only relevant for autonomous
@@ -93,7 +96,7 @@ public class Sybot {
         telemetry.update();
 
         // Store wheels in list for iteration purposes
-        wheelList = new ArrayList<DcMotor>();
+        wheelList = new ArrayList<>();
         wheelList.add(hardwareMap.get(DcMotor.class, "FL"));
         wheelList.add(hardwareMap.get(DcMotor.class, "FR"));
         wheelList.add(hardwareMap.get(DcMotor.class, "BL"));
@@ -261,9 +264,9 @@ public class Sybot {
      * @param direction Direction of movement, in degrees, 0 degrees to go right
      */
     public void polarMove(double distance, double direction) {
-        double radianAngle = direction * (Math.PI / 180) - (driveType == DriveType.POV ? getAngle() : 0);
-        double horizontal = Math.cos(radianAngle) * (mirror ? -1 : 1);
-        double vertical = Math.sin(radianAngle) * 0.87;
+        double radianDirection = radians(direction) - (driveType == DriveType.POV ? getAngle() : 0);
+        double horizontal = Math.cos(radianDirection) * (mirror ? -1 : 1);
+        double vertical = Math.sin(radianDirection) * 0.87;
         int tickCount = toTicks(distance);
 
         setDriveMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -301,7 +304,7 @@ public class Sybot {
      * @param angle angle to turn in degrees, positive values turn counterclockwise and negative values turn clockwise
      */
     public void spin(double angle) {
-        double radianAngle = angle * (Math.PI/180);
+        double radianAngle = radians(angle);
         int tickCount = (int)(radianAngle * 425);
 
         setDriveMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -324,14 +327,14 @@ public class Sybot {
     // TODO finish this method
     // NOT TESTED DO NOT USE
     public void spinDrive(double distance, double direction, double angle) {
-        double radianDirection = direction * (Math.PI/180) - getAngle();
-        double radianAngle = angle * (Math.PI/180);
+        double radianDirection = radians(direction) - getAngle();
+        double radianAngle = radians(angle);
         double horizontal = Math.cos(radianDirection);
         double vertical = Math.sin(radianDirection) * 0.87;
 
         int driveTicks = (int)(distance * TICKS_PER_INCH);
         int spinTicks = (int)(radianAngle * 425);
-        double spin = Math.signum(spinTicks) * 0.2;
+        double remainingTurn, spin;
 
         setDriveMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
@@ -341,15 +344,19 @@ public class Sybot {
         backRight.setTargetPosition((int)((vertical + horizontal) * driveTicks) + spinTicks);
 
         while (isMoving()) {
-            radianDirection = direction * (Math.PI/180) - getAngle();
             horizontal = Math.cos(radianDirection);
             vertical = Math.sin(radianDirection) * 0.87;
 
+            remainingTurn = getAngleDifference(radianAngle + getAngle());
+            if (Math.abs(remainingTurn) < Math.PI/30) spin = 0;
+            else if (Math.abs(remainingTurn) < Math.PI/12) spin = 0.3 * Math.signum(remainingTurn);
+            else spin = 0.6 * Math.signum(remainingTurn);
+
             // Update power to move in a straight line
-            frontLeft.setPower((horizontal + vertical) * 0.65);
-            frontRight.setPower((horizontal - vertical) * 0.65);
-            backLeft.setPower((horizontal - vertical) * 0.65);
-            backRight.setPower((horizontal + vertical) * 0.65);
+            frontLeft.setPower((horizontal + vertical) * 0.65 - spin);
+            frontRight.setPower((horizontal - vertical) * 0.65 + spin);
+            backLeft.setPower((horizontal - vertical) * 0.65 - spin);
+            backRight.setPower((horizontal + vertical) * 0.65 - spin);
         }
     }
 
@@ -388,7 +395,7 @@ public class Sybot {
      */
     public void spinTo(double newAngle) {
         // TODO make this method work consistently
-        spin(newAngle - (getAngle() * 180/Math.PI));
+        spin(getAngleDifference(10));
     }
 
     /**
@@ -491,28 +498,34 @@ public class Sybot {
         }
     }
 
+
+
     /**
      * Returns the direction in which the robot is facing
      * @return the robot's direction as a value from -PI to PI, measured in radians
      */
     public double getAngle() {
         double rawAngle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS).firstAngle;
-        double netAngle = rawAngle - zeroAngle;
+        return boundAngle(rawAngle - zeroAngle);
+    }
 
-        if (netAngle < -Math.PI) netAngle += 2 * Math.PI;
-        if (netAngle > Math.PI) netAngle -= 2 * Math.PI;
-
-        return netAngle;
+    /**
+     * Gets the most efficient possible angle to turn to turn from current position to a target angle
+     * @param targetAngle the target angle for the robot to turn to, in radians
+     * @return positive value if turning clockwise, negative value if turning counterclockwise
+     */
+    public double getAngleDifference(double targetAngle) {
+        double rawDistance = boundAngle(targetAngle) - getAngle();
+        if (Math.abs(rawDistance) > 180)
+            return rawDistance - Math.signum(rawDistance) * 2 * Math.PI;
+        else return rawDistance;
     }
 
     /**
      * Resets the angle so that the direction the robot currently faces is zero degrees
      */
     public void resetAngle() {
-        zeroAngle = getAngle();
-
-        if (zeroAngle < -Math.PI) zeroAngle += 2 * Math.PI;
-        if (zeroAngle > Math.PI) zeroAngle -= 2 * Math.PI;
+        zeroAngle = roundAngle(getAngle());
     }
 
     /**
@@ -555,12 +568,25 @@ public class Sybot {
             leftSlide.setPower(0);
             rightSlide.setPower(0);
 
-            while (slidePosition() < SLIDE_THRESHOLD) {
+            // TODO make this lastPos implementation better
+            int lastPos = slidePosition();
+            int stuckTicks = 0;
+            while (true) {
                 if (!enableThreads || slideTarget() != 0) {
                     leftSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
                     rightSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
                     return;
-                };
+                }
+
+                // TODO this is bad
+                if (slidePosition() > SLIDE_THRESHOLD) break;
+                int pos = slidePosition();
+                if (pos == lastPos) {
+                    stuckTicks++;
+                    counter = stuckTicks;
+                    if (stuckTicks >= 6) break;
+                } else stuckTicks = 0;
+                lastPos = pos;
             }
 
             leftSlide.setPower(0.95);
@@ -628,7 +654,6 @@ public class Sybot {
 
     public class PinchSlide implements Runnable {
         boolean state;
-
         public PinchSlide(boolean state) {
             this.state = state;
         }
@@ -637,25 +662,29 @@ public class Sybot {
         public void run() {
             setClaw(state);
             rest();
+            rest();
             if (state) setSlides(-4300);
             else dropSlides();
-        }
-
-        public void rest() {
-            try {
-                Thread.sleep(700);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
         }
     }
 
     /**
      * Grabs a cone and moves the slides up simultaneously.
      * Will grab cone and move up or release cone and move down.
+     * @param state to which position the slide moves,
+     *              true for closed claw and up,
+     *              false for open claw and down
+     */
+    public void pinchSlide(boolean state) {
+        new Thread(new PinchSlide(state)).start();
+    }
+
+    /**
+     * Grabs a cone and moves both slides up or down simultaneously
+     * Will do whatever opposite of the claw's current state
      */
     public void pinchSlide() {
-        new Thread(new PinchSlide(!pinch)).start();
+        pinchSlide(!pinch);
     }
 
     /**
