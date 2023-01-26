@@ -5,9 +5,10 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.util.Angle;
 import org.firstinspires.ftc.teamcode.util.Sybot;
+import org.firstinspires.ftc.teamcode.util.TeleOpStructured;
 
 @TeleOp(name="Cone Cycle TeleOp")
-public class ConeCycleOp extends LinearOpMode {
+public class ConeCycleOp extends LinearOpMode implements TeleOpStructured {
     public Sybot robot;
     boolean a, b, x;
     boolean lb, rb;
@@ -20,20 +21,17 @@ public class ConeCycleOp extends LinearOpMode {
         robot.setClaw(false);
 
         while (opModeIsActive()) {
-            runLoop();
+            driveTrain();
+            slideSubsystem();
+            clawSubsystem();
+            resetButtons();
+            telemetryConsole();
         }
 
         robot.stop();
     }
 
-    public void runLoop() {
-        driveTrain();
-        slideSubsystem();
-        clawSubsystem();
-        resetButtons();
-        telemetryConsole();
-    }
-
+    @Override
     public void driveTrain() {
         double drive = -gamepad1.left_stick_y;
         double strafe = gamepad1.left_stick_x;
@@ -58,16 +56,19 @@ public class ConeCycleOp extends LinearOpMode {
         else robot.teleDrive(stickAngle, magnitude, turn, multiplier);
     }
 
+    @Override
     public void slideSubsystem() {
         if (gamepad1.right_stick_y != 0) robot.manualSlides = true;
         if (robot.manualSlides) robot.moveSlides(gamepad1.right_stick_y * (gamepad1.left_trigger/2 + .5));
     }
 
+    @Override
     public void clawSubsystem() {
         if (gamepad1.x && !x) robot.toggleClaw();
         if (gamepad1.a && !a) robot.pinchSlide();
     }
 
+    @Override
     public void resetButtons() {
         a = gamepad1.a;
         b = gamepad1.b;
@@ -76,5 +77,6 @@ public class ConeCycleOp extends LinearOpMode {
         rb = gamepad1.right_bumper;
     }
 
+    @Override
     public void telemetryConsole() {}
 }

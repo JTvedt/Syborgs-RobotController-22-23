@@ -43,8 +43,8 @@ public class Sybot {
     public static final int WAIT_TIME = 400;
     public static final int TICK_THRESHOLD = 300;
     public static final int SLIDE_THRESHOLD = -1120;
-
-    public static final double CLOSE_CLAW = 0.27;
+    public static final int SLIDE_HIGH = -4300;
+    public static final double CLOSE_CLAW = 0.3;
 
     public LinearOpMode parent;
     public HardwareMap hardwareMap;
@@ -499,7 +499,6 @@ public class Sybot {
     }
 
 
-
     /**
      * Returns the direction in which the robot is facing
      * @return the robot's direction as a value from -PI to PI, measured in radians
@@ -578,15 +577,14 @@ public class Sybot {
                     return;
                 }
 
-                // TODO this is bad
                 if (slidePosition() > SLIDE_THRESHOLD) break;
+
                 int pos = slidePosition();
-                if (pos == lastPos) {
-                    stuckTicks++;
-                    counter = stuckTicks;
-                    if (stuckTicks >= 6) break;
-                } else stuckTicks = 0;
+                if (pos - lastPos < 20) stuckTicks++;
+                else stuckTicks = 0;
                 lastPos = pos;
+
+                if (stuckTicks > 3) break;
             }
 
             leftSlide.setPower(0.95);
@@ -727,8 +725,8 @@ public class Sybot {
      */
     public void toggleClaw() {
         pinch = !pinch;
-        leftClaw.setPosition(pinch ? 0.7 : 1.0);
-        rightClaw.setPosition(pinch ? 0.3 : 0.0);
+        leftClaw.setPosition(pinch ? 1 - CLOSE_CLAW : 1.0);
+        rightClaw.setPosition(pinch ? CLOSE_CLAW : 0.0);
     }
 
     /**

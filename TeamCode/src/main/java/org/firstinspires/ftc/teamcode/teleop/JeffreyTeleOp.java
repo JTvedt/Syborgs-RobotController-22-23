@@ -92,7 +92,7 @@ public class JeffreyTeleOp extends LinearOpMode {
         robot.teleDrive(stickAngle, magnitude, turn, multiplier);
 
         // P2 Crane subsystem
-        if (gamepad2.dpad_up && !uPad2) robot.setSlides(-4400);
+        if (gamepad2.dpad_up && !uPad2) robot.setSlides(-Sybot.SLIDE_HIGH);
         if (gamepad2.dpad_right && !rPad2) robot.setSlides(-2000);
         if (gamepad2.dpad_down && !dPad2) robot.dropSlides();
         if (gamepad2.dpad_left && !lPad2) robot.lockSlides();
