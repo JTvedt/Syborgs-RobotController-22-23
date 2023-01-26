@@ -25,7 +25,7 @@ public class RGBPipeline extends OpenCvPipeline {
     private Mat submat;
     private int parkingZone = -1;
 
-    //TODO Test this extensively. Originally written for Desktop OpenCV so there may be bugs!
+    // Test this extensively. Originally written for Desktop OpenCV so there may be bugs!
 
     @Override
     public Mat processFrame(Mat input) {

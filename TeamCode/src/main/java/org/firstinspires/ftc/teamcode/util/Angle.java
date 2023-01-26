@@ -14,13 +14,24 @@ public class Angle {
         return radians * 180/Math.PI;
     }
 
-    public static double boundAngle(double angle) {
+    public static double bound(double angle) {
         if (angle > Math.PI) return angle - 2 * Math.PI;
         if (angle < -Math.PI) return angle + 2 * Math.PI;
         return angle;
     }
 
-    public static double roundAngle(double angle) {
-        return Math.round(angle * 2/Math.PI) * Math.PI/2;
+    public static double round(double angle, int increments) {
+        return Math.round(angle * increments/2/Math.PI) * Math.PI/increments/2;
+    }
+
+    public static double round(double angle) {
+        return round(angle, 4);
+    }
+
+    public static double difference(double startAngle, double targetAngle) {
+        double rawDistance = bound(targetAngle) - startAngle;
+        if (Math.abs(rawDistance) > Math.PI)
+            return rawDistance - Math.signum(rawDistance) * 2 * Math.PI;
+        else return rawDistance;
     }
 }

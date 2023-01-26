@@ -4,7 +4,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.util.Sybot;
-import org.firstinspires.ftc.teamcode.util.Angle.*;
 
 /**
  * TeleOp to be used for the robot
@@ -62,7 +61,6 @@ public class JeffreyTeleOp extends LinearOpMode {
         double magnitude = Math.hypot(drive, strafe);
         double multiplier = 0.6 * (gamepad1.b ? 1.4 : 1) * (rTrigger(1) ? 0.35 : 1);
 
-
         // Precision input w/ D-Pad
         if (gamepad1.dpad_up) {
             stickAngle = Math.PI/2;
@@ -92,7 +90,7 @@ public class JeffreyTeleOp extends LinearOpMode {
         robot.teleDrive(stickAngle, magnitude, turn, multiplier);
 
         // P2 Crane subsystem
-        if (gamepad2.dpad_up && !uPad2) robot.setSlides(-Sybot.SLIDE_HIGH);
+        if (gamepad2.dpad_up && !uPad2) robot.setSlides(-Sybot.SLIDE_HIGH_TICKS);
         if (gamepad2.dpad_right && !rPad2) robot.setSlides(-2000);
         if (gamepad2.dpad_down && !dPad2) robot.dropSlides();
         if (gamepad2.dpad_left && !lPad2) robot.lockSlides();

@@ -3,14 +3,14 @@ package org.firstinspires.ftc.teamcode.teleop;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.util.Angle;
 import org.firstinspires.ftc.teamcode.util.Sybot;
-import org.firstinspires.ftc.teamcode.util.TeleOpStructured;
+import org.firstinspires.ftc.teamcode.util.Structured;
 
-@TeleOp(name="Cone Cycle TeleOp")
-public class ConeCycleOp extends LinearOpMode implements TeleOpStructured {
+@TeleOp(name="Singleplayer TeleOp")
+public class ConeCycleOp extends LinearOpMode implements Structured {
     public Sybot robot;
-    boolean a, b, x;
+    boolean a, b, x, y;
+    boolean uPad, dPad, lPad, rPad;
     boolean lb, rb;
     boolean rigidMove = false;
     boolean correctSpin = false;
@@ -45,12 +45,7 @@ public class ConeCycleOp extends LinearOpMode implements TeleOpStructured {
         if (gamepad1.right_bumper && !rb) correctSpin = !correctSpin;
 
         if (rigidMove) stickAngle = Math.round(stickAngle * 2/Math.PI) * Math.PI/2;
-        if (correctSpin && turn == 0) {
-            double angleDiff = robot.getAngleDifference(Angle.roundAngle(robot.getAngle()));
-            if (Math.abs(angleDiff) < Math.PI/60) turn = 0;
-            else if (Math.abs(angleDiff) < Math.PI/36) turn = 0.1 * Math.signum(angleDiff);
-            else turn = 0.3 * Math.signum(angleDiff);
-        }
+        if (correctSpin && turn == 0) turn = robot.smoothAngle();
 
         if (gamepad1.right_stick_x == 0) robot.teleDrive(stickAngle, magnitude * multiplier, turn);
         else robot.teleDrive(stickAngle, magnitude, turn, multiplier);
@@ -58,14 +53,18 @@ public class ConeCycleOp extends LinearOpMode implements TeleOpStructured {
 
     @Override
     public void slideSubsystem() {
-        if (gamepad1.right_stick_y != 0) robot.manualSlides = true;
-        if (robot.manualSlides) robot.moveSlides(gamepad1.right_stick_y * (gamepad1.left_trigger/2 + .5));
+        if (gamepad1.dpad_up && !uPad) robot.setSlides(Sybot.SLIDE_HIGH_TICKS);
+        if (gamepad1.dpad_right && !rPad) robot.setSlides(-2000);
+        if (gamepad1.dpad_down && !dPad) robot.dropSlides();
+
+        if (gamepad1.x) robot.moveSlides(gamepad1.left_trigger/2 + .5);
+        if (gamepad1.y) robot.moveSlides(-gamepad1.left_trigger/2 + .5);
     }
 
     @Override
     public void clawSubsystem() {
-        if (gamepad1.x && !x) robot.toggleClaw();
-        if (gamepad1.a && !a) robot.pinchSlide();
+        if (gamepad1.a && !a) robot.toggleClaw();
+        if (gamepad1.b && !b) robot.pinchSlide();
     }
 
     @Override
@@ -73,6 +72,13 @@ public class ConeCycleOp extends LinearOpMode implements TeleOpStructured {
         a = gamepad1.a;
         b = gamepad1.b;
         x = gamepad1.x;
+        y = gamepad1.y;
+
+        uPad = gamepad1.dpad_up;
+        dPad = gamepad1.dpad_down;
+        lPad = gamepad1.dpad_left;
+        rPad = gamepad1.dpad_right;
+
         lb = gamepad1.left_bumper;
         rb = gamepad1.right_bumper;
     }

@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.util;
 
-import static org.firstinspires.ftc.teamcode.util.Angle.*;
-
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -43,7 +41,7 @@ public class Sybot {
     public static final int WAIT_TIME = 400;
     public static final int TICK_THRESHOLD = 300;
     public static final int SLIDE_THRESHOLD = -1120;
-    public static final int SLIDE_HIGH = -4300;
+    public static final int SLIDE_HIGH_TICKS = -4300;
     public static final double CLOSE_CLAW = 0.3;
 
     public LinearOpMode parent;
@@ -264,7 +262,7 @@ public class Sybot {
      * @param direction Direction of movement, in degrees, 0 degrees to go right
      */
     public void polarMove(double distance, double direction) {
-        double radianDirection = radians(direction) - (driveType == DriveType.POV ? getAngle() : 0);
+        double radianDirection = Angle.radians(direction) - (driveType == DriveType.POV ? getAngle() : 0);
         double horizontal = Math.cos(radianDirection) * (mirror ? -1 : 1);
         double vertical = Math.sin(radianDirection) * 0.87;
         int tickCount = toTicks(distance);
@@ -304,7 +302,7 @@ public class Sybot {
      * @param angle angle to turn in degrees, positive values turn counterclockwise and negative values turn clockwise
      */
     public void spin(double angle) {
-        double radianAngle = radians(angle);
+        double radianAngle = Angle.radians(angle);
         int tickCount = (int)(radianAngle * 425);
 
         setDriveMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -327,8 +325,8 @@ public class Sybot {
     // TODO finish this method
     // NOT TESTED DO NOT USE
     public void spinDrive(double distance, double direction, double angle) {
-        double radianDirection = radians(direction) - getAngle();
-        double radianAngle = radians(angle);
+        double radianDirection = Angle.radians(direction) - getAngle();
+        double radianAngle = Angle.radians(angle);
         double horizontal = Math.cos(radianDirection);
         double vertical = Math.sin(radianDirection) * 0.87;
 
@@ -348,15 +346,18 @@ public class Sybot {
             vertical = Math.sin(radianDirection) * 0.87;
 
             remainingTurn = getAngleDifference(radianAngle + getAngle());
-            if (Math.abs(remainingTurn) < Math.PI/30) spin = 0;
-            else if (Math.abs(remainingTurn) < Math.PI/12) spin = 0.3 * Math.signum(remainingTurn);
-            else spin = 0.6 * Math.signum(remainingTurn);
+            spin = 1.2 * smoothAngle();
 
             // Update power to move in a straight line
-            frontLeft.setPower((horizontal + vertical) * 0.65 - spin);
-            frontRight.setPower((horizontal - vertical) * 0.65 + spin);
-            backLeft.setPower((horizontal - vertical) * 0.65 - spin);
-            backRight.setPower((horizontal + vertical) * 0.65 - spin);
+//            frontLeft.setPower((horizontal + vertical) * 0.65 - spin);
+//            frontRight.setPower((horizontal - vertical) * 0.65 + spin);
+//            backLeft.setPower((horizontal - vertical) * 0.65 - spin);
+//            backRight.setPower((horizontal + vertical) * 0.65 - spin);
+
+            frontLeft.setPower(0.6);
+            frontRight.setPower(0.6);
+            backLeft.setPower(0.6);
+            backRight.setPower(0.6);
         }
     }
 
@@ -394,8 +395,7 @@ public class Sybot {
      * @param newAngle The new angle to spin to relative to old angle
      */
     public void spinTo(double newAngle) {
-        // TODO make this method work consistently
-        spin(getAngleDifference(10));
+        spin(getAngleDifference(newAngle));
     }
 
     /**
@@ -489,15 +489,19 @@ public class Sybot {
 
     /**
      * Puts the thread to sleep for about 300 milliseconds
+     * @param time ticks to wait
      */
-    public void rest() {
+    public void rest(int time) {
         try {
-            Thread.sleep(WAIT_TIME);
+            Thread.sleep(time);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
     }
 
+    public void rest() {
+        rest(WAIT_TIME);
+    }
 
     /**
      * Returns the direction in which the robot is facing
@@ -505,7 +509,7 @@ public class Sybot {
      */
     public double getAngle() {
         double rawAngle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS).firstAngle;
-        return boundAngle(rawAngle - zeroAngle);
+        return Angle.bound(rawAngle - zeroAngle);
     }
 
     /**
@@ -514,17 +518,22 @@ public class Sybot {
      * @return positive value if turning clockwise, negative value if turning counterclockwise
      */
     public double getAngleDifference(double targetAngle) {
-        double rawDistance = boundAngle(targetAngle) - getAngle();
-        if (Math.abs(rawDistance) > 180)
-            return rawDistance - Math.signum(rawDistance) * 2 * Math.PI;
-        else return rawDistance;
+        return Angle.difference(getAngle(), targetAngle);
     }
 
     /**
      * Resets the angle so that the direction the robot currently faces is zero degrees
      */
     public void resetAngle() {
-        zeroAngle = roundAngle(getAngle());
+        zeroAngle = Angle.round(getAngle());
+    }
+
+    public double smoothAngle() {
+        double angleDiff = getAngleDifference(Angle.round(getAngle()));
+        if (Math.abs(angleDiff) < Math.PI/72) return 0;
+        else if (Math.abs(angleDiff) < Math.PI/36) return 0.1 * Math.signum(angleDiff);
+        else if (Math.abs(angleDiff) < Math.PI/18) return 0.2 * Math.signum(angleDiff);
+        else return 0.4 * Math.signum(angleDiff);
     }
 
     /**
@@ -558,6 +567,8 @@ public class Sybot {
     public class DropSlides implements Runnable {
         @Override
         public void run() {
+            if (slideTarget() == 0) return;
+
             leftSlide.setTargetPosition(0);
             rightSlide.setTargetPosition(0);
 
@@ -567,9 +578,10 @@ public class Sybot {
             leftSlide.setPower(0);
             rightSlide.setPower(0);
 
-            // TODO make this lastPos implementation better
             int lastPos = slidePosition();
             int stuckTicks = 0;
+            int slideMovement = 0;
+            int ticks = 0;
             while (true) {
                 if (!enableThreads || slideTarget() != 0) {
                     leftSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -582,6 +594,11 @@ public class Sybot {
                 int pos = slidePosition();
                 if (pos - lastPos < 20) stuckTicks++;
                 else stuckTicks = 0;
+
+                slideMovement += pos - lastPos;
+                ticks++;
+                debugDouble = (double)slideMovement/ticks;
+
                 lastPos = pos;
 
                 if (stuckTicks > 3) break;
@@ -659,9 +676,8 @@ public class Sybot {
         @Override
         public void run() {
             setClaw(state);
-            rest();
-            rest();
-            if (state) setSlides(-4300);
+            rest(600);
+            if (state) setSlides(SLIDE_HIGH_TICKS);
             else dropSlides();
         }
     }
