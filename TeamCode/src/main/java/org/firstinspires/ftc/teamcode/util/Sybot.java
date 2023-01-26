@@ -348,17 +348,16 @@ public class Sybot {
             remainingTurn = getAngleDifference(radianAngle + getAngle());
             spin = 1.2 * smoothAngle();
 
-            // TODO uncomment this code
             // Update power to move in a straight line
-//            frontLeft.setPower((horizontal + vertical) * 0.65 - spin);
-//            frontRight.setPower((horizontal - vertical) * 0.65 + spin);
-//            backLeft.setPower((horizontal - vertical) * 0.65 - spin);
-//            backRight.setPower((horizontal + vertical) * 0.65 - spin);
+            frontLeft.setPower((horizontal + vertical) * 0.65 - spin);
+            frontRight.setPower((horizontal - vertical) * 0.65 + spin);
+            backLeft.setPower((horizontal - vertical) * 0.65 - spin);
+            backRight.setPower((horizontal + vertical) * 0.65 - spin);
 
-            frontLeft.setPower(0.6);
-            frontRight.setPower(0.6);
-            backLeft.setPower(0.6);
-            backRight.setPower(0.6);
+//            frontLeft.setPower(0.6);
+//            frontRight.setPower(0.6);
+//            backLeft.setPower(0.6);
+//            backRight.setPower(0.6);
         }
     }
 
@@ -601,8 +600,6 @@ public class Sybot {
                 debugDouble = (double)slideMovement/ticks;
 
                 lastPos = pos;
-
-                if (stuckTicks > 3) break;
             }
 
             leftSlide.setPower(0.95);

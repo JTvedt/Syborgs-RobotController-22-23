@@ -4,29 +4,27 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.util.Angle;
+import org.firstinspires.ftc.teamcode.util.Controller;
 import org.firstinspires.ftc.teamcode.util.Sybot;
 import org.firstinspires.ftc.teamcode.util.Structured;
 
 @TeleOp(name="Two Player TeleOp")
 public class CoTeleOp extends LinearOpMode implements Structured {
+    Controller controller;
     Sybot robot;
-
-    boolean a2, b2, x2, y2;
-
-    boolean uPad, dPad, lPad, rPad;
-    boolean uPad2, dPad2, lPad2, rPad2;
 
     boolean rigidMove = false, smoothAngle =false;
 
     @Override
     public void runOpMode() {
+        controller = new Controller(gamepad1, gamepad2);
         robot = new Sybot(this, Sybot.OpModeType.TELEOP);
 
         while (opModeIsActive()) {
             driveTrain();
             slideSubsystem();
             clawSubsystem();
-            resetButtons();
+            controller.update();
             telemetryConsole();
         }
 
@@ -45,11 +43,11 @@ public class CoTeleOp extends LinearOpMode implements Structured {
         double multiplier = 0.6 * (gamepad1.a ? 1.4 : 1) * (gamepad1.right_trigger > .5 ? 0.5 : 1);
 
         // Toggles settings
-        if (gamepad1.dpad_left && !lPad) rigidMove = !rigidMove;
-        if (gamepad1.dpad_up && !uPad) smoothAngle = !smoothAngle;
+        if (controller.press(1, "DL")) rigidMove = !rigidMove;
+        if (controller.press(1, "DU")) smoothAngle = !smoothAngle;
 
-        if (gamepad1.dpad_right && !rPad) robot.resetAngle();
-        if (gamepad1.dpad_down && !dPad) robot.resetSlides();
+        if (controller.press(1, "DR")) robot.resetAngle();
+        if (controller.press(1, "DL")) robot.resetSlides();
 
         if (rigidMove) stickAngle = Angle.round(stickAngle);
         if (smoothAngle && turn == 0) turn = robot.smoothAngle();
@@ -60,8 +58,8 @@ public class CoTeleOp extends LinearOpMode implements Structured {
 
     @Override
     public void slideSubsystem() {
-        if (gamepad2.y && !y2) robot.setSlides(Sybot.SLIDE_HIGH_TICKS);
-        if (gamepad2.x && !x2) robot.dropSlides();
+        if (controller.press(2, "Y")) robot.setSlides(Sybot.SLIDE_HIGH_TICKS);
+        if (controller.press(2, "X")) robot.dropSlides();
 
         if (gamepad2.left_trigger > .5 || gamepad2.right_trigger > .5)
             robot.moveSlides((gamepad2.left_trigger + gamepad2.right_trigger)/2);
@@ -71,25 +69,7 @@ public class CoTeleOp extends LinearOpMode implements Structured {
 
     @Override
     public void clawSubsystem() {
-        if (gamepad2.a && !a2) robot.toggleClaw();
-    }
-
-    @Override
-    public void resetButtons() {
-        uPad = gamepad1.dpad_up;
-        dPad = gamepad1.dpad_down;
-        lPad = gamepad1.dpad_left;
-        rPad = gamepad1.dpad_right;
-
-        a2 = gamepad2.a;
-        b2 = gamepad2.b;
-        x2 = gamepad2.x;
-        y2 = gamepad2.y;
-
-        uPad2 = gamepad2.dpad_up;
-        dPad2 = gamepad2.dpad_down;
-        lPad2 = gamepad2.dpad_left;
-        rPad2 = gamepad2.dpad_right;
+        if (controller.press(2, "A")) robot.toggleClaw();
     }
 
     @Override

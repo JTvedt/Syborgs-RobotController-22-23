@@ -26,18 +26,18 @@ public class Controller {
     boolean singleplayer = false;
 
     public Controller(Gamepad gamepad1, Gamepad gamepad2) {
-        if (gamepad2 == null) singleplayer = true;
+        this.gamepad1 = gamepad1;
+        this.gamepad2 = gamepad2;
 
         for (int i = 0; i < buttonKeys.length; i++) {
             map1.put(buttonKeys[i], new Button(buttonList[i]));
-            if (singleplayer) continue;
-
             map2.put(buttonKeys[i], new Button(buttonList[i]));
         }
     }
 
     public Controller(Gamepad gamepad1) {
         this(gamepad1, null);
+        singleplayer = true;
     }
 
     public void update() {

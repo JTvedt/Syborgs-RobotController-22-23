@@ -4,6 +4,5 @@ public interface Structured {
     void driveTrain();
     void slideSubsystem();
     void clawSubsystem();
-    void resetButtons();
     void telemetryConsole();
 }

@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.teleop;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.teamcode.util.Controller;
 import org.firstinspires.ftc.teamcode.util.Sybot;
 
 /**
@@ -90,7 +91,7 @@ public class JeffreyTeleOp extends LinearOpMode {
         robot.teleDrive(stickAngle, magnitude, turn, multiplier);
 
         // P2 Crane subsystem
-        if (gamepad2.dpad_up && !uPad2) robot.setSlides(-Sybot.SLIDE_HIGH_TICKS);
+        if (gamepad2.dpad_up && !uPad2) robot.setSlides(Sybot.SLIDE_HIGH_TICKS);
         if (gamepad2.dpad_right && !rPad2) robot.setSlides(-2000);
         if (gamepad2.dpad_down && !dPad2) robot.dropSlides();
         if (gamepad2.dpad_left && !lPad2) robot.lockSlides();
@@ -124,7 +125,7 @@ public class JeffreyTeleOp extends LinearOpMode {
         telemetry.addData("RSlide power", robot.rightSlide.getPower());
 
         // telemetry.addData("Debug int", robot.debugInt);
-        // telemetry.addData("Debug double", robot.debugDouble);
+        telemetry.addData("Debug double", robot.debugDouble);
         telemetry.addData("Counter", robot.counter);
 
         // telemetry.addData("Claw state", robot.pinch ? "closed" : "open");

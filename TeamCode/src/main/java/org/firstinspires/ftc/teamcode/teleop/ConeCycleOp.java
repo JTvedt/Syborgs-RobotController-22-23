@@ -3,20 +3,20 @@ package org.firstinspires.ftc.teamcode.teleop;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.teamcode.util.Controller;
 import org.firstinspires.ftc.teamcode.util.Sybot;
 import org.firstinspires.ftc.teamcode.util.Structured;
 
 @TeleOp(name="Singleplayer TeleOp")
 public class ConeCycleOp extends LinearOpMode implements Structured {
+    public Controller controller;
     public Sybot robot;
-    boolean a, b, x, y;
-    boolean uPad, dPad, lPad, rPad;
-    boolean lb, rb;
-    boolean rigidMove = false;
-    boolean correctSpin = false;
+
+    boolean rigidMove, smoothAngle = false;
 
     @Override
     public void runOpMode() {
+        controller = new Controller(gamepad1);
         robot = new Sybot(this, Sybot.OpModeType.TELEOP);
         robot.setClaw(false);
 
@@ -24,7 +24,7 @@ public class ConeCycleOp extends LinearOpMode implements Structured {
             driveTrain();
             slideSubsystem();
             clawSubsystem();
-            resetButtons();
+            controller.update();
             telemetryConsole();
         }
 
@@ -41,11 +41,11 @@ public class ConeCycleOp extends LinearOpMode implements Structured {
         double magnitude = Math.hypot(drive, strafe);
         double multiplier = 0.6 * (gamepad1.b ? 1.4 : 1) * (gamepad1.right_trigger > 0.5 ? 0.35 : 1);
 
-        if (gamepad1.left_bumper && !lb) rigidMove = !rigidMove;
-        if (gamepad1.right_bumper && !rb) correctSpin = !correctSpin;
+        if (controller.press("LB")) rigidMove = !rigidMove;
+        if (controller.press("RB")) smoothAngle = !smoothAngle;
 
         if (rigidMove) stickAngle = Math.round(stickAngle * 2/Math.PI) * Math.PI/2;
-        if (correctSpin && turn == 0) turn = robot.smoothAngle();
+        if (smoothAngle && turn == 0) turn = robot.smoothAngle();
 
         if (gamepad1.right_stick_x == 0) robot.teleDrive(stickAngle, magnitude * multiplier, turn);
         else robot.teleDrive(stickAngle, magnitude, turn, multiplier);
@@ -53,9 +53,9 @@ public class ConeCycleOp extends LinearOpMode implements Structured {
 
     @Override
     public void slideSubsystem() {
-        if (gamepad1.dpad_up && !uPad) robot.setSlides(Sybot.SLIDE_HIGH_TICKS);
-        if (gamepad1.dpad_right && !rPad) robot.setSlides(-2000);
-        if (gamepad1.dpad_down && !dPad) robot.dropSlides();
+        if (controller.press("DU")) robot.setSlides(Sybot.SLIDE_HIGH_TICKS);
+        if (controller.press("DR")) robot.setSlides(-2000);
+        if (controller.press("DD")) robot.dropSlides();
 
         if (gamepad1.x) robot.moveSlides(gamepad1.left_trigger/2 + .5);
         if (gamepad1.y) robot.moveSlides(-gamepad1.left_trigger/2 + .5);
@@ -63,24 +63,8 @@ public class ConeCycleOp extends LinearOpMode implements Structured {
 
     @Override
     public void clawSubsystem() {
-        if (gamepad1.a && !a) robot.toggleClaw();
-        if (gamepad1.b && !b) robot.pinchSlide();
-    }
-
-    @Override
-    public void resetButtons() {
-        a = gamepad1.a;
-        b = gamepad1.b;
-        x = gamepad1.x;
-        y = gamepad1.y;
-
-        uPad = gamepad1.dpad_up;
-        dPad = gamepad1.dpad_down;
-        lPad = gamepad1.dpad_left;
-        rPad = gamepad1.dpad_right;
-
-        lb = gamepad1.left_bumper;
-        rb = gamepad1.right_bumper;
+        if (controller.press("A")) robot.toggleClaw();
+        if (controller.press("B")) robot.pinchSlide();
     }
 
     @Override

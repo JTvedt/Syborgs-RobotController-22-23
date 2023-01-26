@@ -28,6 +28,12 @@ public class TestTeleOp extends LinearOpMode {
             if (controller.hold("Y")) {
                 robot.moveSlides(-0.7);
             }
+
+            controller.update();
+
+            telemetry.addData("toString", gamepad1.toString());
+            telemetry.addData("contains b", gamepad1.toString().contains(" b "));
+            telemetry.update();
         }
 
         telemetry.addData("End", "End");
