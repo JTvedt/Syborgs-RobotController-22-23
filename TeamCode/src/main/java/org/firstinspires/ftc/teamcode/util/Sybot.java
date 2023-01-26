@@ -348,6 +348,7 @@ public class Sybot {
             remainingTurn = getAngleDifference(radianAngle + getAngle());
             spin = 1.2 * smoothAngle();
 
+            // TODO uncomment this code
             // Update power to move in a straight line
 //            frontLeft.setPower((horizontal + vertical) * 0.65 - spin);
 //            frontRight.setPower((horizontal - vertical) * 0.65 + spin);
@@ -740,9 +741,7 @@ public class Sybot {
      * Toggles the claw between a closed and open position
      */
     public void toggleClaw() {
-        pinch = !pinch;
-        leftClaw.setPosition(pinch ? 1 - CLOSE_CLAW : 1.0);
-        rightClaw.setPosition(pinch ? CLOSE_CLAW : 0.0);
+        setClaw(!pinch);
     }
 
     /**
@@ -750,8 +749,7 @@ public class Sybot {
      * @param state new state of claw to be in, true for closed, false for open
      */
     public void setClaw(boolean state) {
-        pinch = !state;
-        toggleClaw();
+        setClaw(state ? CLOSE_CLAW : 0);
     }
 
     /**
@@ -759,7 +757,7 @@ public class Sybot {
      * @param pinch value at which the claws should close, 0.0 represents a fully open claw
      */
     public void setClaw(double pinch) {
-        this.pinch = true;
+        this.pinch = pinch > 0;
         leftClaw.setPosition(1 - pinch);
         rightClaw.setPosition(pinch);
     }
