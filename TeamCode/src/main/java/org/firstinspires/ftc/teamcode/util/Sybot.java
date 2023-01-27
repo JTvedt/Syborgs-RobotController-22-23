@@ -42,7 +42,7 @@ public class Sybot {
     public static final int TICK_THRESHOLD = 300;
     public static final int SLIDE_THRESHOLD = -1120;
     public static final int SLIDE_HIGH_TICKS = -4300;
-    public static final double CLOSE_CLAW = 0.3;
+    public static double CLOSE_CLAW = 0.3;
 
     public LinearOpMode parent;
     public HardwareMap hardwareMap;
@@ -327,12 +327,14 @@ public class Sybot {
     public void spinDrive(double distance, double direction, double angle) {
         double radianDirection = Angle.radians(direction) - getAngle();
         double radianAngle = Angle.radians(angle);
+        double targetAngle = Angle.bound(getAngle() + radianAngle);
         double horizontal = Math.cos(radianDirection);
         double vertical = Math.sin(radianDirection) * 0.87;
 
         int driveTicks = (int)(distance * TICKS_PER_INCH);
         int spinTicks = (int)(radianAngle * 425);
-        double remainingTurn, spin;
+        double baseSpin = 0.3 * Math.signum(radianAngle);
+        double spin = 0;
 
         setDriveMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
@@ -341,12 +343,24 @@ public class Sybot {
         backLeft.setTargetPosition((int)((vertical - horizontal) * driveTicks) - spinTicks);
         backRight.setTargetPosition((int)((vertical + horizontal) * driveTicks) + spinTicks);
 
+        setDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
+
         while (isMoving()) {
             horizontal = Math.cos(radianDirection);
             vertical = Math.sin(radianDirection) * 0.87;
 
-            remainingTurn = getAngleDifference(radianAngle + getAngle());
-            spin = 1.2 * smoothAngle();
+            // Calculate spin based on tick differences
+            int avgDisparity = ((frontLeft.getCurrentPosition() - backRight.getCurrentPosition()) + (frontRight.getCurrentPosition() - backLeft.getCurrentPosition()))/2;
+//            if (avgDisparity > 30) spin = baseSpin;
+//            else spin = 0;
+            spin = 0;
+
+            telemetry.addData("FL Difference", frontLeft.getTargetPosition() - frontLeft.getCurrentPosition());
+            telemetry.addData("FR Difference", frontRight.getTargetPosition() - frontRight.getCurrentPosition());
+            telemetry.addData("BL Difference", backLeft.getTargetPosition() - backLeft.getCurrentPosition());
+            telemetry.addData("BR Difference", backRight.getTargetPosition() - backRight.getCurrentPosition());
+            telemetry.addData("Disparity", avgDisparity);
+            telemetry.update();
 
             // Update power to move in a straight line
             frontLeft.setPower((horizontal + vertical) * 0.65 - spin);
@@ -354,10 +368,10 @@ public class Sybot {
             backLeft.setPower((horizontal - vertical) * 0.65 - spin);
             backRight.setPower((horizontal + vertical) * 0.65 - spin);
 
-//            frontLeft.setPower(0.6);
-//            frontRight.setPower(0.6);
-//            backLeft.setPower(0.6);
-//            backRight.setPower(0.6);
+            frontLeft.setPower(0.6);
+            frontRight.setPower(0.6);
+            backLeft.setPower(0.6);
+            backRight.setPower(0.6);
         }
     }
 
@@ -528,12 +542,19 @@ public class Sybot {
         zeroAngle = Angle.round(getAngle());
     }
 
+    public double smoothAngle(double angle) {
+        final double[] thresholds = {72d, 36d, 18d, 9d, .5d};
+        final double[] coefficients = {0, 0.05, 0.1, 0.2, 0.4};
+
+        double angleDiff = getAngleDifference(angle);
+        for (int i = 0; i < thresholds.length; i++) {
+            if (Math.abs(angleDiff) < Math.PI/thresholds[i]) return coefficients[i] * Math.signum(angleDiff);
+        }
+        return 0;
+    }
+
     public double smoothAngle() {
-        double angleDiff = getAngleDifference(Angle.round(getAngle()));
-        if (Math.abs(angleDiff) < Math.PI/72) return 0;
-        else if (Math.abs(angleDiff) < Math.PI/36) return 0.1 * Math.signum(angleDiff);
-        else if (Math.abs(angleDiff) < Math.PI/18) return 0.2 * Math.signum(angleDiff);
-        else return 0.4 * Math.signum(angleDiff);
+        return smoothAngle(Angle.round(getAngle()));
     }
 
     /**
@@ -590,10 +611,13 @@ public class Sybot {
                 }
 
                 if (slidePosition() > SLIDE_THRESHOLD) break;
+                else if (slidePosition() < -2000) continue;
 
                 int pos = slidePosition();
-                if (pos - lastPos < 20) stuckTicks++;
+                if (pos - lastPos < 25) stuckTicks++;
                 else stuckTicks = 0;
+
+                if (stuckTicks >= 3) break;
 
                 slideMovement += pos - lastPos;
                 ticks++;

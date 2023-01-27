@@ -5,8 +5,8 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import java.util.HashMap;
 
 public class Controller {
-    Gamepad gamepad1 = null;
-    Gamepad gamepad2 = null;
+    Gamepad gamepad1;
+    Gamepad gamepad2;
 
     HashMap<String, Button> map1 = new HashMap<>();
     HashMap<String, Button> map2 = new HashMap<>();

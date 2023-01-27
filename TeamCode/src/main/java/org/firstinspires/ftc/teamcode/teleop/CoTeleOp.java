@@ -61,15 +61,18 @@ public class CoTeleOp extends LinearOpMode implements Structured {
         if (controller.press(2, "Y")) robot.setSlides(Sybot.SLIDE_HIGH_TICKS);
         if (controller.press(2, "X")) robot.dropSlides();
 
-        if (gamepad2.left_trigger > .5 || gamepad2.right_trigger > .5)
-            robot.moveSlides((gamepad2.left_trigger + gamepad2.right_trigger)/2);
-        if (gamepad2.left_bumper || gamepad2.right_bumper)
-            robot.moveSlides((gamepad2.left_bumper ? .5 : 0) + (gamepad2.right_bumper ? .5 : 0));
+        if (robot.manualSlides) robot.moveSlides(0);
+        if (gamepad1.left_trigger > .5) robot.moveSlides(1);
+        if (gamepad1.right_trigger > .5) robot.moveSlides(.5);
+        if (gamepad1.left_bumper) robot.moveSlides(-1);
+        if (gamepad1.right_bumper) robot.moveSlides(-.5);
     }
 
     @Override
     public void clawSubsystem() {
         if (controller.press(2, "A")) robot.toggleClaw();
+        if (controller.press(2, "LB")) Sybot.CLOSE_CLAW -= 0.02;
+        if (controller.press(2, "RB")) Sybot.CLOSE_CLAW += 0.02;
     }
 
     @Override

@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.teleop;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.teamcode.util.Angle;
 import org.firstinspires.ftc.teamcode.util.Controller;
 import org.firstinspires.ftc.teamcode.util.Sybot;
 import org.firstinspires.ftc.teamcode.util.Structured;
@@ -27,7 +28,6 @@ public class ConeCycleOp extends LinearOpMode implements Structured {
             controller.update();
             telemetryConsole();
         }
-
         robot.stop();
     }
 
@@ -39,13 +39,13 @@ public class ConeCycleOp extends LinearOpMode implements Structured {
 
         double stickAngle = Math.atan2(drive, strafe);
         double magnitude = Math.hypot(drive, strafe);
-        double multiplier = 0.6 * (gamepad1.b ? 1.4 : 1) * (gamepad1.right_trigger > 0.5 ? 0.35 : 1);
+        double multiplier = 0.6 * (gamepad1.x ? 1.4 : 1) * (gamepad1.right_trigger > 0.5 ? 0.35 : 1);
 
         if (controller.press("LB")) rigidMove = !rigidMove;
         if (controller.press("RB")) smoothAngle = !smoothAngle;
 
         if (rigidMove) stickAngle = Math.round(stickAngle * 2/Math.PI) * Math.PI/2;
-        if (smoothAngle && turn == 0) turn = robot.smoothAngle();
+        if (smoothAngle && turn == 0) turn = -robot.smoothAngle();
 
         if (gamepad1.right_stick_x == 0) robot.teleDrive(stickAngle, magnitude * multiplier, turn);
         else robot.teleDrive(stickAngle, magnitude, turn, multiplier);
@@ -57,6 +57,7 @@ public class ConeCycleOp extends LinearOpMode implements Structured {
         if (controller.press("DR")) robot.setSlides(-2000);
         if (controller.press("DD")) robot.dropSlides();
 
+        if (robot.manualSlides) robot.moveSlides(0);
         if (gamepad1.x) robot.moveSlides(gamepad1.left_trigger/2 + .5);
         if (gamepad1.y) robot.moveSlides(-gamepad1.left_trigger/2 + .5);
     }
@@ -68,5 +69,15 @@ public class ConeCycleOp extends LinearOpMode implements Structured {
     }
 
     @Override
-    public void telemetryConsole() {}
+    public void telemetryConsole() {
+        String settings = "";
+        if (smoothAngle)    settings += "smooth_angle ";
+        if (rigidMove)      settings += "rigid_move ";
+        telemetry.addData("Settings", settings);
+
+        telemetry.addData("Smooth Angle", robot.smoothAngle());
+        telemetry.addData("Angle Diff", robot.getAngleDifference(Angle.round(robot.getAngle())));
+        telemetry.addData("Rounded Angle", Angle.round(robot.getAngle()));
+        telemetry.update();
+    }
 }

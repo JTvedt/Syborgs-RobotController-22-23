@@ -12,9 +12,8 @@ public class AutonA extends LinearOpMode {
     @Override
     public void runOpMode() {
         robot = new Sybot(this);
-        robot.setClaw(true);
 
         // Autonomous processes go here
-        robot.spinDrive(24, 90, 45);
+        robot.spinDrive(96, 90, 45);
     }
 }

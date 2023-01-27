@@ -21,7 +21,7 @@ public class Angle {
     }
 
     public static double round(double angle, int increments) {
-        return Math.round(angle * increments/2/Math.PI) * Math.PI/increments/2;
+        return Math.round(angle * (increments/2d)/Math.PI) * Math.PI/(increments/2d);
     }
 
     public static double round(double angle) {
