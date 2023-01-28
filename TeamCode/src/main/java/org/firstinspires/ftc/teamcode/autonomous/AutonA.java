@@ -14,6 +14,10 @@ public class AutonA extends LinearOpMode {
         robot = new Sybot(this);
 
         // Autonomous processes go here
-        robot.spinDrive(96, 90, 45);
+        robot.setSlides(Sybot.SLIDE_HIGH_TICKS);
+        robot.waitForSlides();
+        sleep(400);
+        robot.dropSlides();
+        robot.waitForSlides();
     }
 }

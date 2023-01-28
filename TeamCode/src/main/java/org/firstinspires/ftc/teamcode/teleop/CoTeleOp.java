@@ -43,8 +43,8 @@ public class CoTeleOp extends LinearOpMode implements Structured {
         double multiplier = 0.6 * (gamepad1.a ? 1.4 : 1) * (gamepad1.right_trigger > .5 ? 0.5 : 1);
 
         // Toggles settings
-        if (controller.press(1, "DL")) rigidMove = !rigidMove;
-        if (controller.press(1, "DU")) smoothAngle = !smoothAngle;
+        if (controller.press(1, "LB")) rigidMove = !rigidMove;
+        if (controller.press(1, "RB")) smoothAngle = !smoothAngle;
 
         if (controller.press(1, "DR")) robot.resetAngle();
         if (controller.press(1, "DL")) robot.resetSlides();

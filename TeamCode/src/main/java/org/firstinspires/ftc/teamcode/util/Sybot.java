@@ -400,7 +400,7 @@ public class Sybot {
      * @param y The amount the robot should move forward
      */
     public void cartesianMove(double x, double y) {
-        polarMove(Math.hypot(y, x), Math.atan2(y, x));
+        polarMove(Math.hypot(y, x), Angle.degrees(Math.atan2(y, x)));
     }
 
     /**
@@ -554,7 +554,7 @@ public class Sybot {
     }
 
     public double smoothAngle() {
-        return smoothAngle(Angle.round(getAngle()));
+        return smoothAngle(Angle.round(getAngle(), 8));
     }
 
     /**
