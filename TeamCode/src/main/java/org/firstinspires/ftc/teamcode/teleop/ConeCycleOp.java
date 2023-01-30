@@ -41,31 +41,45 @@ public class ConeCycleOp extends LinearOpMode implements Structured {
         double magnitude = Math.hypot(drive, strafe);
         double multiplier = 0.6 * (gamepad1.x ? 1.4 : 1) * (gamepad1.right_trigger > 0.5 ? 0.35 : 1);
 
-        if (controller.press("LB")) rigidMove = !rigidMove;
-        if (controller.press("RB")) smoothAngle = !smoothAngle;
+        if (controller.press("LB"))
+            rigidMove = !rigidMove;
+        if (controller.press("RB"))
+            smoothAngle = !smoothAngle;
 
-        if (rigidMove) stickAngle = Math.round(stickAngle * 2/Math.PI) * Math.PI/2;
-        if (smoothAngle && turn == 0) turn = -robot.smoothAngle();
+        if (rigidMove)
+            stickAngle = Math.round(stickAngle * 2/Math.PI) * Math.PI/2;
+        if (smoothAngle && turn == 0)
+            turn = -robot.smoothAngle();
 
-        if (gamepad1.right_stick_x == 0) robot.teleDrive(stickAngle, magnitude * multiplier, turn);
-        else robot.teleDrive(stickAngle, magnitude, turn, multiplier);
+        if (gamepad1.right_stick_x == 0)
+            robot.teleDrive(stickAngle, magnitude * multiplier, turn);
+        else
+            robot.teleDrive(stickAngle, magnitude, turn, multiplier);
     }
 
     @Override
     public void slideSubsystem() {
-        if (controller.press("DU")) robot.setSlides(Sybot.SLIDE_HIGH_TICKS);
-        if (controller.press("DR")) robot.setSlides(-2000);
-        if (controller.press("DD")) robot.dropSlides();
+        if (controller.press("DU"))
+            robot.setSlides(Sybot.SLIDE_HIGH_TICKS);
+        if (controller.press("DR"))
+            robot.setSlides(-2000);
+        if (controller.press("DD"))
+            robot.dropSlides();
 
-        if (robot.manualSlides) robot.moveSlides(0);
-        if (gamepad1.x) robot.moveSlides(gamepad1.left_trigger/2 + .5);
-        if (gamepad1.y) robot.moveSlides(-gamepad1.left_trigger/2 + .5);
+        if (robot.manualSlides)
+            robot.moveSlides(0);
+        if (gamepad1.x)
+            robot.moveSlides(gamepad1.left_trigger/2 + .5);
+        if (gamepad1.y)
+            robot.moveSlides(-gamepad1.left_trigger/2 + .5);
     }
 
     @Override
     public void clawSubsystem() {
-        if (controller.press("A")) robot.toggleClaw();
-        if (controller.press("B")) robot.pinchSlide();
+        if (controller.press("A"))
+            robot.toggleClaw();
+        if (controller.press("B"))
+            robot.pinchSlide();
     }
 
     @Override

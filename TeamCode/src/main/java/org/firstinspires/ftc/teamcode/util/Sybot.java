@@ -67,7 +67,7 @@ public class Sybot {
     public boolean pinch = false; // true for gripped
     public boolean manualSlides = false;
     public boolean slideRelease = false;
-    public boolean mirror = false;
+    public boolean mirrorStrafe = false;
     public boolean enableThreads = true;
     public double debugDouble = 0;
     public int debugInt = 0;
@@ -263,7 +263,7 @@ public class Sybot {
      */
     public void polarMove(double distance, double direction) {
         double radianDirection = Angle.radians(direction) - (driveType == DriveType.POV ? getAngle() : 0);
-        double horizontal = Math.cos(radianDirection) * (mirror ? -1 : 1);
+        double horizontal = Math.cos(radianDirection) * (mirrorStrafe ? -1 : 1);
         double vertical = Math.sin(radianDirection) * 0.87;
         int tickCount = toTicks(distance);
 

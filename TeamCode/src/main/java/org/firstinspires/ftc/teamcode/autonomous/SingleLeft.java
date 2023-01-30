@@ -4,8 +4,6 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.util.Sybot;
-import org.firstinspires.ftc.teamcode.cv.EasyOpenCvPipeline;
-import org.openftc.easyopencv.OpenCvCamera;
 
 /**
  * Places one cone on the high junction and parks. Starting position on the left side
@@ -18,7 +16,7 @@ public class SingleLeft extends LinearOpMode {
     @Override
     public void runOpMode() {
         robot = new Sybot(this, Sybot.OpModeType.AUTONOMOUS, Sybot.StartSide.LEFT);
-        robot.mirror = true;
+        robot.mirrorStrafe = true;
 
         robot.setClaw(true);
         sleep(400);
@@ -50,7 +48,7 @@ public class SingleLeft extends LinearOpMode {
 
     // 0 for red, 1 for green, 2 for blue
     public void park(int parkingSpot) {
-        robot.mirror = false;
+        robot.mirrorStrafe = false;
         if (parkingSpot == 0) robot.strafe(-26);
         else if (parkingSpot == 2) robot.strafe(26);
     }

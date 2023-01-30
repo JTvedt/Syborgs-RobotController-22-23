@@ -46,7 +46,7 @@ public class SingleRight extends LinearOpMode {
 
     // 0 for red, 1 for green, 2 for blue
     public void park(int parkingSpot) {
-        robot.mirror = false;
+        robot.mirrorStrafe = false;
         if (parkingSpot == 0) robot.strafe(-26);
         else if (parkingSpot == 2) robot.strafe(26);
     }
