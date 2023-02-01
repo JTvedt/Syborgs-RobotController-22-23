@@ -20,7 +20,7 @@ public class ParkOnlyAuton extends LinearOpMode{
         Sybot.cvImplementation = Sybot.CvImplementation.APRIL_TAGS;
 
         sleep(400);
-        int parkZone = robot.getZone();
+        int parkZone = robot.retrieveZone();
         robot.drive(1.25);
         telemetry.addData("April Parking in", parkZone);
         telemetry.update();

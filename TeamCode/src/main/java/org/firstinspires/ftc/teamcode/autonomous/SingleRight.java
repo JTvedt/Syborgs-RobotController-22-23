@@ -19,7 +19,7 @@ public class SingleRight extends LinearOpMode {
 
         robot.setClaw(true);
         sleep(400);
-        int parkZone = robot.pipeline.getZone();
+        int parkZone = robot.retrieveZone();
         telemetry.addData("Parking in", parkZone);
         telemetry.update();
         sleep(600);

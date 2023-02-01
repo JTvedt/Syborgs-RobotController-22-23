@@ -13,13 +13,13 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.teamcode.cv.AprilTagDetectionPipeline;
-import org.firstinspires.ftc.teamcode.cv.AprilTagsDetectionTeleOp;
 import org.firstinspires.ftc.teamcode.cv.EasyOpenCvPipeline;
 
 import org.openftc.apriltag.AprilTagDetection;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
+import org.openftc.easyopencv.OpenCvPipeline;
 
 import java.util.ArrayList;
 
@@ -75,26 +75,18 @@ public class Sybot {
     public double debugDouble = 0;
     public int debugInt = 0;
     public int counter;
+    public int parkZone;
 
     public static CvImplementation cvImplementation = CvImplementation.EASYOPENCV;
-    public EasyOpenCvPipeline pipeline;
-    public AprilTagsDetectionTeleOp april_pipeline;
     public OpenCvCamera camera;
-    AprilTagDetectionPipeline aprilTagDetectionPipeline;
 
-    // Default April Tag Params
-    static double fx = 578.272;
-    static double fy = 578.272;
-    static double cx = 402.145;
-    static double cy = 221.506;
-
-    // In meters
-    static double tagsize = 0.166;
+    public EasyOpenCvPipeline eocvPipeline;
+    public AprilTagDetectionPipeline aprilTagsPipeline;
 
     //Tag IDs of sleeve
-    static int Left = 9;
-    static int Middle = 10;
-    static int Right = 11;
+    static final int LEFT_TAG = 9;
+    static final int MIDDLE_TAG = 10;
+    static final int RIGHT_TAG = 11;
 
     AprilTagDetection tagOfInterest = null;
 
@@ -106,11 +98,11 @@ public class Sybot {
      * Constructor for Sybot, takes in the parent, OpMode type, and starting side
      * Starting side is only relevant for autonomous
      * @param parent The OpMode that will be using this class's methods
-     * @param type The type of OpMode, Autonomous or TeleOp
+     * @param opModeType The type of OpMode, Autonomous or TeleOp
      * @param side Starting position of the robot, relevant for autonomous.
      *             If placed on the left side, strafing will be mirrored by default
      */
-    public Sybot(LinearOpMode parent, OpModeType type, StartSide side) {
+    public Sybot(LinearOpMode parent, OpModeType opModeType, StartSide side) {
         this.parent = parent;
         hardwareMap = parent.hardwareMap;
         telemetry = parent.telemetry;
@@ -154,7 +146,7 @@ public class Sybot {
         rightClaw = hardwareMap.get(Servo.class, "RC");
 
         // Computer Vision
-        if (type == OpModeType.AUTONOMOUS) {
+        if (opModeType == OpModeType.AUTONOMOUS) {
             initializeCv(side);
         }
 
@@ -178,146 +170,46 @@ public class Sybot {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
-        parent.waitForStart();
+        switch (opModeType) {
+            case AUTONOMOUS:
+                // During init phase search for the cone
+                searchForSleeve();
+                break;
+            case TELEOP:
+                parent.waitForStart();
+                break;
+        }
         runtime.reset();
     }
 
     public void initializeCv(StartSide side) {
         switch (cvImplementation) {
             case EASYOPENCV:
-                // TODO plug in numbers
-                if (side == StartSide.LEFT) pipeline = new EasyOpenCvPipeline(0, 0, 1, 1);
-                else if (side == StartSide.RIGHT) pipeline = new EasyOpenCvPipeline(0, 0, 1, 1);
-                else pipeline = new EasyOpenCvPipeline(0, 0, 1, 1);
-                WebcamName webcamName = hardwareMap.get(WebcamName.class, "Camera");
-                int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-                camera = OpenCvCameraFactory.getInstance().createWebcam(webcamName, cameraMonitorViewId);
-                camera.setPipeline(pipeline);
-                camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
-                    @Override
-                    public void onOpened() {
-                        camera.startStreaming(640, 480, OpenCvCameraRotation.UPRIGHT);
-                    }
+                if (side == StartSide.LEFT) eocvPipeline = new EasyOpenCvPipeline(0, 0, 1, 1);
+                else if (side == StartSide.RIGHT) eocvPipeline = new EasyOpenCvPipeline(0, 0, 1, 1);
+                else eocvPipeline = new EasyOpenCvPipeline(0, 0, 1, 1);
 
-                    @Override
-                    public void onError(int errorCode) {
-
-                    }
-                });
+                openCamera(eocvPipeline);
                 break;
             case APRIL_TAGS:
-                // TODO whoever is doing April Tags add this stuff
-            {
-                cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-                camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Camera"), cameraMonitorViewId);
-                aprilTagDetectionPipeline = new AprilTagDetectionPipeline(tagsize, fx, fy, cx, cy);
+                // Default April Tag Params
+                final double FX = 578.272;
+                final double FY = 578.272;
+                final double CX = 402.145;
+                final double CY = 221.506;
 
-                camera.setPipeline(aprilTagDetectionPipeline);
-                camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
-                {
-                    @Override
-                    public void onOpened()
-                    {
-                        camera.startStreaming(800,448, OpenCvCameraRotation.UPRIGHT);
-                    }
+                // In meters
+                final double TAG_SIZE = 0.166;
+                aprilTagsPipeline = new AprilTagDetectionPipeline(TAG_SIZE, FX, FY, CX, CY);
 
-                    @Override
-                    public void onError(int errorCode)
-                    {
-
-                    }
-                });
-
+                openCamera(aprilTagsPipeline);
                 telemetry.setMsTransmissionInterval(50);
 
-
                 parent.waitForStart();
-                ArrayList<AprilTagDetection> currentDetections = aprilTagDetectionPipeline.getLatestDetections();
-
-                if(currentDetections.size() != 0)
-                {
-                    boolean tagFound = false;
-
-                    for(AprilTagDetection tag : currentDetections)
-                    {
-                        if(tag.id == Left || tag.id == Middle || tag.id == Right)
-                        {
-                            tagOfInterest = tag;
-                            tagFound = true;
-                            break;
-                        }
-                    }
-
-                    if(tagFound)
-                    {
-                        telemetry.addLine("Tag of interest is in sight!\n\nLocation data:");
-                        tagToTelemetry(tagOfInterest);
-                    }
-                    else
-                    {
-                        telemetry.addLine("Don't see tag of interest :(");
-
-                        if(tagOfInterest == null)
-                        {
-                            telemetry.addLine("(The tag has never been seen)");
-                        }
-                        else
-                        {
-                            telemetry.addLine("\nBut we HAVE seen the tag before; last seen at:");
-                            tagToTelemetry(tagOfInterest);
-                        }
-                    }
-
-                }
-                else
-                {
-                    telemetry.addLine("Don't see tag of interest :(");
-
-                    if(tagOfInterest == null)
-                    {
-                        telemetry.addLine("(The tag has never been seen)");
-                    }
-                    else
-                    {
-                        telemetry.addLine("\nBut we HAVE seen the tag before; last seen at:");
-                        tagToTelemetry(tagOfInterest);
-                    }
-
-                }
-
-                telemetry.update();
-                rest(20);
-
-
-                /*
-                 * The START command just came in: now work off the latest snapshot acquired
-                 * during the init loop.
-                 */
-
-                /* Update the telemetry */
-                if(tagOfInterest != null)
-                {
-                    telemetry.addLine("Tag snapshot:\n");
-                    tagToTelemetry(tagOfInterest);
-                    telemetry.update();
-                }
-                else
-                {
-                    telemetry.addLine("No tag snapshot available, it was never sighted during the init loop :(");
-                    telemetry.update();
-                }
-                /* You wouldn't have this in your autonomous, this is just to prevent the sample from ending */
-                while (parent.opModeIsActive()) {rest(20);}
-            }
         }
-
-
-
     }
 
-
-    void tagToTelemetry(AprilTagDetection detection)
-    {
+    public void addAprilTagsToTelemetry(AprilTagDetection detection) {
         telemetry.addLine(String.format("\nDetected tag ID=%d", detection.id));
         telemetry.addLine(String.format("Translation X: %.2f feet", detection.pose.x*FEET_PER_METER));
         telemetry.addLine(String.format("Translation Y: %.2f feet", detection.pose.y*FEET_PER_METER));
@@ -327,20 +219,95 @@ public class Sybot {
         telemetry.addLine(String.format("Rotation Roll: %.2f degrees", Math.toDegrees(detection.pose.roll)));
     }
 
-    public int getZone() {
-        switch (cvImplementation) {
-            case EASYOPENCV:
-                return pipeline.getZone();
-            case APRIL_TAGS:
-                return april_pipeline.getZone();
-            default:
-                return 1;
+    public void openCamera(OpenCvPipeline pipeline) {
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Camera"), cameraMonitorViewId);
+        camera.setPipeline(pipeline);
+        camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
+            @Override
+            public void onOpened() {
+                camera.startStreaming(640, 480, OpenCvCameraRotation.UPRIGHT);
+            }
+
+            @Override
+            public void onError(int errorCode) {
+
+            }
+        });
+    }
+
+    public void searchForSleeve() {
+        while (!parent.isStarted() && !parent.isStopRequested()) {
+            switch (cvImplementation) {
+                case EASYOPENCV:
+                    parkZone = eocvPipeline.getZone();
+                    telemetry.addData("Sleeve visible", parkZone);
+                    telemetry.addData("Color data", eocvPipeline.getColor());
+                    break;
+                case APRIL_TAGS:
+                    parkZone = getAprilTagsZone();
+                    break;
+            }
         }
+    }
+
+    public int getAprilTagsZone() {
+        ArrayList<AprilTagDetection> currentDetections = aprilTagsPipeline.getLatestDetections();
+        boolean tagFound = false;
+
+        for (AprilTagDetection tag : currentDetections) {
+            if (tag.id == LEFT_TAG || tag.id == MIDDLE_TAG || tag.id == RIGHT_TAG) {
+                tagOfInterest = tag;
+                tagFound = true;
+                break;
+            }
+        }
+
+        if (tagFound) {
+            telemetry.addLine("Tag visible\n\nLocation data:");
+            addAprilTagsToTelemetry(tagOfInterest);
+        } else {
+            telemetry.addLine("No tag present");
+
+            if(tagOfInterest == null) {
+                telemetry.addLine("(The tag has never been seen)");
+            } else {
+                telemetry.addLine("\nTag last seen at:");
+                addAprilTagsToTelemetry(tagOfInterest);
+            }
+        }
+
+        telemetry.update();
+        rest(20);
+
+        switch (tagOfInterest.id) {
+            case LEFT_TAG:
+                return 1;
+            case MIDDLE_TAG:
+                return 2;
+            case RIGHT_TAG:
+                return 3;
+            default:
+                return -1;
+        }
+    }
+
+    public int retrieveZone() {
+        telemetry.addData("Parking in", parkZone);
+        telemetry.update();
+        rest(600);
+        camera.stopStreaming();
+
+        return parkZone;
     }
 
     public enum CvImplementation {
         EASYOPENCV,
         APRIL_TAGS
+    }
+
+    public static void setImplementation(CvImplementation implementation) {
+        cvImplementation = implementation;
     }
 
     /**

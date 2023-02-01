@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.autonomous;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.util.Sybot;
@@ -19,11 +18,7 @@ public class DoubleLeft extends LinearOpMode {
         // Initial Setup
         robot.setClaw(true);
         sleep(200);
-        int parkZone = robot.pipeline.getZone();
-        telemetry.addData("Parking in", parkZone);
-        telemetry.update();
-        sleep(300);
-        robot.camera.stopStreaming();
+        int parkZone = robot.retrieveZone();
 
         // Autonomous processes go here
 

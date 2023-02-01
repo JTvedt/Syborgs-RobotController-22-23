@@ -38,7 +38,7 @@ proguard/
 # Android Studio captures folder
 captures/
 
-#Added by Jeffrey, corrects JDK differences
+# Added by Jeffrey, corrects JDK differences
 .idea/misc.xml
 .idea/compiler.xml
 

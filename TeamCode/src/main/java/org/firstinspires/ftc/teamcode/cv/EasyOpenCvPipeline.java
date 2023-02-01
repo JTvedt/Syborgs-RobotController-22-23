@@ -9,6 +9,7 @@ import org.openftc.easyopencv.OpenCvPipeline;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Simple pipeline that crops image to get color values
@@ -19,6 +20,7 @@ public class EasyOpenCvPipeline extends OpenCvPipeline {
     private Mat bgrInput = new Mat();
     private Mat output = new Mat();
     private Mat submat = new Mat();
+    private String colorOutput = "";
     private int parkingZone = -1;
     double x1 = 0, y1 = 0;
     double x2 = 1, y2 = 1;
@@ -49,9 +51,11 @@ public class EasyOpenCvPipeline extends OpenCvPipeline {
         double meanR = Core.mean(channels.get(2)).val[0];
         double max = Math.max(meanB, Math.max(meanG, meanR));
 
-        if(max == meanB) parkingZone = 3;
+        if(max == meanR) parkingZone = 1;
         else if(max == meanG) parkingZone = 2;
-        else parkingZone = 1;
+        else parkingZone = 3;
+
+        colorOutput = String.format(Locale.getDefault(), "R%.2f, G%.2f B%.2f", meanR, meanG, meanB);
 
         Imgproc.cvtColor(submat, output, Imgproc.COLOR_BGR2RGBA);
         return output;
@@ -59,5 +63,9 @@ public class EasyOpenCvPipeline extends OpenCvPipeline {
 
     public int getZone() {
         return parkingZone;
+    }
+
+    public String getColor() {
+        return colorOutput;
     }
 }

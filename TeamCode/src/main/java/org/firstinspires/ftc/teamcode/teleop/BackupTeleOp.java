@@ -14,9 +14,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
-@Deprecated
 @Disabled
-@TeleOp(name = "Backup TeleOp")
+@TeleOp(name="Backup TeleOp")
 public class BackupTeleOp extends LinearOpMode {
 
     private DcMotor frontRight;

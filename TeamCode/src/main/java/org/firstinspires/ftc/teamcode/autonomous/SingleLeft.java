@@ -20,11 +20,7 @@ public class SingleLeft extends LinearOpMode {
 
         robot.setClaw(true);
         sleep(400);
-        int parkZone = robot.pipeline.getZone();
-        telemetry.addData("Parking in", parkZone);
-        telemetry.update();
-        sleep(600);
-        robot.camera.stopStreaming();
+        int parkZone = robot.retrieveZone();
 
         // Autonomous processes go here
         // Everything in this section is mirrored

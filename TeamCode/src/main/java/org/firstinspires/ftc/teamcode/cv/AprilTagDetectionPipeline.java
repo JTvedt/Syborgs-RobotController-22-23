@@ -309,4 +309,8 @@ public class AprilTagDetectionPipeline extends OpenCvPipeline
             this.tvec = tvec;
         }
     }
+
+    public int getZone() {
+        return 1;
+    }
 }
