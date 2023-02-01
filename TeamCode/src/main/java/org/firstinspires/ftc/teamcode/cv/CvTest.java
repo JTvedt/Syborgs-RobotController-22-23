@@ -11,9 +11,9 @@ public class CvTest extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        Sybot.setImplementation(Sybot.CvImplementation.APRIL_TAGS);
-        robot = new Sybot(this, Sybot.OpModeType.AUTONOMOUS);
+        Sybot.setImplementation(Sybot.CvImplementation.EASYOPENCV);
+        robot = new Sybot(this, Sybot.OpModeType.AUTONOMOUS, Sybot.StartSide.LEFT);
         robot.retrieveZone();
-        telemetry.update();
+        sleep(1000);
     }
 }

@@ -75,7 +75,7 @@ public class Sybot {
     public double debugDouble = 0;
     public int debugInt = 0;
     public int counter;
-    public int parkZone;
+    public int parkZone = -1;
 
     public static CvImplementation cvImplementation = CvImplementation.EASYOPENCV;
     public OpenCvCamera camera;
@@ -209,6 +209,23 @@ public class Sybot {
         }
     }
 
+    /**
+     * Constructor that does not require side
+     * @param parent The OpMode that will be using this class's methods
+     * @param type The type of OpMode, TeleOp or Autonomous
+     */
+    public Sybot(LinearOpMode parent, OpModeType type) {
+        this(parent, type, StartSide.UNSPECIFIED);
+    }
+
+    /**
+     * Constructor that takes in the parent opmode
+     * @param parent The OpMode that will be using this class's methods
+     */
+    public Sybot(LinearOpMode parent) {
+        this(parent, OpModeType.AUTONOMOUS, StartSide.UNSPECIFIED);
+    }
+
     public void addAprilTagsToTelemetry(AprilTagDetection detection) {
         telemetry.addLine(String.format("\nDetected tag ID=%d", detection.id));
         telemetry.addLine(String.format("Translation X: %.2f feet", detection.pose.x*FEET_PER_METER));
@@ -241,7 +258,6 @@ public class Sybot {
             switch (cvImplementation) {
                 case EASYOPENCV:
                     parkZone = eocvPipeline.getZone();
-                    telemetry.addData("Sleeve visible", parkZone);
                     telemetry.addData("Color data", eocvPipeline.getColor());
                     break;
                 case APRIL_TAGS:
@@ -249,6 +265,8 @@ public class Sybot {
                     break;
             }
         }
+
+        telemetry.addData("Sleeve visible", parkZone);
     }
 
     public int getAprilTagsZone() {
@@ -291,8 +309,8 @@ public class Sybot {
                 return -1;
         }
     }
-
     public int retrieveZone() {
+        telemetry.addData("CV Implementation", cvImplementation);
         telemetry.addData("Parking in", parkZone);
         telemetry.update();
         rest(600);
@@ -304,27 +322,11 @@ public class Sybot {
     public enum CvImplementation {
         EASYOPENCV,
         APRIL_TAGS
+
     }
 
     public static void setImplementation(CvImplementation implementation) {
         cvImplementation = implementation;
-    }
-
-    /**
-     * Constructor that does not require side
-     * @param parent The OpMode that will be using this class's methods
-     * @param type The type of OpMode, TeleOp or Autonomous
-     */
-    public Sybot(LinearOpMode parent, OpModeType type) {
-        this(parent, type, StartSide.UNSPECIFIED);
-    }
-
-    /**
-     * Constructor that takes in the parent opmode
-     * @param parent The OpMode that will be using this class's methods
-     */
-    public Sybot(LinearOpMode parent) {
-        this(parent, OpModeType.AUTONOMOUS, StartSide.UNSPECIFIED);
     }
 
     public enum OpModeType {
