@@ -29,12 +29,11 @@ import org.openftc.apriltag.AprilTagDetection;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
-import org.openftc.easyopencv.OpenCvInternalCamera;
 
 import java.util.ArrayList;
 
 @TeleOp
-public class Camera_Ex extends LinearOpMode
+public class AprilTagsDetectionTeleOp extends LinearOpMode
 {
     OpenCvCamera camera;
     AprilTagDetectionPipeline aprilTagDetectionPipeline;
@@ -64,7 +63,7 @@ public class Camera_Ex extends LinearOpMode
     public void runOpMode()
     {
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
+        camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Camera"), cameraMonitorViewId);
         aprilTagDetectionPipeline = new AprilTagDetectionPipeline(tagsize, fx, fy, cx, cy);
 
         camera.setPipeline(aprilTagDetectionPipeline);
@@ -166,21 +165,28 @@ public class Camera_Ex extends LinearOpMode
             telemetry.update();
         }
 
-        /* Actually do something useful */
+        /* Actually do something useful
         if(tagOfInterest.id == Left) {
             //left code
         }else if(tagOfInterest == null || tagOfInterest.id == Middle){
             //middle code
         }else if(tagOfInterest.id == Right){
             //right code
-        }
+        }*/
 
 
 
 
 
         /* You wouldn't have this in your autonomous, this is just to prevent the sample from ending */
-        while (opModeIsActive()) {sleep(20);}
+while (opModeIsActive()) {sleep(20);}
+    }
+
+    /**
+     * Returns detected april tags value to be used for parking
+     */
+    public int getZone(){
+        return tagOfInterest.id;
     }
 
     void tagToTelemetry(AprilTagDetection detection)

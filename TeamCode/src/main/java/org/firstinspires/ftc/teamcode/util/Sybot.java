@@ -12,8 +12,11 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.teamcode.cv.AprilTagDetectionPipeline;
+import org.firstinspires.ftc.teamcode.cv.AprilTagsDetectionTeleOp;
 import org.firstinspires.ftc.teamcode.cv.EasyOpenCvPipeline;
 
+import org.openftc.apriltag.AprilTagDetection;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
@@ -75,7 +78,29 @@ public class Sybot {
 
     public static CvImplementation cvImplementation = CvImplementation.EASYOPENCV;
     public EasyOpenCvPipeline pipeline;
+    public AprilTagsDetectionTeleOp april_pipeline;
     public OpenCvCamera camera;
+    AprilTagDetectionPipeline aprilTagDetectionPipeline;
+
+    // Default April Tag Params
+    static double fx = 578.272;
+    static double fy = 578.272;
+    static double cx = 402.145;
+    static double cy = 221.506;
+
+    // In meters
+    static double tagsize = 0.166;
+
+    //Tag IDs of sleeve
+    static int Left = 9;
+    static int Middle = 10;
+    static int Right = 11;
+
+    AprilTagDetection tagOfInterest = null;
+
+    //Used in telemetry debugging
+    static final double FEET_PER_METER = 3.28084;
+
 
     /**
      * Constructor for Sybot, takes in the parent, OpMode type, and starting side
@@ -164,26 +189,153 @@ public class Sybot {
                 if (side == StartSide.LEFT) pipeline = new EasyOpenCvPipeline(0, 0, 1, 1);
                 else if (side == StartSide.RIGHT) pipeline = new EasyOpenCvPipeline(0, 0, 1, 1);
                 else pipeline = new EasyOpenCvPipeline(0, 0, 1, 1);
+                WebcamName webcamName = hardwareMap.get(WebcamName.class, "Camera");
+                int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+                camera = OpenCvCameraFactory.getInstance().createWebcam(webcamName, cameraMonitorViewId);
+                camera.setPipeline(pipeline);
+                camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
+                    @Override
+                    public void onOpened() {
+                        camera.startStreaming(640, 480, OpenCvCameraRotation.UPRIGHT);
+                    }
+
+                    @Override
+                    public void onError(int errorCode) {
+
+                    }
+                });
                 break;
             case APRIL_TAGS:
                 // TODO whoever is doing April Tags add this stuff
+            {
+                cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+                camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Camera"), cameraMonitorViewId);
+                aprilTagDetectionPipeline = new AprilTagDetectionPipeline(tagsize, fx, fy, cx, cy);
+
+                camera.setPipeline(aprilTagDetectionPipeline);
+                camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
+                {
+                    @Override
+                    public void onOpened()
+                    {
+                        camera.startStreaming(800,448, OpenCvCameraRotation.UPRIGHT);
+                    }
+
+                    @Override
+                    public void onError(int errorCode)
+                    {
+
+                    }
+                });
+
+                telemetry.setMsTransmissionInterval(50);
+
+
+                parent.waitForStart();
+                ArrayList<AprilTagDetection> currentDetections = aprilTagDetectionPipeline.getLatestDetections();
+
+                if(currentDetections.size() != 0)
+                {
+                    boolean tagFound = false;
+
+                    for(AprilTagDetection tag : currentDetections)
+                    {
+                        if(tag.id == Left || tag.id == Middle || tag.id == Right)
+                        {
+                            tagOfInterest = tag;
+                            tagFound = true;
+                            break;
+                        }
+                    }
+
+                    if(tagFound)
+                    {
+                        telemetry.addLine("Tag of interest is in sight!\n\nLocation data:");
+                        tagToTelemetry(tagOfInterest);
+                    }
+                    else
+                    {
+                        telemetry.addLine("Don't see tag of interest :(");
+
+                        if(tagOfInterest == null)
+                        {
+                            telemetry.addLine("(The tag has never been seen)");
+                        }
+                        else
+                        {
+                            telemetry.addLine("\nBut we HAVE seen the tag before; last seen at:");
+                            tagToTelemetry(tagOfInterest);
+                        }
+                    }
+
+                }
+                else
+                {
+                    telemetry.addLine("Don't see tag of interest :(");
+
+                    if(tagOfInterest == null)
+                    {
+                        telemetry.addLine("(The tag has never been seen)");
+                    }
+                    else
+                    {
+                        telemetry.addLine("\nBut we HAVE seen the tag before; last seen at:");
+                        tagToTelemetry(tagOfInterest);
+                    }
+
+                }
+
+                telemetry.update();
+                rest(20);
+
+
+                /*
+                 * The START command just came in: now work off the latest snapshot acquired
+                 * during the init loop.
+                 */
+
+                /* Update the telemetry */
+                if(tagOfInterest != null)
+                {
+                    telemetry.addLine("Tag snapshot:\n");
+                    tagToTelemetry(tagOfInterest);
+                    telemetry.update();
+                }
+                else
+                {
+                    telemetry.addLine("No tag snapshot available, it was never sighted during the init loop :(");
+                    telemetry.update();
+                }
+                /* You wouldn't have this in your autonomous, this is just to prevent the sample from ending */
+                while (parent.opModeIsActive()) {rest(20);}
+            }
         }
 
-        WebcamName webcamName = hardwareMap.get(WebcamName.class, "Camera");
-        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        camera = OpenCvCameraFactory.getInstance().createWebcam(webcamName, cameraMonitorViewId);
-        camera.setPipeline(pipeline);
-        camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
-            @Override
-            public void onOpened() {
-                camera.startStreaming(640, 480, OpenCvCameraRotation.UPRIGHT);
-            }
 
-            @Override
-            public void onError(int errorCode) {
 
-            }
-        });
+    }
+
+
+    void tagToTelemetry(AprilTagDetection detection)
+    {
+        telemetry.addLine(String.format("\nDetected tag ID=%d", detection.id));
+        telemetry.addLine(String.format("Translation X: %.2f feet", detection.pose.x*FEET_PER_METER));
+        telemetry.addLine(String.format("Translation Y: %.2f feet", detection.pose.y*FEET_PER_METER));
+        telemetry.addLine(String.format("Translation Z: %.2f feet", detection.pose.z*FEET_PER_METER));
+        telemetry.addLine(String.format("Rotation Yaw: %.2f degrees", Math.toDegrees(detection.pose.yaw)));
+        telemetry.addLine(String.format("Rotation Pitch: %.2f degrees", Math.toDegrees(detection.pose.pitch)));
+        telemetry.addLine(String.format("Rotation Roll: %.2f degrees", Math.toDegrees(detection.pose.roll)));
+    }
+
+    public int getZone() {
+        switch (cvImplementation) {
+            case EASYOPENCV:
+                return pipeline.getZone();
+            case APRIL_TAGS:
+                return april_pipeline.getZone();
+            default:
+                return 1;
+        }
     }
 
     public enum CvImplementation {

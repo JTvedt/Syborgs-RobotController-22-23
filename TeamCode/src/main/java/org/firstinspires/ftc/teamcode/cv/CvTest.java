@@ -12,7 +12,7 @@ public class CvTest extends LinearOpMode {
     @Override
     public void runOpMode() {
         robot = new Sybot(this, Sybot.OpModeType.AUTONOMOUS);
-        telemetry.addData("Zone", robot.pipeline.getZone());
+        telemetry.addData("Zone", robot.getZone());
         telemetry.update();
     }
 }
