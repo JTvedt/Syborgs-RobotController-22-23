@@ -111,13 +111,13 @@ public class JeffreyTeleOp extends LinearOpMode {
 
         // telemetry.addData("Robot angle", robot.getAngle());
 
-        // telemetry.addData("Drive", drive);
-        // telemetry.addData("Strafe", strafe);
-        // telemetry.addData("Turn", turn);
+         telemetry.addData("Drive", drive);
+         telemetry.addData("Strafe", strafe);
+         telemetry.addData("Turn", turn);
 
-        // telemetry.addData("Stick Angle", stickAngle);
-        // telemetry.addData("Angle", stickAngle - robot.getAngle());
-        // telemetry.addData("Magnitude", magnitude);
+         telemetry.addData("Stick Angle", stickAngle);
+         telemetry.addData("Angle", stickAngle - robot.getAngle());
+         telemetry.addData("Magnitude", magnitude);
 
         telemetry.addData("Slide target", robot.slideTarget());
         telemetry.addData("Slide position", robot.slidePosition());

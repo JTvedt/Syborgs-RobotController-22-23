@@ -43,14 +43,20 @@ public class CoTeleOp extends LinearOpMode implements Structured {
         double multiplier = 0.6 * (gamepad1.a ? 1.4 : 1) * (gamepad1.right_trigger > .5 ? 0.5 : 1);
 
         // Toggles settings
-        if (controller.press(1, "DL")) rigidMove = !rigidMove;
-        if (controller.press(1, "DU")) smoothAngle = !smoothAngle;
+        if (controller.press(1, "LB"))
+            rigidMove = !rigidMove;
+        if (controller.press(1, "RB"))
+            smoothAngle = !smoothAngle;
 
-        if (controller.press(1, "DR")) robot.resetAngle();
-        if (controller.press(1, "DL")) robot.resetSlides();
+        if (controller.press(1, "DR"))
+            robot.resetAngle();
+        if (controller.press(1, "DL"))
+            robot.resetSlides();
 
-        if (rigidMove) stickAngle = Angle.round(stickAngle);
-        if (smoothAngle && turn == 0) turn = robot.smoothAngle();
+        if (rigidMove)
+            stickAngle = Angle.round(stickAngle);
+        if (smoothAngle && turn == 0)
+            turn = robot.smoothAngle();
 
         // Plug in numbers
         robot.teleDrive(stickAngle, magnitude, turn, multiplier);
@@ -58,21 +64,31 @@ public class CoTeleOp extends LinearOpMode implements Structured {
 
     @Override
     public void slideSubsystem() {
-        if (controller.press(2, "Y")) robot.setSlides(Sybot.SLIDE_HIGH_TICKS);
-        if (controller.press(2, "X")) robot.dropSlides();
+        if (controller.press(2, "Y"))
+            robot.setSlides(Sybot.SLIDE_HIGH_TICKS);
+        if (controller.press(2, "X"))
+            robot.dropSlides();
 
-        if (robot.manualSlides) robot.moveSlides(0);
-        if (gamepad1.left_trigger > .5) robot.moveSlides(1);
-        if (gamepad1.right_trigger > .5) robot.moveSlides(.5);
-        if (gamepad1.left_bumper) robot.moveSlides(-1);
-        if (gamepad1.right_bumper) robot.moveSlides(-.5);
+        if (robot.manualSlides)
+            robot.moveSlides(0);
+        if (gamepad1.left_trigger > .5)
+            robot.moveSlides(1);
+        if (gamepad1.right_trigger > .5)
+            robot.moveSlides(.5);
+        if (gamepad1.left_bumper)
+            robot.moveSlides(-1);
+        if (gamepad1.right_bumper)
+            robot.moveSlides(-.5);
     }
 
     @Override
     public void clawSubsystem() {
-        if (controller.press(2, "A")) robot.toggleClaw();
-        if (controller.press(2, "LB")) Sybot.CLOSE_CLAW -= 0.02;
-        if (controller.press(2, "RB")) Sybot.CLOSE_CLAW += 0.02;
+        if (controller.press(2, "A"))
+            robot.toggleClaw();
+        if (controller.press(2, "LB"))
+            Sybot.CLOSE_CLAW -= 0.02;
+        if (controller.press(2, "RB"))
+            Sybot.CLOSE_CLAW += 0.02;
     }
 
     @Override
