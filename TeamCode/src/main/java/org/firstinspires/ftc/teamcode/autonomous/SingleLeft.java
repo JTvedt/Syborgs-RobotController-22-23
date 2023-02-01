@@ -15,11 +15,11 @@ public class SingleLeft extends LinearOpMode {
 
     @Override
     public void runOpMode() {
+        Sybot.setImplementation(Sybot.CvImplementation.EASYOPENCV);
         robot = new Sybot(this, Sybot.OpModeType.AUTONOMOUS, Sybot.StartSide.LEFT);
         robot.mirrorStrafe = true;
 
         robot.setClaw(true);
-        sleep(400);
         int parkZone = robot.retrieveZone();
 
         // Autonomous processes go here

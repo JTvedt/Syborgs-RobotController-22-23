@@ -15,15 +15,11 @@ public class SingleRight extends LinearOpMode {
 
     @Override
     public void runOpMode() {
+        Sybot.setImplementation(Sybot.CvImplementation.EASYOPENCV);
         robot = new Sybot(this, Sybot.OpModeType.AUTONOMOUS, Sybot.StartSide.RIGHT);
 
         robot.setClaw(true);
-        sleep(400);
         int parkZone = robot.retrieveZone();
-        telemetry.addData("Parking in", parkZone);
-        telemetry.update();
-        sleep(600);
-        robot.camera.stopStreaming();
 
         // Autonomous processes go here
         robot.setSlides(-4130);
