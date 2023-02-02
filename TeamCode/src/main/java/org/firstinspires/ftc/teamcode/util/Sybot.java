@@ -187,7 +187,7 @@ public class Sybot {
             case EASYOPENCV:
                 if (side == StartSide.LEFT) eocvPipeline = new EasyOpenCvPipeline(0, 0, 1, 1);
                 else if (side == StartSide.RIGHT) eocvPipeline = new EasyOpenCvPipeline(0, 0, 1, 1);
-                else eocvPipeline = new EasyOpenCvPipeline(0, 0, 1, 1);
+                else eocvPipeline = new EasyOpenCvPipeline(0.3, 0.02, 0.49, 0.18);
 
                 openCamera(eocvPipeline);
                 break;

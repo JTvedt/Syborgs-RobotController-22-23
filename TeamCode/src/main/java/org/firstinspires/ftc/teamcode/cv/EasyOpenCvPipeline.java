@@ -55,7 +55,7 @@ public class EasyOpenCvPipeline extends OpenCvPipeline {
         else if(max == meanG) parkingZone = 2;
         else parkingZone = 3;
 
-        colorOutput = String.format(Locale.getDefault(), "R%.2f, G%.2f B%.2f", meanR, meanG, meanB);
+        colorOutput = String.format(Locale.getDefault(), "R %.2f G %.2f B %.2f", meanR, meanG, meanB);
 
         Imgproc.cvtColor(submat, output, Imgproc.COLOR_BGR2RGBA);
         return output;
