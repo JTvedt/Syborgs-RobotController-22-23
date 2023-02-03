@@ -22,6 +22,7 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvPipeline;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 /**
  * Class containing methods for everything on the robot
@@ -185,8 +186,8 @@ public class Sybot {
     public void initializeCv(StartSide side) {
         switch (cvImplementation) {
             case EASYOPENCV:
-                if (side == StartSide.LEFT) eocvPipeline = new EasyOpenCvPipeline(0, 0, 1, 1);
-                else if (side == StartSide.RIGHT) eocvPipeline = new EasyOpenCvPipeline(0, 0, 1, 1);
+                if (side == StartSide.LEFT) eocvPipeline = new EasyOpenCvPipeline(0.29, 0.11, 0.45, 0.27);
+                else if (side == StartSide.RIGHT) eocvPipeline = new EasyOpenCvPipeline(0.29, 0.11, 0.45, 0.27);
                 else eocvPipeline = new EasyOpenCvPipeline(0.3, 0.02, 0.49, 0.18);
 
                 openCamera(eocvPipeline);
@@ -258,7 +259,9 @@ public class Sybot {
             switch (cvImplementation) {
                 case EASYOPENCV:
                     parkZone = eocvPipeline.getZone();
+                    telemetry.addData("Seen", new String[]{"Red ", "Green ", "Blue "}[parkZone] + parkZone);
                     telemetry.addData("Color data", eocvPipeline.getColor());
+                    telemetry.update();
                     break;
                 case APRIL_TAGS:
                     parkZone = getAprilTagsZone();
