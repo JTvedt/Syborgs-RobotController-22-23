@@ -6,7 +6,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-//import com.qualcomm.robotcore.hardware.DcMotor$RunMode;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -22,13 +21,11 @@ public class BackupTeleOp extends LinearOpMode {
     private DcMotor frontLeft;
     private DcMotor backRight;
     private DcMotor backLeft;
-    private DcMotor leftArm;
     private DcMotor rightArm;
-
+    private DcMotor leftArm;
     private Servo leftClaw;
     private Servo rightClaw;
 
-    double cntPower;
     double current = 0;
 
 
@@ -46,17 +43,15 @@ public class BackupTeleOp extends LinearOpMode {
         backLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         frontRight.setDirection(DcMotor.Direction.REVERSE);
+      
         backRight.setDirection(DcMotor.Direction.REVERSE);
 
-        leftArm  = hardwareMap.get(DcMotor.class, "LS");
-        rightArm = hardwareMap.get(DcMotor.class, "RS");
+        leftArm  = hardwareMap.get(DcMotor.class, "SL");
+        rightArm = hardwareMap.get(DcMotor.class, "SR");
 
         leftArm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightArm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightArm.setDirection(DcMotor.Direction.REVERSE);
-
-        leftClaw = hardwareMap.get(Servo.class, "LC");
-        rightClaw = hardwareMap.get(Servo.class, "RC");
 
         waitForStart();
 
@@ -77,7 +72,7 @@ public class BackupTeleOp extends LinearOpMode {
             leftArm.setPower(up);
             rightArm.setPower(up);
 
-            
+
             if (gamepad2.a) {
                 leftClaw.setPosition(1.0);
                 rightClaw.setPosition(0.0);
@@ -87,17 +82,17 @@ public class BackupTeleOp extends LinearOpMode {
                 rightClaw.setPosition(0.3);
             }
 
-            
+
             telemetry.update();
         }
     }
 
-    
 
-    
+
+
     public void rotate(double power, int degrees)
     {
-        
+
 
         double leftPower, rightPower;
 
@@ -127,8 +122,8 @@ public class BackupTeleOp extends LinearOpMode {
 
         sleep(100);
 
-        
+
     }
 
-    
+
 }

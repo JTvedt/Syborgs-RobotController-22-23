@@ -20,6 +20,7 @@ public class ParkOnlyAuton extends LinearOpMode{
         robot.setDriveUnit(DistanceUnit.TILES);
         robot.retrieveZone();
 
+        robot.drive(1);
         sleep(400);
         if(robot.parkZone == 1){
             robot.strafe(-1);

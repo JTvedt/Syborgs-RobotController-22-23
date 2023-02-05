@@ -205,8 +205,6 @@ public class Sybot {
 
                 openCamera(aprilTagsPipeline);
                 telemetry.setMsTransmissionInterval(50);
-
-                parent.waitForStart();
         }
     }
 

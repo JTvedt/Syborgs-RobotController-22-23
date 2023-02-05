@@ -96,7 +96,7 @@ public class JeffreyTeleOp extends LinearOpMode {
         if (gamepad2.dpad_down && !dPad2) robot.dropSlides();
         if (gamepad2.dpad_left && !lPad2) robot.lockSlides();
 
-        // Manual slide fine tuning
+        // Manual slide fine tuni      ng
         if (gamepad2.right_stick_y != 0) robot.manualSlides = true;
         if (robot.manualSlides) robot.moveSlides(gamepad2.right_stick_y * 0.5);
         if (gamepad2.left_bumper) robot.resetSlides();
