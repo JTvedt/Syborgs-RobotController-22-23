@@ -269,7 +269,9 @@ public class Sybot {
 
         telemetry.addData("Sleeve visible", parkZone);
     }
-
+    /**
+     * Returns AprilTags value, not the parking zone
+     */
     public int getAprilTagsZone() {
         ArrayList<AprilTagDetection> currentDetections = aprilTagsPipeline.getLatestDetections();
         boolean tagFound = false;
@@ -298,17 +300,18 @@ public class Sybot {
 
         telemetry.update();
         rest(20);
-
-        switch (tagOfInterest.id) {
-            case LEFT_TAG:
-                return 1;
-            case MIDDLE_TAG:
-                return 2;
-            case RIGHT_TAG:
-                return 3;
-            default:
-                return -1;
-        }
+        return tagOfInterest.id;
+        //Fixed April tags implementation
+//        switch (tagOfInterest.id) {
+//            case LEFT_TAG:
+//                return 1;
+//            case MIDDLE_TAG:
+//                return 2;
+//            case RIGHT_TAG:
+//                return 3;
+//            default:
+//                return -1;
+//        }
     }
     public int retrieveZone() {
         telemetry.addData("CV Implementation", cvImplementation);
