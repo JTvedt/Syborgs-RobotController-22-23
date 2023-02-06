@@ -12,7 +12,8 @@ public class DoubleLeft extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        robot = new Sybot(this, Sybot.OpModeType.AUTONOMOUS);
+        Sybot.setImplementation(Sybot.CvImplementation.APRIL_TAGS);
+        robot = new Sybot(this, Sybot.OpModeType.AUTONOMOUS, Sybot.StartSide.LEFT);
 
         // Initial Setup
         robot.setClaw(true);

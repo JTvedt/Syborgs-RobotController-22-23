@@ -12,7 +12,7 @@ public class DoubleRight extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        Sybot.setImplementation(Sybot.CvImplementation.EASYOPENCV);
+        Sybot.setImplementation(Sybot.CvImplementation.APRIL_TAGS);
         robot = new Sybot(this, Sybot.OpModeType.AUTONOMOUS, Sybot.StartSide.RIGHT);
 
         // Initial Setup
