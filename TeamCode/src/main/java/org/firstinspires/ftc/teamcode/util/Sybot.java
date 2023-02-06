@@ -78,7 +78,7 @@ public class Sybot {
     public int counter;
     public int parkZone = -1;
 
-    public static CvImplementation cvImplementation = CvImplementation.EASYOPENCV;
+    public static CvImplementation cvImplementation = CvImplementation.APRIL_TAGS;
     public OpenCvCamera camera;
 
     public EasyOpenCvPipeline eocvPipeline;
@@ -89,7 +89,7 @@ public class Sybot {
     static final int MIDDLE_TAG = 10;
     static final int RIGHT_TAG = 11;
 
-    AprilTagDetection tagOfInterest = null;
+    AprilTagDetection tagOfInterest;
 
     //Used in telemetry debugging
     static final double FEET_PER_METER = 3.28084;
