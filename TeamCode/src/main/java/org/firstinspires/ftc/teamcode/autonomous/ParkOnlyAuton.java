@@ -18,15 +18,15 @@ public class ParkOnlyAuton extends LinearOpMode{
         Sybot.setImplementation(Sybot.CvImplementation.APRIL_TAGS);
         robot = new Sybot(this, Sybot.OpModeType.AUTONOMOUS);
         robot.setDriveUnit(DistanceUnit.TILES);
-        robot.retrieveZone();
+        robot.retrieveZone(); //gets AprilTags value
 
         robot.drive(1);
         sleep(400);
-        if(robot.parkZone == 1){
+        if(robot.parkZone == 9){
             robot.strafe(-1);
             telemetry.addData("PARKING IN","LEFT");
             telemetry.update();
-        }else if(robot.parkZone == 3){
+        }else if(robot.parkZone == 11){
             robot.strafe(1);
             telemetry.addData("PARKING IN","RIGHT");
             telemetry.update();
