@@ -128,7 +128,7 @@ public class JeffreyTeleOp extends LinearOpMode {
         telemetry.addData("Debug double", robot.debugDouble);
         telemetry.addData("Counter", robot.counter);
 
-        // telemetry.addData("Claw state", robot.pinch ? "closed" : "open");
+        telemetry.addData("Claw state", robot.pinch ? "closed" : "open");
 
         telemetry.update();
     }
