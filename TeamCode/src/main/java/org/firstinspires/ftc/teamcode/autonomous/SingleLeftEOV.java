@@ -6,22 +6,24 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.util.Sybot;
 
 /**
- * Places one cone on the high junction and parks. Starting position on the right side
+ * Places one cone on the high junction and parks. Starting position on the left side
  * @author Jeffrey Tvedt
  */
-@Autonomous(name="1C Right Autonomous")
-public class SingleRight extends LinearOpMode {
+@Autonomous(name="1C Left Autonomous EOV")
+public class SingleLeftEOV extends LinearOpMode {
     public Sybot robot;
 
     @Override
     public void runOpMode() {
         Sybot.setImplementation(Sybot.CvImplementation.EASYOPENCV);
-        robot = new Sybot(this, Sybot.OpModeType.AUTONOMOUS, Sybot.StartSide.RIGHT);
+        robot = new Sybot(this, Sybot.OpModeType.AUTONOMOUS, Sybot.StartSide.LEFT);
+        robot.mirrorStrafe = true;
 
         robot.setClaw(true);
         int parkZone = robot.retrieveZone();
 
         // Autonomous processes go here
+        // Everything in this section is mirrored
         robot.setSlides(-4130);
         robot.drive(56);
         robot.strafe(-12);
