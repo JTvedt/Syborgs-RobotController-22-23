@@ -62,7 +62,7 @@ public class BackupTeleOp extends LinearOpMode {
             double spin = gamepad1.right_stick_x * 0.4;
             //slides controls
             double reach = gamepad2.right_stick_y * 0.6;
-            reach *= (reach > 0 ? 0.9 : 1 ) * (reach < 0 ? 0.5 : 1);
+            reach *= (reach > 0 ? 0.9 : 1 ) * (reach < 0 ? 0.9 : 1);
 
             //giving power to the motors
             frontLeft.setPower(drive + strafe - spin );
