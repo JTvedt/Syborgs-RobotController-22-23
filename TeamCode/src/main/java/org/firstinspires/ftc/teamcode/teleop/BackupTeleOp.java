@@ -70,7 +70,7 @@ public class BackupTeleOp extends LinearOpMode {
             backLeft.setPower(drive - strafe - spin );
             backRight.setPower(drive + strafe + spin );
             leftSlide.setPower(reach);
-            leftSlide.setPower(reach);
+            rightSlide.setPower(reach);
 
             //claw controls
             if (gamepad2.a) {
