@@ -7,7 +7,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
-@Disabled
 @TeleOp(name="Backup TeleOp")
 public class BackupTeleOp extends LinearOpMode {
 
@@ -47,7 +46,7 @@ public class BackupTeleOp extends LinearOpMode {
 
         leftSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        //rightSlide.setDirection(DcMotor.Direction.REVERSE); //(what does this do?)
+        rightSlide.setDirection(DcMotor.Direction.REVERSE);
 
         //claws mapping
         leftClaw = hardwareMap.get(Servo.class, "LC");
