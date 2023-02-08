@@ -34,7 +34,7 @@ public class BackupTeleOp extends LinearOpMode {
         backLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         frontRight.setDirection(DcMotor.Direction.REVERSE);
-      
+
         backRight.setDirection(DcMotor.Direction.REVERSE);
 
         //slides mapping
@@ -122,6 +122,3 @@ public class BackupTeleOp extends LinearOpMode {
 
 
     }
-
-
-}
