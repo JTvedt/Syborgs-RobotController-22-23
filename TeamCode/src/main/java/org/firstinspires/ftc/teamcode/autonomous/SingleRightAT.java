@@ -40,10 +40,10 @@ public class SingleRightAT extends LinearOpMode {
         sleep(800);
     }
 
-    // 0 for red, 1 for green, 2 for blue
+    // 1 for tag 9, 2 for tag 10, 3 for tag 11
     public void park(int parkingSpot) {
         robot.mirrorStrafe = false;
-        if (parkingSpot == 0) robot.strafe(-26);
-        else if (parkingSpot == 2) robot.strafe(26);
+        if (parkingSpot == 1) robot.strafe(-26);
+        else if (parkingSpot == 3) robot.strafe(26);
     }
 }
