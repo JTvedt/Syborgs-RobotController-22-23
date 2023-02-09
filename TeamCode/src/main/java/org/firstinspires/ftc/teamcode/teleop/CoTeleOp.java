@@ -71,13 +71,13 @@ public class CoTeleOp extends LinearOpMode implements Structured {
 
         if (robot.manualSlides)
             robot.moveSlides(0);
-        if (gamepad1.left_trigger > .5)
+        if (gamepad2.left_trigger > .5)
             robot.moveSlides(1);
-        if (gamepad1.right_trigger > .5)
+        if (gamepad2.right_trigger > .5)
             robot.moveSlides(.5);
-        if (gamepad1.left_bumper)
+        if (gamepad2.left_bumper)
             robot.moveSlides(-1);
-        if (gamepad1.right_bumper)
+        if (gamepad2.right_bumper)
             robot.moveSlides(-.5);
     }
 

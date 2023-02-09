@@ -46,6 +46,7 @@ public class Sybot {
     public static final int TICK_THRESHOLD = 300;
     public static final int SLIDE_THRESHOLD = -1120;
     public static final int SLIDE_HIGH_TICKS = -4300;
+    public static double OPEN_CLAW = 0.0;
     public static double CLOSE_CLAW = 0.3;
 
     public LinearOpMode parent;
@@ -305,6 +306,7 @@ public class Sybot {
         }
         return tagOfInterest.id;
     }
+
     public int retrieveZone() {
         telemetry.addData("CV Implementation", cvImplementation);
         telemetry.addData("Parking in", parkZone);
@@ -887,7 +889,7 @@ public class Sybot {
      * @param state new state of claw to be in, true for closed, false for open
      */
     public void setClaw(boolean state) {
-        setClaw(state ? CLOSE_CLAW : 0);
+        setClaw(state ? CLOSE_CLAW : OPEN_CLAW);
     }
 
     /**
