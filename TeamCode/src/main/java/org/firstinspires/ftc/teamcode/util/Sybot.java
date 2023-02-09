@@ -300,18 +300,10 @@ public class Sybot {
 
         telemetry.update();
         rest(20);
-        if(tagOfInterest.id == LEFT_TAG){
-            return 1;
-        }
-        else if(tagOfInterest.id == MIDDLE_TAG){
-            return 2;
-        }
-        else if(tagOfInterest.id == RIGHT_TAG){
-            return 3;
-        }
-        else{
+        if(tagOfInterest == null){
             return -1;
         }
+        return tagOfInterest.id;
     }
     public int retrieveZone() {
         telemetry.addData("CV Implementation", cvImplementation);
