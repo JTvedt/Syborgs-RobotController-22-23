@@ -52,6 +52,9 @@ public class BackupTeleOp extends LinearOpMode {
         leftClaw = hardwareMap.get(Servo.class, "LC");
         rightClaw = hardwareMap.get(Servo.class, "RC");
 
+        //slide speed (default: 0.9)
+        public int slideSpeed = 0.9;
+        
         waitForStart();
 
         while(opModeIsActive())
@@ -62,7 +65,7 @@ public class BackupTeleOp extends LinearOpMode {
             double spin = gamepad1.right_stick_x * 0.4;
             //slides controls
             double reach = gamepad2.right_stick_y * 0.6;
-            reach *= (reach > 0 ? 0.9 : 1 ) * (reach < 0 ? 0.9 : 1);
+            reach *= (reach > 0 ? slideSpeed : 1 ) * (reach < 0 ? slideSpeed : 1);
 
             //giving power to the motors
             frontLeft.setPower(drive + strafe - spin );
