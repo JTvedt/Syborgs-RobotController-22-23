@@ -54,7 +54,7 @@ public class JeffreyTeleOp extends LinearOpMode {
     // Standard loop that involves two players
     public void standardLoop() {
         // P1 Stick Input
-        double drive = -gamepad1.left_stick_y;
+        double drive = -gamepad1.left_stick_y * 0.8;
         double strafe = gamepad1.left_stick_x;
         double turn = gamepad1.right_stick_x * 0.75;
 
