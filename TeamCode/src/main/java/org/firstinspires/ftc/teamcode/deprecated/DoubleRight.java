@@ -1,19 +1,21 @@
-package org.firstinspires.ftc.teamcode.autonomous;
+package org.firstinspires.ftc.teamcode.deprecated;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.util.Sybot;
 import org.firstinspires.ftc.teamcode.cv.EasyOpenCvPipeline;
-
-@Autonomous(name="2C Left Autonomous")
-public class DoubleLeft extends LinearOpMode {
+@Disabled
+@Deprecated
+@Autonomous(name="2C Right Autonomous")
+public class DoubleRight extends LinearOpMode {
     Sybot robot;
 
     @Override
     public void runOpMode() {
         Sybot.setImplementation(Sybot.CvImplementation.APRIL_TAGS);
-        robot = new Sybot(this, Sybot.OpModeType.AUTONOMOUS, Sybot.StartSide.LEFT);
+        robot = new Sybot(this, Sybot.OpModeType.AUTONOMOUS, Sybot.StartSide.RIGHT);
 
         // Initial Setup
         robot.setClaw(true);
@@ -23,28 +25,27 @@ public class DoubleLeft extends LinearOpMode {
         // Position for cone 1
         robot.setSlides(Sybot.SLIDE_HIGH_TICKS);
         robot.drive(54);
-        robot.spin(-45);
+        robot.spin(45);
         robot.waitForSlides();
         placeCone();
 
-        // Position for cone 2
+        // Move to park
         robot.spin(135);
-        robot.setSlides(-730);
-        robot.strafe(-28);
-        takeCone();
+        robot.drive(-24);
+        park();
 
-        robot.dropSlides();
         robot.waitForSlides();
-        sleep(10000);
+        sleep(4000);
+        robot.stop();
     }
 
     public void placeCone() {
-        robot.cartesianMove(8, 8);      // Move to junction
+        robot.cartesianMove(-8, 8);      // Move to junction
         robot.setSlides(-4000);         // Lower slides slightly
         sleep(600);
         robot.toggleClaw();             // Open claw to drop cone
         robot.setSlides(Sybot.SLIDE_HIGH_TICKS); // Raise slides back up
-        robot.cartesianMove(-8, -8);    // Move away from junction
+        robot.cartesianMove(8, -8);    // Move away from junction
         robot.dropSlides();             // Drop slides
     }
 
