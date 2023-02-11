@@ -78,8 +78,8 @@ public class ConeCycleOp extends LinearOpMode implements Structured {
     public void clawSubsystem() {
         if (controller.press("A"))
             robot.toggleClaw();
-        if (controller.press("B"))
-            robot.pinchSlide();
+//        if (controller.press("B"))
+            //robot.pinchSlide();
     }
 
     @Override
