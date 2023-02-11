@@ -47,7 +47,7 @@ public class Sybot {
     public static final int SLIDE_THRESHOLD = -1120;
     public static final int SLIDE_HIGH_TICKS = -4300;
     public static double OPEN_CLAW = 0.0;
-    public static double CLOSE_CLAW = 0.3;
+    public static double CLOSE_CLAW = 0.4;
 
     public LinearOpMode parent;
     public HardwareMap hardwareMap;
