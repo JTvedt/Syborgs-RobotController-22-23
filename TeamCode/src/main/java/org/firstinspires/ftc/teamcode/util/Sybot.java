@@ -45,7 +45,7 @@ public class Sybot {
     public static final int WAIT_TIME = 400;
     public static final int TICK_THRESHOLD = 300;
     public static final int SLIDE_THRESHOLD = -1120;
-    public static final int SLIDE_HIGH_TICKS = -4300;
+    public static final int SLIDE_HIGH_TICKS = -4340;
     public static double OPEN_CLAW = 0.0;
     public static double CLOSE_CLAW = 0.4;
 
