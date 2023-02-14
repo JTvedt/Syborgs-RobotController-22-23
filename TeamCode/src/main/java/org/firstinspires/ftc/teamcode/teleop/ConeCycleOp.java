@@ -33,8 +33,8 @@ public class ConeCycleOp extends LinearOpMode implements Structured {
 
     @Override
     public void driveTrain() {
-        double drive = -gamepad1.left_stick_y;
-        double strafe = gamepad1.left_stick_x;
+        double drive = -gamepad1.left_stick_y * 0.8;
+        double strafe = gamepad1.left_stick_x * 0.8;
         double turn = gamepad1.right_stick_x * 0.75;
 
         double stickAngle = Math.atan2(drive, strafe);
