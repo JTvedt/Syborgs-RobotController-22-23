@@ -24,9 +24,9 @@ public class SingleRightAT extends LinearOpMode {
         // Autonomous processes go here
         robot.setSlides(-4130);
         robot.drive(56);
-        robot.strafe(-14);
+        robot.strafe(-12);
         robot.waitForSlides();
-        robot.drive(3);
+        //robot.drive(2);
         robot.setSlides(0);
         robot.rest();
         robot.toggleClaw();

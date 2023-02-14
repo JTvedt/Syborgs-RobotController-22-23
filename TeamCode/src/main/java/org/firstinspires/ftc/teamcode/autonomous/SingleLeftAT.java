@@ -26,7 +26,7 @@ public class SingleLeftAT extends LinearOpMode {
         // Everything in this section is mirrored
         robot.setSlides(-4130);
         robot.drive(56);
-        robot.strafe(-12);
+        robot.strafe(-13);
         robot.waitForSlides();
         robot.drive(3);
         robot.setSlides(0);
