@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.deprecated;
+package org.firstinspires.ftc.teamcode.autonomous;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
@@ -11,8 +11,7 @@ import org.firstinspires.ftc.teamcode.util.Sybot;
  * In case slides aren't working this is a parking only auton using april tags
  * @author Tyler Philip & Alex Malladi & Jeffrey Tvedt
  */
-@Deprecated
-@Disabled
+
 @Autonomous(name="2C Left Autonomous AT bruh")
 public class DoubleLeftAT extends LinearOpMode {
     public Sybot robot;
