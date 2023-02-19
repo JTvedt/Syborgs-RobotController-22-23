@@ -28,20 +28,18 @@ public class DoubleLeftAT extends LinearOpMode {
         // Autonomous processes go here
         // Everything in this section is mirrored
         robot.setSlides(-4310); //drop slides
-        robot.drive(38); //forward to drop off cone
-        robot.drive(-7);//back to tile
-        robot.strafe(-17);//strafe right
+        robot.drive(40); //forward to drop off cone
+        robot.drive(-9);//back to tile
+        robot.strafe(-18);//strafe right
         robot.drive(2);
-        robot.strafe(-21);
-        robot.drive(4);//forward slightly
-        robot.setSlides(0); //Bring slides down
+        robot.strafe(-20);
+        robot.drive(3);//forward slightly
+        robot.setSlides(0);
         robot.setClaw(false);
         robot.waitForSlides();
-        //End of one cone
-
         robot.drive(-3);
-        robot.strafe(14);
-        robot.drive(21);//With spin drive drive replaces strafe due to IMU influence
+        robot.strafe(15);
+        robot.drive(22);//With spin drive drive replaces strafe due to IMU influence
         robot.spin(90);
         robot.strafe(-56);
 //        robot.drive(-34);
