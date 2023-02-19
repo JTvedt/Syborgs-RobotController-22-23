@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.deprecated;
+package org.firstinspires.ftc.teamcode.autonomous;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
@@ -33,15 +33,15 @@ public class DoubleLeftAT extends LinearOpMode {
         robot.strafe(-18);//strafe right
         robot.drive(2);
         robot.strafe(-20);
-        robot.drive(3);//forward slightly
+        robot.drive(5);//forward slightly
         robot.setSlides(0);
         robot.setClaw(false);
         robot.waitForSlides();
-        robot.drive(-3);
-        robot.strafe(15);
-        robot.drive(22);//With spin drive drive replaces strafe due to IMU influence
-        robot.spin(90);
-        robot.strafe(-56);
+//        robot.drive(-3);
+//        robot.strafe(15);
+//        robot.drive(22);//With spin drive drive replaces strafe due to IMU influence
+//        robot.spin(90);
+//        robot.strafe(-56);
 //        robot.drive(-34);
 //        robot.strafe(15);
 //        robot.setSlides(-4500);
