@@ -13,7 +13,7 @@ import org.firstinspires.ftc.teamcode.util.Sybot;
  */
 @Deprecated
 @Disabled
-@Autonomous(name="2C Left Autonomous AT bruh")
+@Autonomous(name="2C Left Autonomous AT")
 public class DoubleLeftAT extends LinearOpMode {
     public Sybot robot;
 
