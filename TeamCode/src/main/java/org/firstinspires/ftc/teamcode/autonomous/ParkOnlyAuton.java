@@ -10,7 +10,7 @@ import org.firstinspires.ftc.teamcode.util.Sybot;
  * In case slides aren't working this is a parking only auton using april tags
  * @author Tyler Philip & Jeffrey Tvedt
  */
-@Autonomous(name="Park Only Auton")
+@Autonomous(name="Park Only Autonomous")
 public class ParkOnlyAuton extends LinearOpMode{
     public Sybot robot;
     @Override

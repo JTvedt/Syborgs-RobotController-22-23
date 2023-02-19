@@ -34,7 +34,7 @@ public class DoubleLeftAT extends LinearOpMode {
         robot.strafe(-18);//strafe right
         robot.drive(2);
         robot.strafe(-20);
-        robot.drive(3);//forward slightly11vvv 
+        robot.drive(3);//forward slightly
         robot.setSlides(0);
         robot.setClaw(false);
         robot.waitForSlides();
