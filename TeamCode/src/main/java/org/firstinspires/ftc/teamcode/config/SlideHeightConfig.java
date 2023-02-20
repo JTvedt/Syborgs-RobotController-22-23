@@ -34,8 +34,8 @@ public class SlideHeightConfig extends LinearOpMode {
             robot.setSlides(bottom);
             current = bottom;
         }
-        if(gamepad1.dpad_up){robot.setSlides(current += 50);}
-        if(gamepad1.dpad_down){robot.setSlides(current -= 50);}
+        if(gamepad1.dpad_up){robot.setSlides(current -= 50);}
+        if(gamepad1.dpad_down){robot.setSlides(current += 50);}
 
         telemetry.addData("Encoder Value",current);
         telemetry.update();
