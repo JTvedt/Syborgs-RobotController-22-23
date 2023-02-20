@@ -12,7 +12,7 @@ import org.firstinspires.ftc.teamcode.util.Sybot;
  * @author Tyler Philip & Alex Malladi & Jeffrey Tvedt
  */
 
-@Autonomous(name="2C Left Autonomous AT bruh")
+@Autonomous(name="2C Left Autonomous AT ")
 public class DoubleLeftAT extends LinearOpMode {
     public Sybot robot;
 
@@ -21,7 +21,6 @@ public class DoubleLeftAT extends LinearOpMode {
         Sybot.setImplementation(Sybot.CvImplementation.APRIL_TAGS);
         robot = new Sybot(this, Sybot.OpModeType.AUTONOMOUS, Sybot.StartSide.LEFT);
         robot.mirrorStrafe = true;
-
         robot.setClaw(true);
         int parkZone = robot.retrieveZone();
 
@@ -32,20 +31,19 @@ public class DoubleLeftAT extends LinearOpMode {
         robot.drive(-9);//back to tile
         robot.strafe(-18);//strafe right
         robot.drive(2);
-        robot.strafe(-20);
+        robot.strafe(-18);
         robot.drive(3);//forward slightly
         robot.setSlides(0);
         robot.setClaw(false);
         robot.waitForSlides();
         robot.drive(-3);
         robot.strafe(15);
-        robot.drive(22);//With spin drive drive replaces strafe due to IMU influence
+        robot.drive(24);//With spin drive drive replaces strafe due to IMU influence
         robot.spin(90);
-        robot.strafe(-56);
-//        robot.drive(-34);
-//        robot.strafe(15);
-//        robot.setSlides(-4500);
-//        robot.setClaw(false);
+        robot.drive(-2);
+        robot.strafe(-50);
+        robot.setSlides(-900); //Pickup Top Cone On Stack
+        robot.setClaw(true);
 
 
 

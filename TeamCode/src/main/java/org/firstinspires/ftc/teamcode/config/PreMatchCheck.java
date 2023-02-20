@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.util.Sybot;
 
-@Autonomous(name="Test Autonomous A", group="config")
+@Autonomous(name="Pre Match Check", group="config")
 public class PreMatchCheck extends LinearOpMode {
     public Sybot robot;
     @Override
