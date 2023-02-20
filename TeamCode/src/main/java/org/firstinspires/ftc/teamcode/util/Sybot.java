@@ -410,6 +410,9 @@ public class Sybot {
             telemetry.addData("FR Power:", frontRight.getPower());
             telemetry.addData("BL Power:", backLeft.getPower());
             telemetry.addData("BR Power:", backRight.getPower());
+
+            telemetry.addData("Angle",getAngle());
+
             telemetry.update();
         }
 
