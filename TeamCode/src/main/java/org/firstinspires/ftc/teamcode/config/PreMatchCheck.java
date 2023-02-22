@@ -15,6 +15,7 @@ public class PreMatchCheck extends LinearOpMode {
         int parkZone = robot.retrieveZone();
         robot.setClaw(true);
         robot.setSlides(Sybot.SLIDE_HIGH_TICKS);
+        robot.waitForSlides();
         robot.dropSlides();
     }
 }

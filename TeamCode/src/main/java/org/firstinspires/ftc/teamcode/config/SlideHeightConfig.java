@@ -12,8 +12,8 @@ import org.firstinspires.ftc.teamcode.util.Sybot;
 @TeleOp(name="Slides Height Config", group="config")
 public class SlideHeightConfig extends LinearOpMode {
     public Sybot robot;
-    int bottom = -4130;
-    int current;
+    int bottom = 0;
+    int current = bottom;
     public void runOpMode(){
         robot = new Sybot(this);
 

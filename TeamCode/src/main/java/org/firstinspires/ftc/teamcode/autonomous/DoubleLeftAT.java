@@ -16,34 +16,47 @@ import org.firstinspires.ftc.teamcode.util.Sybot;
 public class DoubleLeftAT extends LinearOpMode {
     public Sybot robot;
 
+
+
     @Override
     public void runOpMode() {
         Sybot.setImplementation(Sybot.CvImplementation.APRIL_TAGS);
         robot = new Sybot(this, Sybot.OpModeType.AUTONOMOUS, Sybot.StartSide.LEFT);
         robot.mirrorStrafe = true;
+        robot.setDriveType(Sybot.DriveType.POV);
+
         robot.setClaw(true);
         int parkZone = robot.retrieveZone();
 
         // Autonomous processes go here
         // Everything in this section is mirrored
-        robot.setSlides(-4310); //drop slides
-        robot.drive(40); //forward to drop off cone
-        robot.drive(-9);//back to tile
+        robot.setSlides(-4310); //Bring up slides
+        robot.drive(37); //forward to drop off cone
+        robot.drive(-7);//back to tile
         robot.strafe(-18);//strafe right
-        robot.drive(2);
-        robot.strafe(-18);
-        robot.drive(3);//forward slightly
-        robot.setSlides(0);
-        robot.setClaw(false);
-        robot.waitForSlides();
-        robot.drive(-3);
-        robot.strafe(15);
+        robot.drive(2); //Adjust forward
+        robot.strafe(-20); //Strafe towards junction
+        robot.drive(3);//forward slightly to junction
+        robot.setSlides(0); //Bring slides down
+        robot.setClaw(false); // Open claw
+        robot.waitForSlides(); // Waits for slides to finish
+        robot.drive(-3); //backup slightly
+        robot.strafe(15); //Strafe left
         robot.drive(24);//With spin drive drive replaces strafe due to IMU influence
-        robot.spin(90);
-        robot.drive(-2);
-        robot.strafe(-50);
-        robot.setSlides(-900); //Pickup Top Cone On Stack
+        robot.spin(90); //Spin towards cones
+        robot.setDriveType(Sybot.DriveType.DIRECTIONAL); //Inverts values and resets IMU
+        robot.strafe(-1.8); //Strafe left
+        robot.drive(52); // Drive up to cones
+        sleep(300);
+        robot.setSlides(-1000); //Pickup Top Cone On Stack
+        robot.waitForSlides();
         robot.setClaw(true);
+        robot.setDriveType(Sybot.DriveType.POV);
+        robot.setSlides(-1500);
+        robot.waitForSlides();
+        robot.setSlides(-4310);
+        robot.strafe(50);
+//        robot.strafe(-20);
 
 
 

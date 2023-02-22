@@ -92,6 +92,10 @@ public class ConeCycleOp extends LinearOpMode implements Structured {
         telemetry.addData("Smooth Angle", robot.smoothAngle());
         telemetry.addData("Angle Diff", robot.getAngleDifference(Angle.round(robot.getAngle())));
         telemetry.addData("Rounded Angle", Angle.round(robot.getAngle()));
+
+        telemetry.addData("Stick", gamepad1.left_stick_y);
+
+
         telemetry.update();
     }
 }
