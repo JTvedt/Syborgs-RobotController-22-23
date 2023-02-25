@@ -6,7 +6,7 @@ public class Angle {
         RADIANS
     }
 
-    public static double radians(double degrees) {
+    public static double toRadians(double degrees) {
         return degrees * Math.PI/180;
     }
 

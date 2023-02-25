@@ -22,7 +22,6 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvPipeline;
 
 import java.util.ArrayList;
-import java.util.Locale;
 
 /**
  * Class containing methods for everything on the robot
@@ -47,7 +46,7 @@ public class Sybot {
     public static final int SLIDE_THRESHOLD = -1120;
     public static final int SLIDE_HIGH_TICKS = -4340;
     public static double OPEN_CLAW = 0.0;
-    public static double CLOSE_CLAW = 0.4;
+    public static double CLOSE_CLAW = 0.3;
 
     public LinearOpMode parent;
     public HardwareMap hardwareMap;
@@ -381,7 +380,7 @@ public class Sybot {
      * @param direction Direction of movement, in degrees, 0 degrees to go right
      */
     public void polarMove(double distance, double direction) {
-        double radianDirection = Angle.radians(direction) - (driveType == DriveType.POV ? getAngle() : 0);
+        double radianDirection = Angle.toRadians(direction) - (driveType == DriveType.POV ? getAngle() : 0);
         double horizontal = Math.cos(radianDirection) * (mirrorStrafe ? -1 : 1);
         double vertical = Math.sin(radianDirection) * 0.87;
         int tickCount = toTicks(distance);
@@ -400,34 +399,18 @@ public class Sybot {
             int diff = getMeanDifference();
             if (diff > TICK_THRESHOLD) setDrivePower(BASE_POWER);
             else setDrivePower(BASE_POWER - (1 - (double)diff/TICK_THRESHOLD) * 0.25);
-
-            telemetry.addData("FL Difference:", frontLeft.getTargetPosition() - frontLeft.getCurrentPosition());
-            telemetry.addData("FR Difference:", frontRight.getTargetPosition() - frontRight.getCurrentPosition());
-            telemetry.addData("BL Difference:", backLeft.getTargetPosition() - backLeft.getCurrentPosition());
-            telemetry.addData("BR Difference:", backRight.getTargetPosition() - backRight.getCurrentPosition());
-
-            telemetry.addData("FL Power:", frontLeft.getPower());
-            telemetry.addData("FR Power:", frontRight.getPower());
-            telemetry.addData("BL Power:", backLeft.getPower());
-            telemetry.addData("BR Power:", backRight.getPower());
-
-            telemetry.addData("Angle",getAngle());
-
-
-
-            telemetry.update();
         }
 
         rest();
     }
+
 
     /**
      * Spins the robot either clockwise or counterclockwise
      * @param angle angle to turn in degrees, positive values turn counterclockwise and negative values turn clockwise
      */
     public void spin(double angle) {
-        double radianAngle = Angle.radians(angle);
-        int tickCount = (int)(radianAngle * 425);
+        int tickCount = (int)(Angle.toRadians(angle) * 425);
 
         setDriveMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
@@ -449,8 +432,8 @@ public class Sybot {
     // TODO finish this method
     // NOT TESTED DO NOT USE
     public void spinDrive(double distance, double direction, double angle) {
-        double radianDirection = Angle.radians(direction) - getAngle();
-        double radianAngle = Angle.radians(angle);
+        double radianDirection = Angle.toRadians(direction) - getAngle();
+        double radianAngle = Angle.toRadians(angle);
         double targetAngle = Angle.bound(getAngle() + radianAngle);
         double horizontal = Math.cos(radianDirection);
         double vertical = Math.sin(radianDirection) * 0.87;
@@ -478,13 +461,6 @@ public class Sybot {
 //            if (avgDisparity > 30) spin = baseSpin;
 //            else spin = 0;
             spin = 0;
-
-            telemetry.addData("FL Difference", frontLeft.getTargetPosition() - frontLeft.getCurrentPosition());
-            telemetry.addData("FR Difference", frontRight.getTargetPosition() - frontRight.getCurrentPosition());
-            telemetry.addData("BL Difference", backLeft.getTargetPosition() - backLeft.getCurrentPosition());
-            telemetry.addData("BR Difference", backRight.getTargetPosition() - backRight.getCurrentPosition());
-            telemetry.addData("Disparity", avgDisparity);
-            telemetry.update();
 
             // Update power to move in a straight line
             frontLeft.setPower((horizontal + vertical) * 0.65 - spin);
@@ -852,7 +828,7 @@ public class Sybot {
      */
     public void waitForSlides() {
         while (Math.abs(slidePosition() - slideTarget()) > 16) {
-            telemetry.addData("Slide Difference", Math.abs(slidePosition() - slideTarget()));
+//            telemetry.addData("Slide Difference", Math.abs(slidePosition() - slideTarget()));
         }
 
         rest();
