@@ -9,6 +9,7 @@ import org.firstinspires.ftc.teamcode.util.Sybot;
 /**
  *2 cone autonomous using cartesian movement
  * @author Jeffrey Tvedt & Alex Malladi & Tyler Philip
+ * COMMENTS that start with !!!! are important as they are values that sometimes change in the code based on preformance and small movement fails
  */
 @Autonomous(name="2 Cone Auton AT Turn")
 public class TwoLeftAT extends LinearOpMode{
@@ -23,8 +24,8 @@ public class TwoLeftAT extends LinearOpMode{
         robot.setSlides(Sybot.SLIDE_HIGH_TICKS);
 
         // Move to cone 1
-        robot.drive(53);
-        robot.spin(-33);
+        robot.drive(51);// !!!! value sometimes changes to 51 instead of 53
+        robot.spin(-26);
         robot.cartesianMove(8, 7.7);
         robot.waitForSlides();
         robot.setSlides(-4000);
@@ -33,33 +34,37 @@ public class TwoLeftAT extends LinearOpMode{
         sleep(300);
         robot.setSlides(Sybot.SLIDE_HIGH_TICKS);
 
-        // DO NOT TOUCH ANYTHING ABOVE THIS
-        // WE SPENT WAY TOO LONG ON IT AND DO NOT WANT TO FIX IT AGAIN
+
 
 
         // Exit and move to cone stack
         robot.cartesianMove(-7.8, -8.8);
         robot.setSlides(-1000);
         robot.waitForSlides();
-        robot.spin(115);
+        robot.spin(108);
+        robot.drive(2);// Commented out depending on if initial value is 53
+
         robot.strafe(-27);
 
         //Bring Slides down to cone stack
-        robot.setSlides(-900);
+        robot.setSlides(-850);
         robot.waitForSlides();
-        robot.strafe(-3.5);
+        robot.drive(2.5);
+        robot.strafe(-3); //!!!! Commented out occasionally
         robot.setClaw(true); //Crabs cone
         robot.drive(2);
         sleep(300);
         robot.setSlides(Sybot.SLIDE_HIGH_TICKS); //Brings cone up
+        // DO NOT TOUCH ANYTHING ABOVE THIS
+        // WE SPENT WAY TOO LONG ON IT AND DO NOT WANT TO FIX IT AGAIN
 
         //Moves back to high junc tion
-        robot.strafe(27);
-        robot.spin(-125);
-        robot.cartesianMove(8,8.5);
+        robot.strafe(25 );
+        robot.spin(-132);
+        robot.cartesianMove(8,8.8  );
 
         //Places cone on the junction
-        robot.setSlides(-4000);
+        robot.setSlides(-4130);
         sleep(600);
         robot.setClaw(false);
         sleep(300);
