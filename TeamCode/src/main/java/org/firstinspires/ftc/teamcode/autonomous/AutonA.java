@@ -19,5 +19,7 @@ public class AutonA extends LinearOpMode {
         sleep(400);
         robot.dropSlides();
         robot.waitForSlides();
+
+        robot.setSlides(-4000);
     }
 }

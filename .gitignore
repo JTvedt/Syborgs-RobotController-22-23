@@ -89,3 +89,7 @@ lint/generated/
 lint/outputs/
 lint/tmp/
 # lint/reports/
+
+# Subsystem stuff (added by Jeffrey)
+/TeamCode/src/main/java/org/firstinspires/ftc/teamcode/util/hardware/
+/TeamCode/src/main/java/org/firstinspires/ftc/teamcode/util/subsystems/

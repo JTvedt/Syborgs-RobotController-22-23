@@ -96,7 +96,7 @@ public class JeffreyTeleOp extends LinearOpMode {
         if (gamepad2.dpad_down && !dPad2) robot.dropSlides();
         if (gamepad2.dpad_left && !lPad2) robot.lockSlides();
 
-        // Manual slide fine tuni      ng
+        // Manual slide fine tuning
         if (gamepad2.right_stick_y != 0) robot.manualSlides = true;
         if (robot.manualSlides) robot.moveSlides(gamepad2.right_stick_y * 0.5);
         if (gamepad2.left_bumper) robot.resetSlides();
@@ -121,12 +121,6 @@ public class JeffreyTeleOp extends LinearOpMode {
 
         telemetry.addData("Slide target", robot.slideTarget());
         telemetry.addData("Slide position", robot.slidePosition());
-        telemetry.addData("LSlide power", robot.leftSlide.getPower());
-        telemetry.addData("RSlide power", robot.rightSlide.getPower());
-
-        // telemetry.addData("Debug int", robot.debugInt);
-        telemetry.addData("Debug double", robot.debugDouble);
-        telemetry.addData("Counter", robot.counter);
 
         telemetry.addData("Claw state", robot.pinch ? "closed" : "open");
 

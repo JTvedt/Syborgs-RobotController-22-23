@@ -48,34 +48,32 @@ public class Sybot {
     public static double OPEN_CLAW = 0.0;
     public static double CLOSE_CLAW = 0.3;
 
-    public LinearOpMode parent;
-    public HardwareMap hardwareMap;
-    public Telemetry telemetry;
+    private final LinearOpMode parent;
+    private final HardwareMap hardwareMap;
+    private final Telemetry telemetry;
 
-    public ArrayList<DcMotor> wheelList;
-    public DcMotor frontLeft;
-    public DcMotor frontRight;
-    public DcMotor backLeft;
-    public DcMotor backRight;
+    private final ArrayList<DcMotor> wheelList;
+    private final DcMotor frontLeft;
+    private final DcMotor frontRight;
+    private final DcMotor backLeft;
+    private final DcMotor backRight;
 
-    public DcMotor leftSlide;
-    public DcMotor rightSlide;
+    private final DcMotor leftSlide;
+    private final DcMotor rightSlide;
 
-    public Servo leftClaw;
-    public Servo rightClaw;
+    private final Servo leftClaw;
+    private final Servo rightClaw;
 
-    public DriveType driveType = DriveType.POV;
-    public DistanceUnit driveUnit = DistanceUnit.INCHES;
-    public BNO055IMU imu;
-    public double zeroAngle = 0;
+    private final BNO055IMU imu;
+
+    private DriveType driveType = DriveType.POV;
+    private DistanceUnit driveUnit = DistanceUnit.INCHES;
+    private double zeroAngle = 0;
+    private boolean enableThreads = true;
     public boolean pinch = false; // true for gripped
     public boolean manualSlides = false;
     public boolean slideRelease = false;
     public boolean mirrorStrafe = false;
-    public boolean enableThreads = true;
-    public double debugDouble = 0;
-    public int debugInt = 0;
-    public int counter;
     public int parkZone = -1;
 
     public static CvImplementation cvImplementation = CvImplementation.APRIL_TAGS;
@@ -721,7 +719,6 @@ public class Sybot {
 
                 slideMovement += pos - lastPos;
                 ticks++;
-                debugDouble = (double)slideMovement/ticks;
 
                 lastPos = pos;
             }
@@ -756,8 +753,6 @@ public class Sybot {
                 if (slideTarget() != target || !enableThreads || !slideRelease) {
                     return;
                 }
-                debugDouble = Math.abs(slidePosition() - target);
-                debugInt = target;
             }
 
             moveSlides(0.0);
