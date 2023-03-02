@@ -44,9 +44,12 @@ public class Sybot {
     public static final int WAIT_TIME = 400;
     public static final int TICK_THRESHOLD = 300;
     public static final int SLIDE_THRESHOLD = -1120;
-    public static final int SLIDE_HIGH_TICKS = -4340;
-    public static double OPEN_CLAW = 0.0;
-    public static double CLOSE_CLAW = 0.3;
+    public static final int SLIDE_HIGH_TICKS = -4450;
+    public static final int CLAW_TIME = 710;
+    public static double LEFT_OPEN = 1.0;
+    public static double LEFT_CLOSE = 0.7;
+    public static double RIGHT_OPEN = 0.0;
+    public static double RIGHT_CLOSE = 0.3;
 
     private final LinearOpMode parent;
     private final HardwareMap hardwareMap;
@@ -58,8 +61,8 @@ public class Sybot {
     private final DcMotor backLeft;
     private final DcMotor backRight;
 
-    private final DcMotor leftSlide;
-    private final DcMotor rightSlide;
+    public final DcMotor leftSlide;
+    public final DcMotor rightSlide;
 
     private final Servo leftClaw;
     private final Servo rightClaw;
@@ -69,12 +72,13 @@ public class Sybot {
     private DriveType driveType = DriveType.POV;
     private DistanceUnit driveUnit = DistanceUnit.INCHES;
     private double zeroAngle = 0;
-    private boolean enableThreads = true;
+    public boolean enableThreads = true;
     public boolean pinch = false; // true for gripped
     public boolean manualSlides = false;
     public boolean slideRelease = false;
     public boolean mirrorStrafe = false;
     public int parkZone = -1;
+    public int slideDelta = 0;
 
     public static CvImplementation cvImplementation = CvImplementation.APRIL_TAGS;
     public OpenCvCamera camera;
@@ -652,7 +656,7 @@ public class Sybot {
     }
 
     public double smoothAngle() {
-        return smoothAngle(Angle.round(getAngle(), 8));
+        return smoothAngle(Angle.round(getAngle(), 4));
     }
 
     /**
@@ -694,6 +698,9 @@ public class Sybot {
             leftSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
             rightSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
+            leftSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            rightSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
             leftSlide.setPower(0);
             rightSlide.setPower(0);
 
@@ -712,6 +719,7 @@ public class Sybot {
                 else if (slidePosition() < -2000) continue;
 
                 int pos = slidePosition();
+                slideDelta = pos - lastPos;
                 if (pos - lastPos < 25) stuckTicks++;
                 else stuckTicks = 0;
 
@@ -793,7 +801,7 @@ public class Sybot {
         @Override
         public void run() {
             setClaw(state);
-            rest(600);
+            rest(CLAW_TIME);
             if (state) setSlides(SLIDE_HIGH_TICKS);
             else dropSlides();
         }
@@ -865,7 +873,7 @@ public class Sybot {
      * @param state new state of claw to be in, true for closed, false for open
      */
     public void setClaw(boolean state) {
-        setClaw(state ? CLOSE_CLAW : OPEN_CLAW);
+        setClaw(state ? LEFT_CLOSE : LEFT_OPEN, state ? RIGHT_CLOSE : RIGHT_OPEN);
     }
 
     /**
@@ -873,8 +881,12 @@ public class Sybot {
      * @param pinch value at which the claws should close, 0.0 represents a fully open claw
      */
     public void setClaw(double pinch) {
-        this.pinch = pinch > 0;
-        leftClaw.setPosition(1 - pinch);
-        rightClaw.setPosition(pinch);
+        setClaw(1 - pinch, pinch);
+    }
+
+    public void setClaw(double leftPinch, double rightPinch) {
+        leftClaw.setPosition(leftPinch);
+        rightClaw.setPosition(rightPinch);
+        pinch = leftPinch < LEFT_OPEN && rightPinch > RIGHT_OPEN;
     }
 }

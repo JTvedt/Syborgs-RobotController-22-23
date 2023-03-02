@@ -86,9 +86,9 @@ public class CoTeleOp extends LinearOpMode implements Structured {
         if (controller.press(2, "A"))
             robot.toggleClaw();
         if (controller.press(2, "LB"))
-            Sybot.CLOSE_CLAW -= 0.02;
+            Sybot.RIGHT_CLOSE -= 0.02;
         if (controller.press(2, "RB"))
-            Sybot.CLOSE_CLAW += 0.02;
+            Sybot.RIGHT_CLOSE += 0.02;
     }
 
     @Override

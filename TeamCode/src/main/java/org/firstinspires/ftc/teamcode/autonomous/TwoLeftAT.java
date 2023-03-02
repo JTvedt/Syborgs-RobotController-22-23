@@ -34,9 +34,6 @@ public class TwoLeftAT extends LinearOpMode{
         sleep(300);
         robot.setSlides(Sybot.SLIDE_HIGH_TICKS);
 
-
-
-
         // Exit and move to cone stack
         robot.cartesianMove(-7.8, -8.8);
         robot.setSlides(-1000);
@@ -58,10 +55,10 @@ public class TwoLeftAT extends LinearOpMode{
         // DO NOT TOUCH ANYTHING ABOVE THIS
         // WE SPENT WAY TOO LONG ON IT AND DO NOT WANT TO FIX IT AGAIN
 
-        //Moves back to high junc tion
+        //Moves back to high junction
         robot.strafe(25 );
         robot.spin(-132);
-        robot.cartesianMove(8,8.8  );
+        robot.cartesianMove(8, 8.8);
 
         //Places cone on the junction
         robot.setSlides(-4130);

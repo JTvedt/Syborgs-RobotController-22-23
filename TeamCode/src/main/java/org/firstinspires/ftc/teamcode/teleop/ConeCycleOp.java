@@ -39,7 +39,7 @@ public class ConeCycleOp extends LinearOpMode implements Structured {
 
         double stickAngle = Math.atan2(drive, strafe);
         double magnitude = Math.hypot(drive, strafe);
-        double multiplier = 0.6 * (gamepad1.x ? 1.4 : 1) * (gamepad1.right_trigger > 0.5 ? 0.35 : 1);
+        double multiplier = 0.65 * (gamepad1.x ? 1.4 : 1) * (gamepad1.right_trigger > 0.5 ? 0.35 : 1);
 
         if (controller.press("LB"))
             rigidMove = !rigidMove;
@@ -71,30 +71,28 @@ public class ConeCycleOp extends LinearOpMode implements Structured {
         if (gamepad1.x)
             robot.moveSlides(gamepad1.left_trigger/2 + .5);
         if (gamepad1.y)
-            robot.moveSlides(-gamepad1.left_trigger/2 + .5);
+            robot.moveSlides(-gamepad1.left_trigger/2 - .5);
     }
 
     @Override
     public void clawSubsystem() {
         if (controller.press("A"))
             robot.toggleClaw();
-//        if (controller.press("B"))
-            //robot.pinchSlide();
+        if (controller.press("B"))
+            robot.pinchSlide();
     }
 
     @Override
     public void telemetryConsole() {
         String settings = "";
-        if (smoothAngle)    settings += "smooth_angle ";
-        if (rigidMove)      settings += "rigid_move ";
+        if (smoothAngle)        settings += "smooth_angle ";
+        if (rigidMove)          settings += "rigid_move ";
+        if (robot.manualSlides) settings += "manual_slides ";
         telemetry.addData("Settings", settings);
 
-        telemetry.addData("Smooth Angle", robot.smoothAngle());
-        telemetry.addData("Angle Diff", robot.getAngleDifference(Angle.round(robot.getAngle())));
-        telemetry.addData("Rounded Angle", Angle.round(robot.getAngle()));
-
-        telemetry.addData("Stick", gamepad1.left_stick_y);
-
+        telemetry.addData("Slide position", robot.slidePosition());
+        telemetry.addData("Slide delta", robot.slideDelta);
+        telemetry.addData("Claw state", robot.pinch ? "CLOSE" : "OPEN");
 
         telemetry.update();
     }
