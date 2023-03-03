@@ -1,32 +1,33 @@
-package org.firstinspires.ftc.teamcode.autonomous;
+package org.firstinspires.ftc.teamcode.deprecated;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.util.Sybot;
 
 /**
- * Places one cone on the high junction and parks. Starting position on the left side
+ * Places one cone on the high junction and parks. Starting position on the right side
  * @author Jeffrey Tvedt
  */
-@Autonomous(name="1C Left Autonomous AT")
-public class SingleLeftAT extends LinearOpMode {
+@Deprecated
+@Disabled
+@Autonomous(name="1C Right Autonomous EOV")
+public class SingleRightEOV extends LinearOpMode {
     public Sybot robot;
 
     @Override
     public void runOpMode() {
-        Sybot.setImplementation(Sybot.CvImplementation.APRIL_TAGS);
-        robot = new Sybot(this, Sybot.OpModeType.AUTONOMOUS, Sybot.StartSide.LEFT);
-        robot.mirrorStrafe = true;
+        Sybot.setImplementation(Sybot.CvImplementation.EASYOPENCV);
+        robot = new Sybot(this, Sybot.OpModeType.AUTONOMOUS, Sybot.StartSide.RIGHT);
 
         robot.setClaw(true);
         int parkZone = robot.retrieveZone();
 
         // Autonomous processes go here
-        // Everything in this section is mirrored
         robot.setSlides(-4130);
         robot.drive(56);
-        robot.strafe(-13);
+        robot.strafe(-12);
         robot.waitForSlides();
         robot.drive(3);
         robot.setSlides(0);
@@ -45,7 +46,7 @@ public class SingleLeftAT extends LinearOpMode {
     // 0 for red, 1 for green, 2 for blue
     public void park(int parkingSpot) {
         robot.mirrorStrafe = false;
-        if (parkingSpot == 9) robot.strafe(-26);
-        else if (parkingSpot == 11) robot.strafe(26);
+        if (parkingSpot == 0) robot.strafe(-26);
+        else if (parkingSpot == 2) robot.strafe(26);
     }
 }

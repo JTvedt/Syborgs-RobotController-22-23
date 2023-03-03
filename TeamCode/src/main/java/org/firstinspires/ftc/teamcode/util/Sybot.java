@@ -706,8 +706,6 @@ public class Sybot {
 
             int lastPos = slidePosition();
             int stuckTicks = 0;
-            int slideMovement = 0;
-            int ticks = 0;
             while (true) {
                 if (!enableThreads || slideTarget() != 0) {
                     leftSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -715,18 +713,13 @@ public class Sybot {
                     return;
                 }
 
-                if (slidePosition() > SLIDE_THRESHOLD) break;
-                else if (slidePosition() < -2000) continue;
-
                 int pos = slidePosition();
                 slideDelta = pos - lastPos;
-                if (pos - lastPos < 25) stuckTicks++;
+
+                if (slidePosition() > SLIDE_THRESHOLD) break;
+                if (slideDelta < 25 && pos > -2500 || slideDelta < 5) stuckTicks++;
                 else stuckTicks = 0;
-
                 if (stuckTicks >= 3) break;
-
-                slideMovement += pos - lastPos;
-                ticks++;
 
                 lastPos = pos;
             }
