@@ -68,6 +68,9 @@ public class ConeCycleOp extends LinearOpMode implements Structured {
         if (controller.press("DD"))
             robot.dropSlides();
 
+        if (controller.press("RS"))
+            robot.resetSlides();
+
         if (robot.manualSlides)
             robot.moveSlides(0);
         if (gamepad1.x)

@@ -10,7 +10,7 @@ public class Angle {
         return degrees * Math.PI/180;
     }
 
-    public static double degrees(double radians) {
+    public static double toDegrees(double radians) {
         return radians * 180/Math.PI;
     }
 

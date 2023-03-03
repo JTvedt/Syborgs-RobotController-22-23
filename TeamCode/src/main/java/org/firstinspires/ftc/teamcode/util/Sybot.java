@@ -44,12 +44,13 @@ public class Sybot {
     public static final int WAIT_TIME = 400;
     public static final int TICK_THRESHOLD = 300;
     public static final int SLIDE_THRESHOLD = -1120;
-    public static final int SLIDE_HIGH_TICKS = -4450;
+    public static final int SLIDE_HIGH_TICKS = -4500;
     public static final int CLAW_TIME = 710;
-    public static double LEFT_OPEN = 1.0;
-    public static double LEFT_CLOSE = 0.7;
+
+    public static double LEFT_OPEN = 0.66;
+    public static double LEFT_CLOSE = 0.48;
     public static double RIGHT_OPEN = 0.0;
-    public static double RIGHT_CLOSE = 0.3;
+    public static double RIGHT_CLOSE = 0.18;
 
     private final LinearOpMode parent;
     private final HardwareMap hardwareMap;
@@ -502,7 +503,7 @@ public class Sybot {
      * @param y The amount the robot should move forward
      */
     public void cartesianMove(double x, double y) {
-        polarMove(Math.hypot(y, x), Angle.degrees(Math.atan2(y, x)));
+        polarMove(Math.hypot(y, x), Angle.toDegrees(Math.atan2(y, x)));
     }
 
     /**
@@ -511,7 +512,7 @@ public class Sybot {
      * @param newAngle The new angle to spin to relative to old angle
      */
     public void spinTo(double newAngle) {
-        spin(getAngleDifference(newAngle));
+        spin(Angle.toDegrees(getAngleDifference(Angle.toRadians(newAngle))));
     }
 
     /**
@@ -736,7 +737,8 @@ public class Sybot {
      * Drops the slides to ground level
      */
     public void dropSlides() {
-        new Thread(new DropSlides()).start();
+        setSlides(0); // temporary
+//        new Thread(new DropSlides()).start();
     }
 
     /**

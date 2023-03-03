@@ -14,13 +14,15 @@ public class Controller {
     static final String[] buttonKeys = {
             "A", "B", "X", "Y",
             "DU", "DD", "DL", "DR",
-            "LB", "RB"
+            "LB", "RB", "LS", "RS"
     };
 
     static final String[] buttonList = {
             "a", "b", "x", "y",
-            "dpad_up", "dpad_down", "dpad_left", "dpad_right",
-            "left_bumper", "right_bumper"
+            "dpad_up", "dpad_down",
+            "dpad_left", "dpad_right",
+            "left_bumper", "right_bumper",
+            "left stick button", "right stick button"
     };
 
     boolean singleplayer = false;
