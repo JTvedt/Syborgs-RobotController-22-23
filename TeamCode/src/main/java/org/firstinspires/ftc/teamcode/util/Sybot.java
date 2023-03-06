@@ -41,7 +41,7 @@ public class Sybot {
     public static final double SLIDE_SPEED_UP = 0.7;
     public static final double SLIDE_SPEED_DOWN = 0.4;
 
-    public static final int WAIT_TIME = 400;
+    public static final int WAIT_TIME = 200;
     public static final int TICK_THRESHOLD = 300;
     public static final int SLIDE_THRESHOLD = -1120;
     public static final int SLIDE_HIGH_TICKS = -800;
@@ -512,7 +512,20 @@ public class Sybot {
      * @param newAngle The new angle to spin to relative to old angle
      */
     public void spinTo(double newAngle) {
-        spin(Angle.toDegrees(getAngleDifference(Angle.toRadians(newAngle))));
+        double radAngle = Angle.toRadians(newAngle);
+        double direction = Math.signum(getAngleDifference(radAngle));
+
+        while (Math.abs(getAngleDifference(radAngle)) > Math.PI/72) {
+            telemetry.addData("Target", radAngle);
+            telemetry.addData("Power", smoothAngle(radAngle));
+            telemetry.update();
+            frontLeft.setPower(-direction * smoothAngle(radAngle));
+            frontRight.setPower(direction * smoothAngle(radAngle));
+            backLeft.setPower(-direction * smoothAngle(radAngle));
+            backRight.setPower(direction * smoothAngle(radAngle));
+        }
+
+        rest();
     }
 
     /**
@@ -646,8 +659,8 @@ public class Sybot {
     }
 
     public double smoothAngle(double angle) {
-        final double[] thresholds = {72d, 36d, 18d, 9d, .5d};
-        final double[] coefficients = {0, 0.05, 0.1, 0.2, 0.4};
+        final double[] thresholds = {144d, 72d, 36d, 18d, 9d, .5d};
+        final double[] coefficients = {0, 0.025, 0.05, 0.1, 0.2, 0.4};
 
         double angleDiff = getAngleDifference(angle);
         for (int i = 0; i < thresholds.length; i++) {
@@ -735,7 +748,9 @@ public class Sybot {
 
     /**
      * Drops the slides to ground level
+     * THIS IS DEPRECATED USE setSlides(0) INSTEAD
      */
+    @Deprecated
     public void dropSlides() {
         setSlides(0); // temporary
 //        new Thread(new DropSlides()).start();

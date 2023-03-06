@@ -39,7 +39,7 @@ public class ConeCycleOp extends LinearOpMode implements Structured {
 
         double stickAngle = Math.atan2(drive, strafe);
         double magnitude = Math.hypot(drive, strafe);
-        double multiplier = 0.65 * (gamepad1.x ? 1.4 : 1) * (gamepad1.right_trigger > 0.5 ? 0.35 : 1);
+        double multiplier = 0.8 * (gamepad1.x ? 1.25 : 1) * (gamepad1.right_trigger > 0.5 ? 0.35 : 1);
 
         if (controller.press("LB"))
             rigidMove = !rigidMove;
@@ -64,9 +64,9 @@ public class ConeCycleOp extends LinearOpMode implements Structured {
         if (controller.press("DU"))
             robot.setSlides(Sybot.SLIDE_HIGH_TICKS);
         if (controller.press("DR"))
-            robot.setSlides(-400);
+            robot.setSlides(-500);
         if (controller.press("DD"))
-            robot.dropSlides();
+            robot.setSlides(0);
 
         if (controller.press("RS"))
             robot.resetSlides();
@@ -74,9 +74,9 @@ public class ConeCycleOp extends LinearOpMode implements Structured {
         if (robot.manualSlides)
             robot.moveSlides(0);
         if (gamepad1.x)
-            robot.setSlides(robot.slideTarget() + 50);
+            robot.setSlides(robot.slideTarget() + 20);
         if (gamepad1.y)
-            robot.setSlides(robot.slideTarget() - 50);
+            robot.setSlides(robot.slideTarget() - 20);
     }
 
     @Override

@@ -6,8 +6,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.util.DistanceUnit;
 import org.firstinspires.ftc.teamcode.util.Sybot;
 
-@Autonomous(name="Scrim Auton (L)")
-public class ScrimAuton extends LinearOpMode {
+@Autonomous(name="Reg Auton (R)")
+public class RegAuton extends LinearOpMode {
     public Sybot robot;
 
     @Override
@@ -21,22 +21,22 @@ public class ScrimAuton extends LinearOpMode {
 
         // Move to first junction
         robot.drive(2.3);
-        robot.spinTo(-45);
-        robot.cartesianMove(.25, .25);
+        robot.spinTo(45);
+        robot.cartesianMove(-.25, .25);
         robot.waitForSlides();
 
         // Place and retreat
-        robot.setSlides(-4300);
+        robot.setSlides(-760);
         sleep(400);
         robot.setClaw(false);
         robot.setSlides(Sybot.SLIDE_HIGH_TICKS);
-        robot.cartesianMove(-.25, -.25);
-        robot.dropSlides();
+        robot.cartesianMove(.25, -.25);
+        robot.setSlides(0);
 
         // Move to stack
-        robot.spinTo(90);
-        robot.strafe(-1.2);
-        robot.setSlides(-800);
+        robot.spinTo(-90);
+        robot.strafe(1.2);
+        robot.setSlides(-160);
 
         // Pick from stack
         robot.setClaw(true);

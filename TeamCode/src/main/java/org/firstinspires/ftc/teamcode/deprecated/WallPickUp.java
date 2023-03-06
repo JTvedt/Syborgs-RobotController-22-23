@@ -1,6 +1,7 @@
-package org.firstinspires.ftc.teamcode.autonomous;
+package org.firstinspires.ftc.teamcode.deprecated;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.util.DistanceUnit;
@@ -10,6 +11,8 @@ import org.firstinspires.ftc.teamcode.util.Sybot;
  * In case slides aren't working this is a parking only auton using april tags
  * @author Tyler Philip & Jeffrey Tvedt
  */
+@Disabled
+@Deprecated
 @Autonomous(name="Wall Pickup")
 public class WallPickUp extends LinearOpMode{
     public Sybot robot;
