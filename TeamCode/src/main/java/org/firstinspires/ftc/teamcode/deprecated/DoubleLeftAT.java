@@ -4,8 +4,6 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.checkerframework.framework.qual.DefaultInUncheckedCodeFor;
-import org.firstinspires.ftc.teamcode.util.DistanceUnit;
 import org.firstinspires.ftc.teamcode.util.Sybot;
 /**
  * In case slides aren't working this is a parking only auton using april tags
@@ -74,7 +72,7 @@ public class DoubleLeftAT extends LinearOpMode {
 
     // 0 for red, 1 for green, 2 for blue
     public void park(int parkingSpot) {
-        robot.mirrorStrafe = false;
+        robot.mirrorDirection = false;
         if (parkingSpot == 9) robot.strafe(-26);
         else if (parkingSpot == 11) robot.strafe(26);
     }

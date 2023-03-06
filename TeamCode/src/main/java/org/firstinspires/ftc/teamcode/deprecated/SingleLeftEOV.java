@@ -20,7 +20,7 @@ public class SingleLeftEOV extends LinearOpMode {
     public void runOpMode() {
         Sybot.setImplementation(Sybot.CvImplementation.EASYOPENCV);
         robot = new Sybot(this, Sybot.OpModeType.AUTONOMOUS, Sybot.StartSide.LEFT);
-        robot.mirrorStrafe = true;
+        robot.mirrorDirection = true;
 
         robot.setClaw(true);
         int parkZone = robot.retrieveZone();
@@ -47,7 +47,7 @@ public class SingleLeftEOV extends LinearOpMode {
 
     // 0 for red, 1 for green, 2 for blue
     public void park(int parkingSpot) {
-        robot.mirrorStrafe = false;
+        robot.mirrorDirection = false;
         if (parkingSpot == 0) robot.strafe(-26);
         else if (parkingSpot == 2) robot.strafe(26);
     }

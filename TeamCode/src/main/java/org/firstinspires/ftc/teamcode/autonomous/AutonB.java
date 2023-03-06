@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.util.DistanceUnit;
 import org.firstinspires.ftc.teamcode.util.Sybot;
 import org.firstinspires.ftc.teamcode.cv.EasyOpenCvPipeline;
 import org.openftc.easyopencv.OpenCvCamera;
@@ -16,11 +17,10 @@ public class AutonB extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        robot = new Sybot(this, Sybot.OpModeType.AUTONOMOUS, Sybot.StartSide.LEFT);
+        robot = new Sybot(this, Sybot.OpModeType.AUTONOMOUS);
+        robot.setDriveUnit(DistanceUnit.TILES);
 
-        robot.setSlides(-400);
-        robot.waitForSlides();
-        robot.setSlides(0);
-        robot.waitForSlides();
+        robot.drive(2.3);
+        robot.spinTo(-90);
     }
 }

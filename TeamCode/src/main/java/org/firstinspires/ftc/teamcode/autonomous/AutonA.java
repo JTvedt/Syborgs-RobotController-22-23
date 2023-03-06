@@ -16,15 +16,15 @@ public class AutonA extends LinearOpMode {
 
         robot.spinTo(-45);
         robot.spinTo(90);
-        telemetry.addData("Angle", robot.getAngle());
+//        telemetry.addData("Angle", robot.getAngle());
         sleep(400);
         robot.spinTo(-130);
         robot.spinTo(90);
-        telemetry.addData("Angle", robot.getAngle());
+//        telemetry.addData("Angle", robot.getAngle());
         sleep(400);
         robot.spinTo(-90);
         robot.spinTo(90);
-        telemetry.addData("Angle", robot.getAngle());
+//        telemetry.addData("Angle", robot.getAngle());
         telemetry.update();
         sleep(400);
         sleep(200000);

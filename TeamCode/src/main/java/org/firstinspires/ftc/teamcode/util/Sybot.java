@@ -77,7 +77,7 @@ public class Sybot {
     public boolean pinch = false; // true for gripped
     public boolean manualSlides = false;
     public boolean slideRelease = false;
-    public boolean mirrorStrafe = false;
+    public boolean mirrorDirection = false;
     public int parkZone = -1;
     public int slideDelta = 0;
 
@@ -384,7 +384,7 @@ public class Sybot {
      */
     public void polarMove(double distance, double direction) {
         double radianDirection = Angle.toRadians(direction) - (driveType == DriveType.POV ? getAngle() : 0);
-        double horizontal = Math.cos(radianDirection) * (mirrorStrafe ? -1 : 1);
+        double horizontal = Math.cos(radianDirection) * (mirrorDirection ? -1 : 1);
         double vertical = Math.sin(radianDirection) * 0.87;
         int tickCount = toTicks(distance);
 
@@ -513,19 +513,29 @@ public class Sybot {
      */
     public void spinTo(double newAngle) {
         double radAngle = Angle.toRadians(newAngle);
-        double direction = Math.signum(getAngleDifference(radAngle));
+        setDriveMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        while (Math.abs(getAngleDifference(radAngle)) > Math.PI/72) {
+        while (Math.abs(getAngle() - radAngle) > Math.PI/270) {
+            double power = smoothAngle(radAngle) * 1.5;
+            if (Math.abs(power) < 0.175)
+                power = Math.signum(power) * 0.175;
+
+            frontLeft.setPower(-power);
+            frontRight.setPower(power);
+            backLeft.setPower(-power);
+            backRight.setPower(power);
+
             telemetry.addData("Target", radAngle);
-            telemetry.addData("Power", smoothAngle(radAngle));
+            telemetry.addData("Angle", getAngle());
+            telemetry.addData("Difference", Math.abs(getAngleDifference(radAngle)));
+            telemetry.addData("Power", power);
             telemetry.update();
-            frontLeft.setPower(-direction * smoothAngle(radAngle));
-            frontRight.setPower(direction * smoothAngle(radAngle));
-            backLeft.setPower(-direction * smoothAngle(radAngle));
-            backRight.setPower(direction * smoothAngle(radAngle));
         }
+        telemetry.addLine("Target Reached");
+        telemetry.update();
 
-        rest();
+        stopMovement();
+        rest(300);
     }
 
     /**
@@ -664,7 +674,8 @@ public class Sybot {
 
         double angleDiff = getAngleDifference(angle);
         for (int i = 0; i < thresholds.length; i++) {
-            if (Math.abs(angleDiff) < Math.PI/thresholds[i]) return coefficients[i] * Math.signum(angleDiff);
+            if (Math.abs(angleDiff) < Math.PI/thresholds[i])
+                return coefficients[i] * Math.signum(angleDiff);
         }
         return 0;
     }

@@ -19,6 +19,7 @@ public class TwoLeftAT extends LinearOpMode{
         Sybot.setImplementation(Sybot.CvImplementation.APRIL_TAGS);
         robot = new Sybot(this, Sybot.OpModeType.AUTONOMOUS);
         robot.setDriveUnit(DistanceUnit.INCHES);
+        robot.retrieveZone();
         robot.setClaw(true);
         sleep(670);
         robot.setSlides(Sybot.SLIDE_HIGH_TICKS);
