@@ -45,6 +45,8 @@ public class ConeCycleOp extends LinearOpMode implements Structured {
             rigidMove = !rigidMove;
         if (controller.press("RB"))
             smoothAngle = !smoothAngle;
+        if (controller.press("LS"))
+            robot.resetAngle();
 
         if (rigidMove)
             stickAngle = Math.round(stickAngle * 2/Math.PI) * Math.PI/2;
@@ -61,8 +63,6 @@ public class ConeCycleOp extends LinearOpMode implements Structured {
     public void slideSubsystem() {
         if (controller.press("DU"))
             robot.setSlides(Sybot.SLIDE_HIGH_TICKS);
-        if (controller.press("DL"))
-            robot.setSlides(0);
         if (controller.press("DR"))
             robot.setSlides(-2000);
         if (controller.press("DD"))
@@ -74,9 +74,9 @@ public class ConeCycleOp extends LinearOpMode implements Structured {
         if (robot.manualSlides)
             robot.moveSlides(0);
         if (gamepad1.x)
-            robot.moveSlides(gamepad1.left_trigger/4 + .75);
+            robot.moveSlides(gamepad1.left_trigger/3 + .66);
         if (gamepad1.y)
-            robot.moveSlides(-gamepad1.left_trigger/4 - .75);
+            robot.moveSlides(-gamepad1.left_trigger/3 - .66);
     }
 
     @Override
