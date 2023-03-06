@@ -64,7 +64,7 @@ public class ConeCycleOp extends LinearOpMode implements Structured {
         if (controller.press("DU"))
             robot.setSlides(Sybot.SLIDE_HIGH_TICKS);
         if (controller.press("DR"))
-            robot.setSlides(-2000);
+            robot.setSlides(-400);
         if (controller.press("DD"))
             robot.dropSlides();
 
@@ -74,9 +74,9 @@ public class ConeCycleOp extends LinearOpMode implements Structured {
         if (robot.manualSlides)
             robot.moveSlides(0);
         if (gamepad1.x)
-            robot.moveSlides(gamepad1.left_trigger/3 + .66);
+            robot.setSlides(robot.slideTarget() + 50);
         if (gamepad1.y)
-            robot.moveSlides(-gamepad1.left_trigger/3 - .66);
+            robot.setSlides(robot.slideTarget() - 50);
     }
 
     @Override
@@ -95,9 +95,10 @@ public class ConeCycleOp extends LinearOpMode implements Structured {
         if (robot.manualSlides) settings += "manual_slides ";
         telemetry.addData("Settings", settings);
 
-        telemetry.addData("Slide position", robot.slidePosition());
-        telemetry.addData("Slide delta", robot.slideDelta);
-        telemetry.addData("Claw state", robot.pinch ? "CLOSE" : "OPEN");
+        telemetry.addData("Robot Angle", robot.getAngle());
+        telemetry.addData("Slide Position", robot.slidePosition());
+        telemetry.addData("Slide Delta", robot.slideDelta);
+        telemetry.addData("Claw State", robot.pinch ? "CLOSE" : "OPEN");
 
         telemetry.update();
     }

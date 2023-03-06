@@ -39,7 +39,7 @@ public class Sybot {
     public static final double TICKS_PER_CM = TICKS_PER_INCH * 2.54;
 
     public static final double SLIDE_SPEED_UP = 0.7;
-    public static final double SLIDE_SPEED_DOWN = 0.2;
+    public static final double SLIDE_SPEED_DOWN = 0.4;
 
     public static final int WAIT_TIME = 400;
     public static final int TICK_THRESHOLD = 300;
