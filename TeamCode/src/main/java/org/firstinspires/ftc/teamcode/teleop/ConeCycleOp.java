@@ -96,7 +96,9 @@ public class ConeCycleOp extends LinearOpMode implements Structured {
         telemetry.addData("Settings", settings);
 
         telemetry.addData("Robot Angle", robot.getAngle());
-        telemetry.addData("Slide Position", robot.slidePosition());
+        telemetry.addData("Left Slide", robot.leftSlide.getCurrentPosition());
+        telemetry.addData("Right Slide", robot.rightSlide.getCurrentPosition());
+        telemetry.addData("Slide Target", robot.slideTarget());
         telemetry.addData("Slide Delta", robot.slideDelta);
         telemetry.addData("Claw State", robot.pinch ? "CLOSE" : "OPEN");
 

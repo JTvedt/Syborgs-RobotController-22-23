@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -31,17 +32,17 @@ import java.util.ArrayList;
 public class Sybot {
     public final ElapsedTime runtime = new ElapsedTime();
 
-    public static final double BASE_POWER = 0.35;
+    public static final double BASE_POWER = 0.43;
     public static final double PULSES_PER_REVOLUTION = 537.7;
     public static final double WHEEL_CIRCUMFERENCE = 15.76;
     public static final double TICKS_PER_INCH = PULSES_PER_REVOLUTION / WHEEL_CIRCUMFERENCE;
     public static final double TICKS_PER_TILE = TICKS_PER_INCH * 24;
     public static final double TICKS_PER_CM = TICKS_PER_INCH * 2.54;
 
-    public static final double SLIDE_SPEED_UP = 0.7;
-    public static final double SLIDE_SPEED_DOWN = 0.4;
+    public static final double SLIDE_SPEED_UP = 0.8;
+    public static final double SLIDE_SPEED_DOWN = 0.47;
 
-    public static final int WAIT_TIME = 200;
+    public static final int WAIT_TIME = 220;
     public static final int TICK_THRESHOLD = 300;
     public static final int SLIDE_THRESHOLD = -1120;
     public static final int SLIDE_HIGH_TICKS = -800;
@@ -73,6 +74,7 @@ public class Sybot {
     private DriveType driveType = DriveType.POV;
     private DistanceUnit driveUnit = DistanceUnit.INCHES;
     private double zeroAngle = 0;
+    private double targetAngle = 0;
     public boolean enableThreads = true;
     public boolean pinch = false; // true for gripped
     public boolean manualSlides = false;
@@ -138,8 +140,11 @@ public class Sybot {
         leftSlide = hardwareMap.get(DcMotor.class, "LS");
         rightSlide = hardwareMap.get(DcMotor.class, "RS");
 
-        leftSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        leftSlide.setTargetPosition(0);
+        rightSlide.setTargetPosition(0);
 
         leftSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -398,13 +403,31 @@ public class Sybot {
         setDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
         setDrivePower(BASE_POWER);
 
+        double power, smooth;
         while (isMoving()) {
             int diff = getMeanDifference();
-            if (diff > TICK_THRESHOLD) setDrivePower(BASE_POWER);
-            else setDrivePower(BASE_POWER - (1 - (double)diff/TICK_THRESHOLD) * 0.25);
+            if (diff > TICK_THRESHOLD) power = BASE_POWER;
+            else power = BASE_POWER - (1 - (double)diff/TICK_THRESHOLD) * 0.25;
+
+            smooth = smoothAngle(targetAngle);
+
+            // Bad solution, please delete
+            for (DcMotor motor : wheelList)
+                setMotorPower(motor, power, smooth);
+
+            telemetry.addData("Angle Diff", getAngleDifference(targetAngle));
+            telemetry.addData("Smooth", smooth);
+            telemetry.addData("Direction", targetAngle);
+            telemetry.addData("Angle", getAngle());
+            telemetry.update();
         }
 
         rest();
+    }
+
+    public void setMotorPower(DcMotor motor, double power, double smooth) {
+        if (motor == frontRight || motor == backRight) smooth *= -1;
+        motor.setPower(power + (motor.getTargetPosition() > 0 ? -smooth : smooth));
     }
 
 
@@ -430,6 +453,7 @@ public class Sybot {
         }
 
         rest();
+        targetAngle = getAngle();
     }
 
     // TODO finish this method
@@ -439,6 +463,7 @@ public class Sybot {
         double radianAngle = Angle.toRadians(angle);
         double targetAngle = Angle.bound(getAngle() + radianAngle);
         double horizontal = Math.cos(radianDirection);
+
         double vertical = Math.sin(radianDirection) * 0.87;
 
         int driveTicks = (int)(distance * TICKS_PER_INCH);
@@ -512,7 +537,8 @@ public class Sybot {
      * @param newAngle The new angle to spin to relative to old angle
      */
     public void spinTo(double newAngle) {
-        double radAngle = Angle.toRadians(newAngle);
+        double radAngle = Angle.toRadians(newAngle) * (mirrorDirection ? -1 : 1);
+        targetAngle = radAngle;
         setDriveMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         while (Math.abs(getAngle() - radAngle) > Math.PI/270) {
@@ -535,7 +561,7 @@ public class Sybot {
         telemetry.update();
 
         stopMovement();
-        rest(300);
+        rest();
     }
 
     /**
@@ -669,15 +695,7 @@ public class Sybot {
     }
 
     public double smoothAngle(double angle) {
-        final double[] thresholds = {144d, 72d, 36d, 18d, 9d, .5d};
-        final double[] coefficients = {0, 0.025, 0.05, 0.1, 0.2, 0.4};
-
-        double angleDiff = getAngleDifference(angle);
-        for (int i = 0; i < thresholds.length; i++) {
-            if (Math.abs(angleDiff) < Math.PI/thresholds[i])
-                return coefficients[i] * Math.signum(angleDiff);
-        }
-        return 0;
+        return Range.clip(3.6/Math.PI * getAngleDifference(angle), -0.4, 0.4);
     }
 
     public double smoothAngle() {

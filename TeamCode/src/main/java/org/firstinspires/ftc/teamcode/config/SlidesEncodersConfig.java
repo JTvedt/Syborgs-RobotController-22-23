@@ -49,7 +49,8 @@ public class SlidesEncodersConfig extends LinearOpMode {
         y = gamepad1.y;
 
         telemetry.addData("Slide Height", slidesHeight);
-        telemetry.addData("Slide Position", robot.slidePosition());
+        telemetry.addData("Left Slide", robot.leftSlide.getCurrentPosition());
+        telemetry.addData("Right Slide", robot.rightSlide.getCurrentPosition());
         telemetry.update();
     }
 }
