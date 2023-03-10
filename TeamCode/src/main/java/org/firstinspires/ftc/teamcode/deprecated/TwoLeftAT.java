@@ -1,6 +1,7 @@
-package org.firstinspires.ftc.teamcode.autonomous;
+package org.firstinspires.ftc.teamcode.deprecated;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.util.DistanceUnit;
@@ -11,6 +12,8 @@ import org.firstinspires.ftc.teamcode.util.Sybot;
  * @author Jeffrey Tvedt & Alex Malladi & Tyler Philip
  * COMMENTS that start with !!!! are important as they are values that sometimes change in the code based on preformance and small movement fails
  */
+@Deprecated
+@Disabled
 @Autonomous(name="2 Cone Auton AT Turn")
 public class TwoLeftAT extends LinearOpMode{
     public Sybot robot;

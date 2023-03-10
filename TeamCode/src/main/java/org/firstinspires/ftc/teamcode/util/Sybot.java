@@ -32,7 +32,7 @@ import java.util.ArrayList;
 public class Sybot {
     public final ElapsedTime runtime = new ElapsedTime();
 
-    public static final double BASE_POWER = 0.43;
+    public static final double BASE_POWER = 0.5;
     public static final double PULSES_PER_REVOLUTION = 537.7;
     public static final double WHEEL_CIRCUMFERENCE = 15.76;
     public static final double TICKS_PER_INCH = PULSES_PER_REVOLUTION / WHEEL_CIRCUMFERENCE;
@@ -80,6 +80,7 @@ public class Sybot {
     public boolean manualSlides = false;
     public boolean slideRelease = false;
     public boolean mirrorDirection = false;
+    public double slidePower = 1.0;
     public int parkZone = -1;
     public int slideDelta = 0;
 
@@ -389,7 +390,7 @@ public class Sybot {
      */
     public void polarMove(double distance, double direction) {
         double radianDirection = Angle.toRadians(direction) - (driveType == DriveType.POV ? getAngle() : 0);
-        double horizontal = Math.cos(radianDirection) * (mirrorDirection ? -1 : 1);
+        double horizontal = Math.cos(radianDirection);
         double vertical = Math.sin(radianDirection) * 0.87;
         int tickCount = toTicks(distance);
 
@@ -404,12 +405,14 @@ public class Sybot {
         setDrivePower(BASE_POWER);
 
         double power, smooth;
-        while (isMoving()) {
+        while (Math.abs(getRemaining(frontLeft) + getRemaining(backRight))/2 > 16
+                && Math.abs(getRemaining(frontRight) + getRemaining(backLeft))/2 > 16) {
             int diff = getMeanDifference();
             if (diff > TICK_THRESHOLD) power = BASE_POWER;
             else power = BASE_POWER - (1 - (double)diff/TICK_THRESHOLD) * 0.25;
 
-            smooth = smoothAngle(targetAngle);
+            smooth = smoothAngle(targetAngle)/2;
+            smooth = 0;
 
             // Bad solution, please delete
             for (DcMotor motor : wheelList)
@@ -430,6 +433,9 @@ public class Sybot {
         motor.setPower(power + (motor.getTargetPosition() > 0 ? -smooth : smooth));
     }
 
+    public int getRemaining(DcMotor motor) {
+        return motor.getTargetPosition() - motor.getCurrentPosition();
+    }
 
     /**
      * Spins the robot either clockwise or counterclockwise
@@ -542,7 +548,7 @@ public class Sybot {
         setDriveMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         while (Math.abs(getAngle() - radAngle) > Math.PI/270) {
-            double power = smoothAngle(radAngle) * 1.5;
+            double power = smoothAngle(radAngle) * 2;
             if (Math.abs(power) < 0.175)
                 power = Math.signum(power) * 0.175;
 
@@ -691,7 +697,7 @@ public class Sybot {
      * Resets the angle so that the direction the robot currently faces is zero degrees
      */
     public void resetAngle() {
-        zeroAngle = Angle.round(getAngle());
+        zeroAngle = getAngle();
     }
 
     public double smoothAngle(double angle) {
@@ -711,7 +717,7 @@ public class Sybot {
             return;
         }
 
-        double power = height < slideTarget() ? SLIDE_SPEED_UP : SLIDE_SPEED_DOWN;
+        double power = (height < slideTarget() ? SLIDE_SPEED_UP : SLIDE_SPEED_DOWN) * slidePower;
 
         manualSlides = false;
         leftSlide.setTargetPosition(height);

@@ -6,8 +6,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.util.DistanceUnit;
 import org.firstinspires.ftc.teamcode.util.Sybot;
 
-@Autonomous(name="Reg Auton (R)")
-public class RegAuton extends LinearOpMode {
+@Autonomous(name="Regionals Auton (R)")
+public class RegAutonRight extends LinearOpMode {
     public Sybot robot;
 
     @Override
@@ -21,7 +21,7 @@ public class RegAuton extends LinearOpMode {
         robot.setSlides(Sybot.SLIDE_HIGH_TICKS);
 
         // Move to first junction
-        robot.drive(2.35);
+        robot.drive(2.4);
 
         placeCone();
         getCone(-140);
@@ -57,7 +57,7 @@ public class RegAuton extends LinearOpMode {
         // Move to stack
         robot.spinTo(-90);
         robot.setSlides(height);
-        robot.strafe(1.37);
+        robot.strafe(1.38);
 
         // Pick from stack
         robot.waitForSlides();
@@ -67,7 +67,7 @@ public class RegAuton extends LinearOpMode {
         sleep(200);
 
         // Return to tile
-        robot.strafe(-1.21);
+        robot.strafe(-1.38);
     }
 
     void park() {

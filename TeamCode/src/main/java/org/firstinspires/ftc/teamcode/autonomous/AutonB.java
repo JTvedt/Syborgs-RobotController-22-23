@@ -20,7 +20,6 @@ public class AutonB extends LinearOpMode {
         robot = new Sybot(this, Sybot.OpModeType.AUTONOMOUS);
         robot.setDriveUnit(DistanceUnit.TILES);
 
-        robot.drive(2.3);
-        robot.spinTo(-90);
+        robot.polarMove(2, 60);
     }
 }
