@@ -39,7 +39,7 @@ public class ConeCycleOp extends LinearOpMode implements Structured {
 
         double stickAngle = Math.atan2(drive, strafe);
         double magnitude = Math.hypot(drive, strafe);
-        double multiplier = 0.8 * (gamepad1.b ? 1.25 : 1) * (gamepad1.right_trigger > 0.5 ? 0.35 : 1);
+        double multiplier = 0.8 * (gamepad1.right_trigger > 0.5 ? 0.35 : 1);
 
         if (controller.press("LB"))
             rigidMove = !rigidMove;
@@ -90,6 +90,8 @@ public class ConeCycleOp extends LinearOpMode implements Structured {
     public void clawSubsystem() {
         if (controller.press("A"))
             robot.toggleClaw();
+        if (controller.press("B"))
+            robot.pinchSlide();
     }
 
     @Override
@@ -104,7 +106,7 @@ public class ConeCycleOp extends LinearOpMode implements Structured {
         telemetry.addData("Left Slide", robot.leftSlide.getCurrentPosition());
         telemetry.addData("Right Slide", robot.rightSlide.getCurrentPosition());
         telemetry.addData("Slide Target", robot.slideTarget());
-        telemetry.addData("Slide Delta", robot.slideDelta);
+        telemetry.addData("Slide Delta", robot.slideDelta());
         telemetry.addData("Claw State", robot.pinch ? "CLOSE" : "OPEN");
 
         telemetry.update();

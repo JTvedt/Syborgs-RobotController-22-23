@@ -6,8 +6,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.util.DistanceUnit;
 import org.firstinspires.ftc.teamcode.util.Sybot;
 
-@Autonomous(name="Regionals Auton (R)")
-public class RegAutonRight extends LinearOpMode {
+@Autonomous(name="1C Auton (R)")
+public class SingleLeft extends LinearOpMode {
     public Sybot robot;
 
     @Override
@@ -24,21 +24,19 @@ public class RegAutonRight extends LinearOpMode {
         robot.drive(2.3);
 
         placeCone();
-        getCone(-140);
-        placeCone();
 
         robot.spinTo(0);
         robot.setSlides(0);
-        robot.drive(-2);
+        robot.drive(-1);
 
-//        park();
+        park();
         robot.waitForSlides();
     }
 
     void placeCone() {
         // Move to junction
-        robot.spinTo(45);
-        robot.cartesianMove(-.33, .33);
+        robot.spinTo(-45);
+        robot.cartesianMove(.31, .31);
         robot.waitForSlides();
 
         // Place cone
@@ -47,28 +45,14 @@ public class RegAutonRight extends LinearOpMode {
         robot.setClaw(false);
 
         // Retreat
-        robot.cartesianMove(.33, -.33);
+        robot.cartesianMove(-.31, -.33);
         robot.setSlides(0);
     }
 
-    void getCone(int height) {
-        // Move to stack
-        robot.spinTo(-90);
-        robot.setSlides(height);
-        robot.strafe(1.2);
-
-        // Pick from stack
-        robot.waitForSlides();
-        robot.setClaw(true);
-        sleep(400);
-        robot.setSlides(Sybot.SLIDE_HIGH_TICKS);
-        sleep(200);
-
-        // Return to tile
-        robot.strafe(-1.1);
-    }
-
     void park() {
-
+        if (robot.parkZone == 9)
+            robot.strafe(-1);
+        else if (robot.parkZone == 11)
+            robot.strafe(1);
     }
 }

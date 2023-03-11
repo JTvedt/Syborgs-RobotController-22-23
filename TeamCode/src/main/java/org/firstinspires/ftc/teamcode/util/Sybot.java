@@ -32,7 +32,7 @@ import java.util.ArrayList;
 public class Sybot {
     public final ElapsedTime runtime = new ElapsedTime();
 
-    public static final double BASE_POWER = 0.5;
+    public static final double BASE_POWER = 0.35;
     public static final double PULSES_PER_REVOLUTION = 537.7;
     public static final double WHEEL_CIRCUMFERENCE = 15.76;
     public static final double TICKS_PER_INCH = PULSES_PER_REVOLUTION / WHEEL_CIRCUMFERENCE;
@@ -82,7 +82,7 @@ public class Sybot {
     public boolean mirrorDirection = false;
     public double slidePower = 1.0;
     public int parkZone = -1;
-    public int slideDelta = 0;
+    public int lastSlide = 0;
 
     public static CvImplementation cvImplementation = CvImplementation.APRIL_TAGS;
     public OpenCvCamera camera;
@@ -412,7 +412,6 @@ public class Sybot {
             else power = BASE_POWER - (1 - (double)diff/TICK_THRESHOLD) * 0.25;
 
             smooth = smoothAngle(targetAngle)/2;
-            smooth = 0;
 
             // Bad solution, please delete
             for (DcMotor motor : wheelList)
@@ -763,7 +762,7 @@ public class Sybot {
                 }
 
                 int pos = slidePosition();
-                slideDelta = pos - lastPos;
+                int slideDelta = pos - lastPos;
 
                 if (slidePosition() > SLIDE_THRESHOLD) break;
                 if (slideDelta < 25 && pos > -2500 || slideDelta < 5) stuckTicks++;
@@ -789,6 +788,12 @@ public class Sybot {
     public void dropSlides() {
         setSlides(0); // temporary
 //        new Thread(new DropSlides()).start();
+    }
+
+    public int slideDelta() {
+        int buffer = lastSlide;
+        lastSlide = slidePosition();
+        return lastSlide - buffer;
     }
 
     /**
